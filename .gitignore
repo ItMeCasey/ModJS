@@ -1,0 +1,10 @@
+.gradle/
+build/
+run/
+run-data/
+out/
+.idea/
+*.iml
+.vscode/
+logs/
+crash-reports/

@@ -1,0 +1,130 @@
+package com.itmecasey.modjs.registry;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/** Configuration for an item created by {@code StartupEvents.registry('item', ...)}. */
+public final class ItemBuilderJS {
+    private final String id;
+    private String displayName;
+    private int maxStackSize = 64;
+    private String texture;
+    private String parentModel = "minecraft:item/generated";
+    private String tab = "minecraft:ingredients";
+    private String rarity;
+    private boolean glow;
+    private Integer nutrition;
+    private float saturation;
+    private boolean alwaysEdible;
+    private final List<String> tooltips = new ArrayList<>();
+
+    ItemBuilderJS(String id) {
+        this.id = id;
+    }
+
+    public String id() {
+        return id;
+    }
+
+    public String displayName() {
+        return displayName != null ? displayName : RegistryNames.titleCase(id);
+    }
+
+    public int maxStackSize() {
+        return maxStackSize;
+    }
+
+    public String texture() {
+        return texture != null ? texture : RegistryManager.NAMESPACE + ":item/" + id;
+    }
+
+    public String parentModel() {
+        return parentModel;
+    }
+
+    public String tab() {
+        return tab;
+    }
+
+    public String rarity() {
+        return rarity;
+    }
+
+    public boolean glow() {
+        return glow;
+    }
+
+    public Integer nutrition() {
+        return nutrition;
+    }
+
+    public float saturation() {
+        return saturation;
+    }
+
+    public boolean isAlwaysEdible() {
+        return alwaysEdible;
+    }
+
+    public List<String> tooltips() {
+        return tooltips;
+    }
+
+    public ItemBuilderJS displayName(String name) {
+        this.displayName = name;
+        return this;
+    }
+
+    public ItemBuilderJS maxStackSize(int size) {
+        this.maxStackSize = Math.max(1, Math.min(99, size));
+        return this;
+    }
+
+    public ItemBuilderJS unstackable() {
+        return maxStackSize(1);
+    }
+
+    /** Texture id such as {@code "mymod:item/ruby"}; defaults to {@code modjs:item/<id>}. */
+    public ItemBuilderJS texture(String texture) {
+        this.texture = texture;
+        return this;
+    }
+
+    public ItemBuilderJS parentModel(String model) {
+        this.parentModel = model;
+        return this;
+    }
+
+    /** Creative tab id, for example {@code "minecraft:tools_and_utilities"}. */
+    public ItemBuilderJS tab(String tabId) {
+        this.tab = tabId.contains(":") ? tabId : "minecraft:" + tabId;
+        return this;
+    }
+
+    /** One of {@code common}, {@code uncommon}, {@code rare}, {@code epic}. */
+    public ItemBuilderJS rarity(String rarity) {
+        this.rarity = rarity;
+        return this;
+    }
+
+    public ItemBuilderJS glow(boolean glow) {
+        this.glow = glow;
+        return this;
+    }
+
+    public ItemBuilderJS food(int nutrition, double saturation) {
+        this.nutrition = nutrition;
+        this.saturation = (float) saturation;
+        return this;
+    }
+
+    public ItemBuilderJS alwaysEdible() {
+        this.alwaysEdible = true;
+        return this;
+    }
+
+    public ItemBuilderJS tooltip(String line) {
+        tooltips.add(line);
+        return this;
+    }
+}

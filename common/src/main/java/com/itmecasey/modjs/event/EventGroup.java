@@ -1,0 +1,171 @@
+package com.itmecasey.modjs.event;
+
+import com.itmecasey.modjs.script.ModJSContextFactory;
+import com.itmecasey.modjs.script.ScriptManager;
+import com.itmecasey.modjs.script.ScriptType;
+import org.mozilla.javascript.BaseFunction;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+/**
+ * A script-visible namespace of events, such as {@code ServerEvents}. Reading any property yields a function that
+ * registers a handler: {@code ServerEvents.recipes(event => ...)} or, with an id filter,
+ * {@code ServerEvents.tags('item', event => ...)}.
+ */
+public final class EventGroup extends ScriptableObject {
+    private record Handler(ScriptType owner, Function function, Scriptable scope) {
+    }
+
+    private final String name;
+    private final ScriptType allowedType;
+    private final Map<String, List<Handler>> handlers = new HashMap<>();
+    private final Map<String, Registrar> registrars = new HashMap<>();
+
+    public EventGroup(String name, ScriptType allowedType) {
+        this.name = name;
+        this.allowedType = allowedType;
+    }
+
+    @Override
+    public String getClassName() {
+        return "EventGroup";
+    }
+
+    public String groupName() {
+        return name;
+    }
+
+    @Override
+    public boolean has(String property, Scriptable start) {
+        return true;
+    }
+
+    @Override
+    public Object get(String property, Scriptable start) {
+        return registrars.computeIfAbsent(property, Registrar::new);
+    }
+
+    private static String key(String event, String extraId) {
+        return extraId == null ? event : event + ":" + extraId;
+    }
+
+    /** Removes every handler a given script type registered, called before that type's scripts are re-run. */
+    public synchronized void clear(ScriptType owner) {
+        for (List<Handler> list : handlers.values()) {
+            list.removeIf(handler -> handler.owner == owner);
+        }
+    }
+
+    private synchronized void register(ScriptType owner, String event, String extraId, Function function, Scriptable scope) {
+        if (allowedType != null && allowedType != owner) {
+            ScriptManager.of(owner).addError(name + "." + event + " can only be used in " + allowedType.directory);
+            return;
+        }
+        handlers.computeIfAbsent(key(event, extraId), k -> new CopyOnWriteArrayList<>()).add(new Handler(owner, function, scope));
+    }
+
+    public synchronized boolean hasHandlers(String event) {
+        for (Map.Entry<String, List<Handler>> entry : handlers.entrySet()) {
+            String key = entry.getKey();
+            if ((key.equals(event) || key.startsWith(event + ":")) && !entry.getValue().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Ids that handlers registered for {@code event} with an id filter, such as the registries of {@code tags}. */
+    public synchronized java.util.Set<String> extraIds(String event) {
+        java.util.Set<String> ids = new java.util.LinkedHashSet<>();
+        for (Map.Entry<String, List<Handler>> entry : handlers.entrySet()) {
+            if (entry.getKey().startsWith(event + ":") && !entry.getValue().isEmpty()) {
+                ids.add(entry.getKey().substring(event.length() + 1));
+            }
+        }
+        return ids;
+    }
+
+    /** Runs only the handlers registered for exactly {@code event:extraId}. Returns true if cancelled. */
+    public boolean postExact(String event, String extraId, EventJS eventObject) {
+        List<Handler> toRun;
+        synchronized (this) {
+            List<Handler> list = handlers.get(key(event, extraId));
+            toRun = list == null ? List.of() : new ArrayList<>(list);
+        }
+        run(event, toRun, eventObject);
+        return eventObject.isCancelled();
+    }
+
+    /** Posts an event with no id filter. Returns true if a handler cancelled it. */
+    public boolean post(String event, EventJS eventObject) {
+        return post(event, null, eventObject);
+    }
+
+    /**
+     * Runs every handler registered for {@code event}, then those registered for {@code event:extraId}.
+     * Returns true if the event was cancelled.
+     */
+    public boolean post(String event, String extraId, EventJS eventObject) {
+        List<Handler> toRun = new ArrayList<>();
+        synchronized (this) {
+            List<Handler> general = handlers.get(event);
+            if (general != null) {
+                toRun.addAll(general);
+            }
+            if (extraId != null) {
+                List<Handler> specific = handlers.get(key(event, extraId));
+                if (specific != null) {
+                    toRun.addAll(specific);
+                }
+            }
+        }
+        run(event, toRun, eventObject);
+        return eventObject.isCancelled();
+    }
+
+    private void run(String event, List<Handler> toRun, EventJS eventObject) {
+        for (Handler handler : toRun) {
+            try {
+                ModJSContextFactory.INSTANCE.call(cx -> {
+                    Object wrapped = Context.javaToJS(eventObject, handler.scope);
+                    return handler.function.call(cx, handler.scope, handler.scope, new Object[] {wrapped});
+                });
+            } catch (RhinoException e) {
+                ScriptManager.of(handler.owner).reportError(name + "." + event, e);
+            }
+        }
+    }
+
+    private final class Registrar extends BaseFunction {
+        private final String event;
+
+        Registrar(String event) {
+            this.event = event;
+        }
+
+        @Override
+        public Object call(Context cx, Scriptable callScope, Scriptable thisObj, Object[] args) {
+            ScriptType owner = ScriptManager.currentType();
+            if (owner == null) {
+                throw Context.reportRuntimeError("Events can only be registered while scripts load");
+            }
+            if (args.length == 1 && args[0] instanceof Function function) {
+                register(owner, event, null, function, ScriptManager.of(owner).scope());
+            } else if (args.length == 2 && args[1] instanceof Function function) {
+                register(owner, event, Context.toString(args[0]), function, ScriptManager.of(owner).scope());
+            } else {
+                throw Context.reportRuntimeError(name + "." + event + " expects (handler) or (id, handler)");
+            }
+            return Context.getUndefinedValue();
+        }
+    }
+}
