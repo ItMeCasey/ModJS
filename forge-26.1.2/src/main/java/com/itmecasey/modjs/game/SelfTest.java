@@ -218,6 +218,16 @@ public final class SelfTest {
         check("custom tool tier sets durability", rubyPick.getMaxDamage() == 900);
         check("custom armor material sets durability", rubyHelmet.getMaxDamage() == 11 * 30);
 
+        BlockPos cratePos = new BlockPos(8, 100, 8);
+        level.setBlockAndUpdate(cratePos, net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("modjs:test_crate")).defaultBlockState());
+        BlockEntityJS crate = new UtilsBinding().blockEntity("minecraft:overworld", 8, 100, 8);
+        check("container block has a block entity with its rows", crate != null && crate.getId().equals("modjs:container") && crate.getSize() == 18);
+        if (crate != null) {
+            crate.setItem(4, "minecraft:emerald", 9);
+            check("container block keeps items in its data", crate.getNbt().contains("minecraft:emerald"));
+        }
+        level.setBlockAndUpdate(cratePos, Blocks.AIR.defaultBlockState());
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

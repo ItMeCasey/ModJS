@@ -38,3 +38,4 @@ StartupEvents.registry('item', event => {
   event.create('ruby_pickaxe').tool('pickaxe', 'modjs:ruby');
   event.create('ruby_helmet').armor('helmet', 'ruby');
 });
+StartupEvents.registry('block', event => event.create('test_crate').container(2).hardness(2));

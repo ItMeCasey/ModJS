@@ -15,6 +15,7 @@ public final class BlockBuilderJS {
     private String type = "basic";
     private String unifyTag;
     private String dropItem;
+    private int containerRows;
 
     BlockBuilderJS(String id) {
         this.id = id;
@@ -54,6 +55,23 @@ public final class BlockBuilderJS {
 
     public boolean isNoItem() {
         return noItem;
+    }
+
+    /** Rows (1 to 6) of nine slots when this block is a storage container, or 0. */
+    public int containerRows() {
+        return containerRows;
+    }
+
+    /**
+     * Makes the block a storage container like a chest, with {@code rows} rows of nine slots. Right-click opens it; its items
+     * drop when it is broken. Readable and writable from scripts through {@code event.blockEntity}.
+     */
+    public BlockBuilderJS container(int rows) {
+        if (rows < 1 || rows > 6) {
+            throw new IllegalArgumentException("container rows must be 1 to 6, got " + rows);
+        }
+        this.containerRows = rows;
+        return this;
     }
 
     /** Item id dropped instead of the block itself, or null. */

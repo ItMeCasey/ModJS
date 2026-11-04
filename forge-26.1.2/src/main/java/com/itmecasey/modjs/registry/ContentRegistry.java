@@ -28,6 +28,9 @@ public final class ContentRegistry {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, RegistryManager.NAMESPACE);
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, RegistryManager.NAMESPACE);
 
+    private static final java.util.List<RegistryObject<Block>> CONTAINER_BLOCKS = new java.util.ArrayList<>();
+    private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
+        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
 
     record TabEntry(String tab, RegistryObject<Item> item) {
@@ -51,6 +54,9 @@ public final class ContentRegistry {
                 if (b.requiresTool()) {
                     properties.requiresCorrectToolForDrops();
                 }
+                if (b.containerRows() > 0) {
+                    return new ContainerBlocks.ContainerBlock(properties, b.containerRows());
+                }
                 return switch (b.type()) {
                     case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
                     case "stairs" -> new net.minecraft.world.level.block.StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties);
@@ -59,6 +65,9 @@ public final class ContentRegistry {
                     default -> new Block(properties);
                 };
             });
+            if (b.containerRows() > 0) {
+                CONTAINER_BLOCKS.add(block);
+            }
             if (!b.isNoItem()) {
                 RegistryObject<Item> item = ITEMS.register(b.id(), () ->
                     new BlockItem(block.get(), new Item.Properties().setId(ITEMS.key(b.id()))));
@@ -140,6 +149,16 @@ public final class ContentRegistry {
                     }
                 })
                 .build());
+        }
+        if (!CONTAINER_BLOCKS.isEmpty()) {
+            BLOCK_ENTITIES.register("container", () -> {
+                net.minecraft.world.level.block.entity.BlockEntityType<ContainerBlocks.ContainerEntity> type =
+                    new net.minecraft.world.level.block.entity.BlockEntityType<>(ContainerBlocks.ContainerEntity::new,
+                        CONTAINER_BLOCKS.stream().map(RegistryObject::get).collect(java.util.stream.Collectors.toSet()));
+                ContainerBlocks.setType(type);
+                return type;
+            });
+            BLOCK_ENTITIES.register(modBusGroup);
         }
         TABS.register(modBusGroup);
         BLOCKS.register(modBusGroup);

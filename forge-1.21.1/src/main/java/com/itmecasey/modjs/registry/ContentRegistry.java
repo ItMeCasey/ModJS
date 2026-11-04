@@ -32,6 +32,9 @@ public final class ContentRegistry {
 
     private static final java.util.Map<String, net.minecraft.world.item.Tier> CUSTOM_TIERS = new java.util.HashMap<>();
     private static final java.util.Map<String, RegistryObject<net.minecraft.world.item.ArmorMaterial>> CUSTOM_ARMOR = new java.util.HashMap<>();
+    private static final java.util.List<RegistryObject<Block>> CONTAINER_BLOCKS = new java.util.ArrayList<>();
+    private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
+        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
     private static final DeferredRegister<net.minecraft.world.item.ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, RegistryManager.NAMESPACE);
 
     record TabEntry(String tab, RegistryObject<Item> item) {
@@ -61,6 +64,9 @@ public final class ContentRegistry {
                 if (b.requiresTool()) {
                     properties.requiresCorrectToolForDrops();
                 }
+                if (b.containerRows() > 0) {
+                    return new ContainerBlocks.ContainerBlock(properties, b.containerRows());
+                }
                 return switch (b.type()) {
                     case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
                     case "stairs" -> new net.minecraft.world.level.block.StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties);
@@ -69,6 +75,9 @@ public final class ContentRegistry {
                     default -> new Block(properties);
                 };
             });
+            if (b.containerRows() > 0) {
+                CONTAINER_BLOCKS.add(block);
+            }
             if (!b.isNoItem()) {
                 RegistryObject<Item> item = ITEMS.register(b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
                 TAB_ENTRIES.add(new TabEntry(b.tab(), item));
@@ -113,6 +122,16 @@ public final class ContentRegistry {
                     }
                 })
                 .build());
+        }
+        if (!CONTAINER_BLOCKS.isEmpty()) {
+            BLOCK_ENTITIES.register("container", () -> {
+                net.minecraft.world.level.block.entity.BlockEntityType<ContainerBlocks.ContainerEntity> type =
+                    net.minecraft.world.level.block.entity.BlockEntityType.Builder.of(ContainerBlocks.ContainerEntity::new,
+                        CONTAINER_BLOCKS.stream().map(RegistryObject::get).toArray(Block[]::new)).build(null);
+                ContainerBlocks.setType(type);
+                return type;
+            });
+            BLOCK_ENTITIES.register(modBus);
         }
         TABS.register(modBus);
         BLOCKS.register(modBus);
