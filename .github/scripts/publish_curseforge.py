@@ -82,8 +82,8 @@ def clean_name(module, version):
 def multipart(fields, file_field, path, name):
     boundary = uuid.uuid4().hex
     lines = []
-    for name, value in fields.items():
-        lines.append((f"--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\n"
+    for field, value in fields.items():
+        lines.append((f"--{boundary}\r\nContent-Disposition: form-data; name=\"{field}\"\r\n"
                       f"Content-Type: application/json\r\n\r\n{value}\r\n").encode("utf-8"))
     lines.append((f"--{boundary}\r\nContent-Disposition: form-data; name=\"{file_field}\"; filename=\"{name}\"\r\n"
                   "Content-Type: application/java-archive\r\n\r\n").encode("utf-8"))
