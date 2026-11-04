@@ -14,7 +14,7 @@ Spend: none
 - [~] Item commands `/modjs hand`, `toolbar` and `inventory` list held item ids (registered, not yet run by a player) (w:1)
 
 ## Startup scripts
-- [~] Registry events: items, blocks and creative tabs done; fluids, block entities and entity types not done (w:5)
+- [~] Registry events: items, blocks, creative tabs, fluids, tool tiers, armor materials and container block entities done; entity types left out on purpose (w:5)
 - [~] Item and block builders: properties, tooltip, food, tool, armor, and block types (w:4)
 - [x] Data generation: tags, loot tables, and recipes written as data pack output (w:3)
 - [~] Asset generation: lang, models, blockstates, and textures via a generated resource pack (w:4)
@@ -45,12 +45,12 @@ Spend: none
 
 ## Client scripts
 - [~] Client events: tooltip, key bindings, HUD overlay, and asset preload (w:3)
-- [~] Client screens: scripted title screen and splash text (compiled, not seen on a client); other screens and widgets not started (w:2)
+- [~] Client screens: scripted title screen, splash text and your own screens with buttons, text and text boxes (compiled, not seen on a client) (w:3)
 
 ## Compatibility and tooling
 - [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); EMI, REI and 26.1.2 blocked by missing Forge builds; Create recipe types not started (w:3)
 - [x] Type definitions: a hand-written modjs.d.ts and jsconfig.json are written to modjs/ on launch (w:3)
-- [ ] In-game error overlay at startup and on script error (w:2)
+- [x] Script errors shown in chat when operators join (server and startup scripts) and to players for client scripts; no separate overlay screen (w:2)
 - [x] Item unification: canonical items, materials (ores, crushed, clumps, shards), fluids, recipe, loot and inventory unification, config file (both versions self-tested with fake mods, not real ones) (w:5)
 - [ ] Port to more Minecraft versions and loaders, closing the gaps listed in docs/PORTING.md (EMI, REI, JEI on 26.1.2, checkSpawn) (w:5)
 

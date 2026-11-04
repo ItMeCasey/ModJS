@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,6 +22,23 @@ class TitleScreenTest {
         assertEquals("Only this\n", splashes.toFile());
         splashes.clear();
         assertEquals("\n", splashes.toFile());
+    }
+
+    @Test
+    void scriptedScreensHaveScreenDefaultsAndInputs() {
+        TitleScreenConfig screen = TitleScreenConfig.forScreen();
+        assertEquals("default", screen.backgroundKind());
+        assertEquals("none", screen.logoKind());
+        assertTrue(screen.closesOnEsc());
+        assertFalse(screen.splashShown());
+        screen.input("name", null);
+        screen.button("OK", "close");
+        assertEquals(1, screen.inputs().size());
+        assertEquals(200, screen.inputs().get(0).width());
+        assertEquals(64, screen.inputs().get(0).maxLength());
+        assertEquals("close", screen.buttons().get(0).action());
+        assertFalse(new TitleScreenConfig().closesOnEsc());
+        assertNull(com.itmecasey.modjs.client.ScriptedScreens.get("missing"));
     }
 
     @Test

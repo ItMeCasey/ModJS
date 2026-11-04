@@ -25,18 +25,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** The main menu described by {@code ClientEvents.titleScreen}. */
-public final class ScriptedTitleScreen extends Screen {
+public final class ScriptedTitleScreen extends Screen implements ScriptedScreens.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
 
     private final TitleScreenConfig config;
+    private final Screen previous;
+    private final java.util.Map<String, net.minecraft.client.gui.components.EditBox> boxes = new java.util.HashMap<>();
+    private final java.util.Map<String, String> kept = new java.util.HashMap<>();
     private final LogoRenderer logoRenderer = new LogoRenderer(false);
     private Identifier backgroundTexture;
     private Identifier logoTexture;
     private SplashRenderer splash;
 
     public ScriptedTitleScreen(TitleScreenConfig config) {
+        this(config, null);
+    }
+
+    public ScriptedTitleScreen(TitleScreenConfig config, Screen previous) {
         super(Component.translatable("narrator.screen.title"));
         this.config = config;
+        this.previous = previous;
         String bg = config.backgroundKind();
         if (bg.contains(":")) {
             backgroundTexture = Identifier.tryParse(bg);
@@ -49,13 +57,57 @@ public final class ScriptedTitleScreen extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return false;
+        return config.closesOnEsc();
+    }
+
+    @Override
+    public void onClose() {
+        minecraft.setScreen(previous);
+    }
+
+    @Override
+    public String getValue(String id) {
+        net.minecraft.client.gui.components.EditBox box = boxes.get(id);
+        return box != null ? box.getValue() : kept.getOrDefault(id, "");
+    }
+
+    @Override
+    public void setValue(String id, String value) {
+        net.minecraft.client.gui.components.EditBox box = boxes.get(id);
+        if (box != null) {
+            box.setValue(value);
+        }
+        kept.put(id, value);
+    }
+
+    @Override
+    public void close() {
+        onClose();
+    }
+
+    @Override
+    public void open(String name) {
+        TitleScreenConfig next = ScriptedScreens.get(name);
+        if (next != null) {
+            minecraft.setScreen(new ScriptedTitleScreen(next, this));
+        }
     }
 
     @Override
     protected void init() {
         if (config.splashShown() && splash == null) {
             splash = minecraft.getSplashManager().getSplash();
+        }
+        boxes.forEach((id, box) -> kept.put(id, box.getValue()));
+        boxes.clear();
+        for (TitleScreenConfig.Input input : config.inputs()) {
+            net.minecraft.client.gui.components.EditBox box = new net.minecraft.client.gui.components.EditBox(font,
+                width / 2 - input.width() / 2 + input.x(), input.y(), input.width(), input.height(), Component.literal(input.id()));
+            box.setMaxLength(input.maxLength());
+            box.setHint(Component.literal(input.placeholder()));
+            box.setValue(kept.getOrDefault(input.id(), input.initial()));
+            addRenderableWidget(box);
+            boxes.put(input.id(), box);
         }
         int stackY = height / 4 + 48;
         for (TitleScreenConfig.Button spec : config.buttons()) {
@@ -77,7 +129,7 @@ public final class ScriptedTitleScreen extends Screen {
         if (spec.callback() != null) {
             Function fn = spec.callback();
             try {
-                ModJSContextFactory.INSTANCE.call(cx -> fn.call(cx, fn.getParentScope(), fn.getParentScope(), new Object[0]));
+                ModJSContextFactory.INSTANCE.call(cx -> fn.call(cx, fn.getParentScope(), fn.getParentScope(), new Object[] {this}));
             } catch (RhinoException e) {
                 LOGGER.error("Title screen button '{}' failed: {}", spec.label(), e.getMessage());
             }
@@ -88,6 +140,10 @@ public final class ScriptedTitleScreen extends Screen {
             String host = action.substring("connect:".length()).strip();
             ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(host),
                 new ServerData(spec.label(), host, ServerData.Type.OTHER), false, null);
+        } else if (action.equals("close")) {
+            onClose();
+        } else if (action.startsWith("open:")) {
+            open(action.substring("open:".length()).strip());
         } else if (action.startsWith("url:")) {
             Util.getPlatform().openUri(action.substring("url:".length()).strip());
         } else {
@@ -106,7 +162,7 @@ public final class ScriptedTitleScreen extends Screen {
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         switch (config.backgroundKind()) {
-            case "panorama", "dirt" -> super.extractBackground(graphics, mouseX, mouseY, partialTick);
+            case "panorama", "dirt", "default" -> super.extractBackground(graphics, mouseX, mouseY, partialTick);
             case "color" -> graphics.fill(0, 0, width, height, config.backgroundColor());
             default -> {
                 if (backgroundTexture != null) {

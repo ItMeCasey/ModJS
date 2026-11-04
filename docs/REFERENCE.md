@@ -52,6 +52,8 @@ Worn armor art is the vanilla iron armor recolored with `color`; put your own te
 Change existing blocks from a startup script: `BlockEvents.modification(e => e.modify('minecraft:stone', b => { b.destroySpeed = 9; b.explosionResistance = 77; b.lightEmission = 5; }))`
 (also `friction`, `speedFactor`, `jumpFactor`, `requiresTool`).
 
+Storage blocks: `event.create('crate').container(3)` makes a chest-like block with 3 rows of 9 slots (opens on right-click, drops its items, readable with `event.blockEntity`).
+
 Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier. Armor: `.armor('helmet' | 'chestplate' | 'leggings' | 'boots', 'leather' | 'chainmail' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla material. Add items to existing tabs: `StartupEvents.modifyCreativeTab('minecraft:tools_and_utilities', e => e.add('modjs:ruby'))`.
 
 Fluids: `StartupEvents.registry('fluid', e => e.create('goo').color(0x44FF44).luminosity(6).density(1500).noBucket())` registers `modjs:goo`, `modjs:goo_flowing`, a liquid block and `modjs:goo_bucket`; it uses the vanilla water textures tinted by `color`.
@@ -142,7 +144,7 @@ On 26.1.2 blocks and block states reach scripts as stand-ins: `Blocks.STONE.id`,
 ## Client scripts
 
 `ClientEvents.lang('en_us', event => event.add('key', 'Value'))`; rename existing things with `event.renameItem('minecraft:diamond', 'Shiny Rock')`, `renameBlock`, `renameEntity` (display names only; F3+T to apply), `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
-`ClientEvents.keyPressed(event => ...)`, `ClientEvents.leftDebugInfo` / `rightDebugInfo` (`event.add('text')` adds lines to F3), `ClientEvents.init`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
+`ClientEvents.keyPressed(event => ...)`, `ItemEvents.dynamicTooltips('minecraft:apple', e => ...)` (per item id), `ClientEvents.leftDebugInfo` / `rightDebugInfo` (`event.add('text')` adds lines to F3), `ClientEvents.init`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
 
 ### Unifying items (Ore Dictionary style)
 
@@ -209,6 +211,24 @@ ClientEvents.titleScreen(event => {
 Button actions: `singleplayer`, `multiplayer`, `options`, `mods`, `languages`, `quit`, `connect:host`, `url:https://...`, or a function.
 Buttons without `x`/`y` stack down the middle. If no `titleScreen` handler exists the vanilla menu stays. F3+T applies changes.
 The `panorama` background draws the vanilla one on 1.21.1; on 26.1.2 it uses the game's default menu background.
+
+### Your own screens
+
+```js
+ClientEvents.screens(event => {
+  event.create('hub', screen => {
+    screen.text('Pick a name', { y: 30 });
+    screen.input('name', { placeholder: 'Your name', y: 60, width: 160 });
+    screen.button('Go', s => { console.log('hello ' + s.getValue('name')); s.close(); }, { y: 90, width: 80 });
+    screen.button('More', 'open:settings', { y: 115, width: 80 });
+    screen.button('Close', 'close', { y: 140, width: 80 });
+  });
+  event.create('settings', screen => screen.button('Back', 'close', { y: 60 }));
+});
+ClientEvents.keyPressed(e => { if (e.key === 72 && e.action === 1) Client.openScreen('hub'); });   // H
+```
+A screen config has the same methods as `ClientEvents.titleScreen` plus `input(id, options)` and `closeOnEsc(bool)`; a button callback receives the screen
+(`getValue(id)`, `setValue(id, text)`, `close()`, `open(name)`). Button actions also include `close` and `open:<name>`. `Client.openScreen(name)` and `Client.closeScreen()` work from any client script.
 
 ### Recipe viewers (JEI)
 

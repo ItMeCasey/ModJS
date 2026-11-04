@@ -37,7 +37,8 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | | loggedIn, loggedOut | compiled |
 | | splashes, titleScreen (ModJS only) | compiled; splash and screen unchecked on a client |
 | | init, leftDebugInfo, rightDebugInfo | compiled |
-| | painterUpdated, paintScreen | no |
+| | painterUpdated, paintScreen | no (use `ClientEvents.screens` for your own screens) |
+| | screens (ModJS only): scripted screens with buttons, text and text boxes; `Client.openScreen` | compiled; not seen on a client |
 | BlockEvents | broken, placed, rightClicked, leftClicked | yes (broken checked in game test) |
 | | farmlandTrampled | compiled |
 | | modification | yes (hardness, resistance, light, friction, speed, jump, tool requirement; checked) |
@@ -47,7 +48,8 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | | modification (max stack size, max damage, rarity) | yes, checked on both versions |
 | | firstLeftClicked, firstRightClicked, canPickUp | compiled |
 | | armorTierRegistry, toolTierRegistry (as `StartupEvents.registry` `armor_material` and `tool_tier`) | yes (checked) |
-| | dynamicTooltips, modelProperties | no |
+| | dynamicTooltips | compiled (same data as `tooltip`, filtered by item id) |
+| | modelProperties | no |
 | EntityEvents | hurt | yes (checked) |
 | | death, spawned | compiled |
 | | checkSpawn | compiled on both versions |
@@ -77,7 +79,8 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | Block entities, other shapes | no |
 | Creative tab | yes |
 | Fluid (source, flowing, block, bucket, tint) | yes (registered; look and behavior unchecked on a client) |
-| Entity type, block entity, sound, enchantment, and the rest | no (entity types are not in KubeJS core either) |
+| Container block entity (`block.container(rows)`) | yes (checked on both versions) |
+| Entity type, other block entities, sound, enchantment, and the rest | no (entity types need a renderer and AI, and are not in KubeJS core either) |
 
 ## Recipes
 
@@ -101,3 +104,12 @@ Mod-specific recipe schemas (for example Create): no.
 - Recipe, tag, loot and worldgen changes are written as a generated data pack, so they work with any other data pack.
 - On 26.1.2 a script cannot hold a raw Minecraft `Block` or block state (the engine would inspect client-only classes and crash a dedicated server), so those are swapped for stand-ins with `id`, `defaultState`, `blockId` and `properties`. Fixed and checked in the self test.
 - `Unify` (ModJS only, an Ore Dictionary replacement): recipe, loot and inventory unification and generated materials were checked in the headless self test on both versions with a fake second mod (vanilla iron ingots as tin). Not checked with real mods that use custom recipe types.
+
+## Left unbuilt on purpose
+
+- **Entity types:** a new mob needs a model, renderer, attributes and AI. A script cannot supply those safely without a client to check, and KubeJS core has no entity registry either.
+- **Block detectors** (`detectorChanged`, `detectorPowered`, `detectorUnpowered`): they belong to a KubeJS-only detector block. Use a normal block with `BlockEvents` or a container block.
+- **`recipeTypeRegistry`, `specialRecipeSerializers`:** new recipe types need Java serializers; scripts cannot define them.
+- **Create and other mod recipe schemas:** their JSON formats change between mod versions and cannot be checked here. Use `event.custom({...})` with the mod's own JSON.
+- **JEI custom categories and recipe hiding:** custom categories need drawing code; hiding single recipes needs each viewer's recipe ids. `hideItems` and `hideCategories` cover most needs.
+- **Bucket unification, custom-code ores, custom-code structures:** see the unification section of the reference.

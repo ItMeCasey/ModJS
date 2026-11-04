@@ -98,6 +98,7 @@ public final class DataBuilder {
         }
         com.itmecasey.modjs.client.TitleScreenConfig title = new com.itmecasey.modjs.client.TitleScreenConfig();
         EventGroups.CLIENT.post("titleScreen", title);
+        com.itmecasey.modjs.client.ScriptedScreens.rebuild(EventGroups.CLIENT);
         com.itmecasey.modjs.client.TitleScreenConfig.set(EventGroups.CLIENT.hasHandlers("titleScreen") ? title : null);
 
         EventGroups.CLIENT.post("generateAssets", new DataEventJS(data));

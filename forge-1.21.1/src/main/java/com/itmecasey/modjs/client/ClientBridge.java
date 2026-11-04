@@ -40,6 +40,17 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        com.itmecasey.modjs.client.ScriptedScreens.setHooks(name -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.ScriptedScreens.get(name);
+            if (config != null) {
+                mc.execute(() -> mc.setScreen(new ScriptedTitleScreen(config, mc.screen)));
+            }
+        }, () -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            mc.execute(() -> mc.setScreen(null));
+        });
+
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.CustomizeGuiOverlayEvent.DebugText e) -> {
             String name = e.getSide() == net.minecraftforge.client.event.CustomizeGuiOverlayEvent.DebugText.Side.Left ? "leftDebugInfo" : "rightDebugInfo";
             if (EventGroups.CLIENT.hasHandlers(name)) {
@@ -72,6 +83,9 @@ public final class ClientBridge {
                         builder.tooltips().forEach(line -> e.getToolTip().add(Component.literal(line)));
                     }
                 }
+            }
+            if (EventGroups.ITEM.hasHandlers("dynamicTooltips")) {
+                EventGroups.ITEM.post("dynamicTooltips", id, new TooltipEventJS(stack, e.getToolTip()));
             }
             if (EventGroups.ITEM.hasHandlers("tooltip")) {
                 EventGroups.ITEM.post("tooltip", new TooltipEventJS(stack, e.getToolTip()));

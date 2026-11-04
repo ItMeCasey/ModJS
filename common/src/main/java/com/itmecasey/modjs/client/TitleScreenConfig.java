@@ -21,13 +21,30 @@ public final class TitleScreenConfig extends EventJS {
     public record Text(String text, int x, int y, int color, boolean centered) {
     }
 
+    /** A text box. {@code id} is how a button callback reads it back with {@code screen.getValue(id)}. */
+    public record Input(String id, String placeholder, String initial, int x, int y, int width, int height, int maxLength) {
+    }
+
     private final List<Button> buttons = new ArrayList<>();
     private final List<Text> texts = new ArrayList<>();
+    private final List<Input> inputs = new ArrayList<>();
+    private boolean closeOnEsc;
     private String background = "panorama";
     private int backgroundColor = 0xFF101018;
     private String logo = "vanilla";
     private boolean showSplash = true;
     private boolean showVersion = true;
+
+    /** A config with the defaults for a normal screen: dimmed game behind it, no logo, splash or version text, closes with Escape. */
+    public static TitleScreenConfig forScreen() {
+        TitleScreenConfig config = new TitleScreenConfig();
+        config.background = "default";
+        config.logo = "none";
+        config.showSplash = false;
+        config.showVersion = false;
+        config.closeOnEsc = true;
+        return config;
+    }
 
     public static TitleScreenConfig current() {
         return current;
@@ -59,6 +76,31 @@ public final class TitleScreenConfig extends EventJS {
 
     public void showSplash(boolean show) {
         this.showSplash = show;
+    }
+
+    /** Whether Escape closes this screen (default true for screens, false for the title screen). */
+    public void closeOnEsc(boolean close) {
+        this.closeOnEsc = close;
+    }
+
+    /**
+     * Adds a text box. Options: {@code placeholder}, {@code value}, {@code x} (offset from center), {@code y} (from top),
+     * {@code width}, {@code height}, {@code maxLength}. A button callback receives the screen and reads it with {@code screen.getValue(id)}.
+     */
+    public void input(String id, Object options) {
+        Integer x = number(options, "x");
+        Integer y = number(options, "y");
+        Integer w = number(options, "width");
+        Integer h = number(options, "height");
+        Integer max = number(options, "maxLength");
+        String placeholder = JsonUtil.asString(options == null ? null : JsonUtil.property(options, "placeholder"));
+        String value = JsonUtil.asString(options == null ? null : JsonUtil.property(options, "value"));
+        inputs.add(new Input(id, placeholder == null ? "" : placeholder, value == null ? "" : value, x != null ? x : 0, y != null ? y : 40,
+            w != null ? w : 200, h != null ? h : 20, max != null ? max : 64));
+    }
+
+    public void input(String id) {
+        input(id, null);
     }
 
     public void showVersion(boolean show) {
@@ -105,6 +147,14 @@ public final class TitleScreenConfig extends EventJS {
 
     public List<Button> buttons() {
         return buttons;
+    }
+
+    public List<Input> inputs() {
+        return inputs;
+    }
+
+    public boolean closesOnEsc() {
+        return closeOnEsc;
     }
 
     public List<Text> texts() {
