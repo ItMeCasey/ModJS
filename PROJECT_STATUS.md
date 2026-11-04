@@ -2,7 +2,7 @@
 <!-- status-format: 1 -->
 
 Updated: 2026-11-03
-Summary: ModJS runs KubeJS-style scripts on Rhino in Forge 26.1.2 and 1.21.1, both built and smoke-tested in a real game-test server; gameplay events, client scripts and networking are untested in a running game.
+Summary: ModJS runs KubeJS-style scripts on Rhino in Forge 26.1.2 and 1.21.1; both are built, self-tested in a headless server and built by CI, while client scripts and networking are untested on a real client.
 Spend: none
 
 ## Foundation
@@ -34,6 +34,8 @@ Spend: none
 - [x] Server scheduler: run after N ticks and repeating tasks (w:1)
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
 - [~] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers (w:4)
+- [x] Item modification: change max stack size, max damage and rarity of existing items (checked on both versions) (w:2)
+- [x] GitHub Actions build runs both modules and the self test (passing) (w:1)
 
 ## Shared helpers
 - [~] Global helpers: item and ingredient builders, text components, JSON IO, NBT, and server access (w:3)
