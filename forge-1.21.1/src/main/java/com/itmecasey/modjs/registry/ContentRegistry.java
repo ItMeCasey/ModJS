@@ -49,7 +49,13 @@ public final class ContentRegistry {
                 if (b.requiresTool()) {
                     properties.requiresCorrectToolForDrops();
                 }
-                return new Block(properties);
+                return switch (b.type()) {
+                    case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
+                    case "stairs" -> new net.minecraft.world.level.block.StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties);
+                    case "wall" -> new net.minecraft.world.level.block.WallBlock(properties);
+                    case "fence" -> new net.minecraft.world.level.block.FenceBlock(properties);
+                    default -> new Block(properties);
+                };
             });
             if (!b.isNoItem()) {
                 RegistryObject<Item> item = ITEMS.register(b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
@@ -71,6 +77,9 @@ public final class ContentRegistry {
                         food.alwaysEdible();
                     }
                     properties.food(food.build());
+                }
+                if (b.toolType() != null) {
+                    return tool(b, properties);
                 }
                 return new Item(properties);
             });
@@ -100,6 +109,24 @@ public final class ContentRegistry {
         ResourceLocation id = ResourceLocation.tryParse(itemId);
         Item item = id == null ? Items.STONE : BuiltInRegistries.ITEM.get(id);
         return new ItemStack(item);
+    }
+
+    private static Item tool(ItemBuilderJS b, Item.Properties properties) {
+        net.minecraft.world.item.Tier tier = switch (b.toolTier()) {
+            case "wood" -> net.minecraft.world.item.Tiers.WOOD;
+            case "stone" -> net.minecraft.world.item.Tiers.STONE;
+            case "gold" -> net.minecraft.world.item.Tiers.GOLD;
+            case "diamond" -> net.minecraft.world.item.Tiers.DIAMOND;
+            case "netherite" -> net.minecraft.world.item.Tiers.NETHERITE;
+            default -> net.minecraft.world.item.Tiers.IRON;
+        };
+        return switch (b.toolType()) {
+            case "axe" -> new net.minecraft.world.item.AxeItem(tier, properties.attributes(net.minecraft.world.item.AxeItem.createAttributes(tier, 6.0f, -3.1f)));
+            case "shovel" -> new net.minecraft.world.item.ShovelItem(tier, properties.attributes(net.minecraft.world.item.ShovelItem.createAttributes(tier, 1.5f, -3.0f)));
+            case "hoe" -> new net.minecraft.world.item.HoeItem(tier, properties.attributes(net.minecraft.world.item.HoeItem.createAttributes(tier, -2.0f, -1.0f)));
+            case "sword" -> new net.minecraft.world.item.SwordItem(tier, properties.attributes(net.minecraft.world.item.SwordItem.createAttributes(tier, 3, -2.4f)));
+            default -> new net.minecraft.world.item.PickaxeItem(tier, properties.attributes(net.minecraft.world.item.PickaxeItem.createAttributes(tier, 1.0f, -2.8f)));
+        };
     }
 
     private static Rarity rarity(String name) {

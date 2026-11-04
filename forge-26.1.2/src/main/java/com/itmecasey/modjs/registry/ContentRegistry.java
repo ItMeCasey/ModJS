@@ -50,7 +50,13 @@ public final class ContentRegistry {
                 if (b.requiresTool()) {
                     properties.requiresCorrectToolForDrops();
                 }
-                return new Block(properties);
+                return switch (b.type()) {
+                    case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
+                    case "stairs" -> new net.minecraft.world.level.block.StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties);
+                    case "wall" -> new net.minecraft.world.level.block.WallBlock(properties);
+                    case "fence" -> new net.minecraft.world.level.block.FenceBlock(properties);
+                    default -> new Block(properties);
+                };
             });
             if (!b.isNoItem()) {
                 RegistryObject<Item> item = ITEMS.register(b.id(), () ->
@@ -75,6 +81,23 @@ public final class ContentRegistry {
                         food.alwaysEdible();
                     }
                     properties.food(food.build());
+                }
+                if (b.toolType() != null) {
+                    net.minecraft.world.item.ToolMaterial material = switch (b.toolTier()) {
+                        case "wood" -> net.minecraft.world.item.ToolMaterial.WOOD;
+                        case "stone" -> net.minecraft.world.item.ToolMaterial.STONE;
+                        case "gold" -> net.minecraft.world.item.ToolMaterial.GOLD;
+                        case "diamond" -> net.minecraft.world.item.ToolMaterial.DIAMOND;
+                        case "netherite" -> net.minecraft.world.item.ToolMaterial.NETHERITE;
+                        default -> net.minecraft.world.item.ToolMaterial.IRON;
+                    };
+                    switch (b.toolType()) {
+                        case "axe" -> properties.axe(material, 6.0f, -3.1f);
+                        case "shovel" -> properties.shovel(material, 1.5f, -3.0f);
+                        case "hoe" -> properties.hoe(material, -2.0f, -1.0f);
+                        case "sword" -> properties.sword(material, 3.0f, -2.4f);
+                        default -> properties.pickaxe(material, 1.0f, -2.8f);
+                    }
                 }
                 return new Item(properties);
             });

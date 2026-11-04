@@ -41,6 +41,8 @@ StartupEvents.registry('creative_tab', event => {
 });
 ```
 
+Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier.
+
 Everything is registered as `modjs:<id>`. Put textures at `modjs/assets/modjs/textures/item/<id>.png` and
 `.../block/<id>.png`. Models, blockstates, lang entries and block loot tables are generated for you.
 `StartupEvents.init` and `StartupEvents.postInit` fire at common setup and load complete.

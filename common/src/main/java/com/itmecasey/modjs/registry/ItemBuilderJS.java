@@ -16,6 +16,8 @@ public final class ItemBuilderJS {
     private Integer nutrition;
     private float saturation;
     private boolean alwaysEdible;
+    private String toolType;
+    private String toolTier = "iron";
     private final List<String> tooltips = new ArrayList<>();
 
     ItemBuilderJS(String id) {
@@ -36,6 +38,31 @@ public final class ItemBuilderJS {
 
     public String texture() {
         return texture != null ? texture : RegistryManager.NAMESPACE + ":item/" + id;
+    }
+
+    /** Tool kind: pickaxe, axe, shovel, hoe or sword; null for a plain item. */
+    public String toolType() {
+        return toolType;
+    }
+
+    public String toolTier() {
+        return toolTier;
+    }
+
+    /** Makes the item a tool of a vanilla tier: wood, stone, iron, gold, diamond or netherite. */
+    public ItemBuilderJS tool(String type, String tier) {
+        String t = type.toLowerCase();
+        if (!java.util.List.of("pickaxe", "axe", "shovel", "hoe", "sword").contains(t)) {
+            throw new IllegalArgumentException("Unknown tool type '" + type + "'; use pickaxe, axe, shovel, hoe or sword");
+        }
+        String r = tier.toLowerCase();
+        if (!java.util.List.of("wood", "stone", "iron", "gold", "diamond", "netherite").contains(r)) {
+            throw new IllegalArgumentException("Unknown tool tier '" + tier + "'; use wood, stone, iron, gold, diamond or netherite");
+        }
+        this.toolType = t;
+        this.toolTier = r;
+        this.parentModel = "minecraft:item/handheld";
+        return this;
     }
 
     public String parentModel() {

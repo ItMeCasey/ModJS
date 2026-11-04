@@ -12,6 +12,7 @@ public final class BlockBuilderJS {
     private String tab = "minecraft:building_blocks";
     private boolean noItem;
     private boolean dropsNothing;
+    private String type = "basic";
 
     BlockBuilderJS(String id) {
         this.id = id;
@@ -55,6 +56,21 @@ public final class BlockBuilderJS {
 
     public boolean isDropsNothing() {
         return dropsNothing;
+    }
+
+    /** One of basic, slab, stairs, wall, fence. */
+    public String type() {
+        return type;
+    }
+
+    /** Shape of the block: "basic" (default), "slab", "stairs", "wall" or "fence". */
+    public BlockBuilderJS type(String type) {
+        String t = type.toLowerCase();
+        if (!java.util.List.of("basic", "slab", "stairs", "wall", "fence").contains(t)) {
+            throw new IllegalArgumentException("Unknown block type '" + type + "'; use basic, slab, stairs, wall or fence");
+        }
+        this.type = t;
+        return this;
     }
 
     public BlockBuilderJS displayName(String name) {

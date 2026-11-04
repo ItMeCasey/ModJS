@@ -73,6 +73,20 @@ public final class SelfTest {
         MinecraftForge.EVENT_BUS.post(hurt);
         check("EntityEvents.hurt changes the amount", hurt.getAmount() == 6.0f);
 
+        for (String shaped : new String[] {"test_slab", "test_stairs", "test_wall", "test_fence"}) {
+            String key = "modjs:" + shaped;
+            boolean found = net.minecraft.core.registries.BuiltInRegistries.BLOCK.stream()
+                .anyMatch(b -> net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(b).toString().equals(key));
+            check("registered shaped block " + shaped, found);
+        }
+
+        for (String tool : new String[] {"test_pickaxe", "test_sword"}) {
+            String key = "modjs:" + tool;
+            boolean found = net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+                .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals(key));
+            check("registered tool " + tool, found);
+        }
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

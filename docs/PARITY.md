@@ -53,8 +53,12 @@ textures and models have not been run on a real client.
 
 | Type | Status |
 |---|---|
-| Item (name, stack size, food, rarity, tooltip, texture, creative tab) | yes (tools, armor and tiers: no) |
-| Block (hardness, resistance, light, requires tool, texture, loot drop) | yes (shaped blocks, block entities: no) |
+| Item (name, stack size, food, rarity, tooltip, texture, creative tab) | yes |
+| Tools (pickaxe, axe, shovel, hoe, sword with a vanilla tier) | yes (registered; models unchecked on a client) |
+| Armor and custom tiers | no |
+| Block (hardness, resistance, light, requires tool, texture, loot drop) | yes |
+| Block shapes: slab, stairs, wall, fence | yes (registered; models unchecked on a client) |
+| Block entities, other shapes | no |
 | Creative tab | yes |
 | Fluid, entity type, block entity, sound, enchantment, and the rest | no |
 

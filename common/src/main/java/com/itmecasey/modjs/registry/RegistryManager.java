@@ -77,12 +77,16 @@ public final class RegistryManager {
             if (!block.isNoItem()) {
                 lang.addProperty("item." + NAMESPACE + "." + block.id(), block.displayName());
                 if (VersionFormat.current().usesItemDefinitions()) {
-                    writeItemDefinition(data, block.id(), NAMESPACE + ":block/" + block.id());
+                    writeItemDefinition(data, block.id(), BlockShapes.itemModel(block));
                 } else {
                     JsonObject itemModel = new JsonObject();
-                    itemModel.addProperty("parent", NAMESPACE + ":block/" + block.id());
+                    itemModel.addProperty("parent", BlockShapes.itemModel(block));
                     data.putJson(NAMESPACE, "models/item/" + block.id(), itemModel);
                 }
+            }
+            if (!block.type().equals("basic")) {
+                BlockShapes.write(data, block);
+                continue;
             }
             JsonObject variant = new JsonObject();
             variant.addProperty("model", NAMESPACE + ":block/" + block.id());
@@ -122,6 +126,23 @@ public final class RegistryManager {
                 JsonObject entry = new JsonObject();
                 entry.addProperty("type", "minecraft:item");
                 entry.addProperty("name", NAMESPACE + ":" + block.id());
+                if (block.type().equals("slab")) {
+                    JsonObject setCount = new JsonObject();
+                    setCount.addProperty("function", "minecraft:set_count");
+                    setCount.addProperty("count", 2);
+                    JsonObject properties = new JsonObject();
+                    properties.addProperty("type", "double");
+                    JsonObject isDouble = new JsonObject();
+                    isDouble.addProperty("condition", "minecraft:block_state_property");
+                    isDouble.addProperty("block", NAMESPACE + ":" + block.id());
+                    isDouble.add("properties", properties);
+                    JsonArray fnConditions = new JsonArray();
+                    fnConditions.add(isDouble);
+                    setCount.add("conditions", fnConditions);
+                    JsonArray functions = new JsonArray();
+                    functions.add(setCount);
+                    entry.add("functions", functions);
+                }
                 JsonArray entries = new JsonArray();
                 entries.add(entry);
                 JsonObject condition = new JsonObject();

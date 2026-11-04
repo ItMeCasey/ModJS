@@ -35,6 +35,7 @@ Spend: none
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
 - [~] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers (w:4)
 - [x] Item modification: change max stack size, max damage and rarity of existing items (checked on both versions) (w:2)
+- [x] Block shapes (slab, stairs, wall, fence) and vanilla-tier tool items; registered and self-tested, models not checked on a client (w:2)
 - [x] GitHub Actions build runs both modules and the self test (passing) (w:1)
 
 ## Shared helpers
