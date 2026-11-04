@@ -6,6 +6,7 @@ Everything you need to fill in the two project forms. Files are in `branding/ico
 
 | Field | CurseForge | Modrinth |
 |---|---|---|
+| Project ID | 1783874 | (not created yet) |
 | Name | ModJS | ModJS |
 | Slug / URL | `modjs` | `modjs` |
 | Icon / logo | `icon/icon_512.png` (square, at least 400x400) | `icon/icon_512.png` (square, under 256 KiB) |

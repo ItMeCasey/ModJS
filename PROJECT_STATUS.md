@@ -62,4 +62,4 @@ Spend: none
 - [x] Wiki at itmecasey.com/wiki/modjs: 38 pages with examples, written and checked locally in the site folder (w:3)
 - [x] Deploy the ModJS wiki to the droplet and check it live (w:1)
 - [x] Logo, banners, section headers and CurseForge description in branding/ and curseforge/ (not yet pushed or uploaded) (w:2)
-- [ ] Create the CurseForge and Modrinth projects and upload the jars (w:3)
+- [~] Create the CurseForge and Modrinth projects and upload the jars (CurseForge project 1783874 created; no jars uploaded, Modrinth not created) (w:3)

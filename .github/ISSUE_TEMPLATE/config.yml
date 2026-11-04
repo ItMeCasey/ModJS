@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the wiki first
+    url: https://itmecasey.com/wiki/modjs/
+    about: Guides, examples and a cookbook for every part of ModJS.
+  - name: Troubleshooting
+    url: https://itmecasey.com/wiki/modjs/?p=troubleshooting
+    about: What to check when a script does nothing, errors, or a change doesn't show up.

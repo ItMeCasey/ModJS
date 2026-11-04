@@ -1,0 +1,65 @@
+name: Crash report
+description: The game crashed or won't start, and ModJS may be involved.
+title: "[Crash] "
+labels: ["crash"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sorry about the crash. The crash report is the most useful thing you can send. It's in the `crash-reports` folder of your Minecraft folder.
+  - type: input
+    id: crash
+    attributes:
+      label: Crash report link
+      description: Upload the crash report to https://mclo.gs or a GitHub gist and paste the link.
+      placeholder: https://mclo.gs/...
+    validations:
+      required: true
+  - type: textarea
+    id: when
+    attributes:
+      label: When does it crash?
+      placeholder: On startup / when I join a world / after /modjs reload / when I open a script screen
+    validations:
+      required: true
+  - type: textarea
+    id: script
+    attributes:
+      label: Script that triggers it
+      description: If removing a script stops the crash, paste that script and say which folder it's in.
+      render: javascript
+  - type: input
+    id: modjs
+    attributes:
+      label: ModJS version
+    validations:
+      required: true
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Loader
+      options:
+        - Forge
+        - NeoForge
+    validations:
+      required: true
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - 26.1.2
+        - 1.21.1
+        - 1.20.1
+    validations:
+      required: true
+  - type: dropdown
+    id: side
+    attributes:
+      label: Client or server?
+      options:
+        - Client
+        - Dedicated server
+        - Both
+    validations:
+      required: true

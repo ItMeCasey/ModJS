@@ -1,0 +1,83 @@
+name: Bug report
+description: Something in ModJS doesn't work the way the wiki says it should.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. If the game crashed, use **Crash report** instead.
+        If your own script has an error and you're not sure it's a ModJS bug, use **Script help**.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you saw, and what you expected to see.
+      placeholder: A recipe I removed with event.remove still shows up in the crafting table.
+    validations:
+      required: true
+  - type: textarea
+    id: script
+    attributes:
+      label: The smallest script that shows it
+      description: Paste the script, and say which folder it's in (startup_scripts, server_scripts or client_scripts).
+      render: javascript
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Put the script in modjs/server_scripts
+        2. Run /modjs reload
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: errors
+    attributes:
+      label: Output of /modjs errors
+      description: Run it in game after the problem happens, or paste the matching lines from logs/latest.log.
+      render: text
+  - type: input
+    id: modjs
+    attributes:
+      label: ModJS version
+      description: From the jar's file name or the mod list.
+    validations:
+      required: true
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Loader
+      options:
+        - Forge
+        - NeoForge
+    validations:
+      required: true
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - 26.1.2
+        - 1.21.1
+        - 1.20.1
+    validations:
+      required: true
+  - type: dropdown
+    id: side
+    attributes:
+      label: Where did it happen?
+      options:
+        - Single player
+        - Multiplayer client
+        - Dedicated server
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Other mods
+      description: Anything that touches the same recipes, items or screens, or the full mod list if you're unsure.

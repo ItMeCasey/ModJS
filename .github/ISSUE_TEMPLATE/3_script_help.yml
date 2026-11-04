@@ -1,0 +1,38 @@
+name: Script help
+description: Your script doesn't do what you expect and you're not sure whether it's a bug.
+title: "[Help] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the [troubleshooting page](https://itmecasey.com/wiki/modjs/?p=troubleshooting) first, and run `/modjs errors` and `/modjs trace on` in game. The trace shows whether your event fires at all.
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+      placeholder: Give every new player a private void dimension and teleport them into it.
+    validations:
+      required: true
+  - type: textarea
+    id: script
+    attributes:
+      label: Your script
+      description: Say which folder it's in (startup_scripts, server_scripts or client_scripts).
+      render: javascript
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happens instead
+      description: Include the output of `/modjs errors` if there is any.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: ModJS, Minecraft and loader versions
+      placeholder: ModJS 2026.11.23, Minecraft 1.21.1, NeoForge
+    validations:
+      required: true

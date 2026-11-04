@@ -1,0 +1,45 @@
+name: Feature request
+description: An idea for something scripts could do.
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check [Coming from KubeJS](https://itmecasey.com/wiki/modjs/?p=kubejs-parity) first. It lists what was left out on purpose, such as new mob types.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      placeholder: An event for when a player enters a dimension.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?
+      description: What you're trying to build, and what you do now instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: What part of ModJS is it about?
+      options:
+        - Items, blocks or fluids
+        - Recipes, tags or loot
+        - World generation or dimensions
+        - Gameplay events
+        - Unify
+        - Client scripts, menus or screens
+        - Recipe viewers (JEI, BEI, EMI, REI)
+        - A new Minecraft version or loader
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: What the script would look like
+      description: Sketch the call you wish existed.
+      render: javascript
