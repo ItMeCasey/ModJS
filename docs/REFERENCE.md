@@ -128,6 +128,32 @@ A block entity gives `id`, `blockId`, `x/y/z`, `hasInventory`, `size`, `getItemI
 `ClientEvents.lang('en_us', event => event.add('key', 'Value'))`; rename existing things with `event.renameItem('minecraft:diamond', 'Shiny Rock')`, `renameBlock`, `renameEntity` (display names only; F3+T to apply), `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
 `ClientEvents.keyPressed(event => ...)`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
 
+### Splash text and the main menu
+
+```js
+ClientEvents.splashes(event => {
+  event.add('Made with ModJS!', 'Welcome back');   // add lines
+  event.remove('creeper');                          // remove any splash containing the text
+  // event.set('Only this one');  event.clear();    // replace or empty the list
+});
+
+ClientEvents.titleScreen(event => {
+  event.background('panorama');            // or 'dirt', 'mymod:textures/gui/bg.png', or a color like 0x101018
+  event.logo('vanilla');                   // or 'none', or a texture id
+  event.showSplash(true);
+  event.button('Singleplayer', 'singleplayer');
+  event.button('Multiplayer', 'multiplayer');
+  event.button('Join the Hub', 'connect:play.example.com');
+  event.button('Our Discord', 'url:https://discord.gg/example', { width: 120 });
+  event.button('Say hi', () => console.log('hi'), { x: 130, y: 60, width: 60 });   // x: from center, y: from top
+  event.button('Quit', 'quit');
+  event.text('Welcome to the server', { y: 8, color: 0xFFD700 });
+});
+```
+Button actions: `singleplayer`, `multiplayer`, `options`, `mods`, `languages`, `quit`, `connect:host`, `url:https://...`, or a function.
+Buttons without `x`/`y` stack down the middle. If no `titleScreen` handler exists the vanilla menu stays. F3+T applies changes.
+The `panorama` background draws the vanilla one on 1.21.1; on 26.1.2 it uses the game's default menu background.
+
 ## Helpers
 
 `Item.of`, `Ingredient.of`, `Text.of/red/green/...`, `Utils.runAfter(ticks, fn)`, `Utils.runEvery(ticks, fn)`,

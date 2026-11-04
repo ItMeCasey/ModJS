@@ -45,7 +45,7 @@ Spend: none
 
 ## Client scripts
 - [~] Client events: tooltip, key bindings, HUD overlay, and asset preload (w:3)
-- [ ] Client screen and widget hooks (w:2)
+- [~] Client screens: scripted title screen and splash text (compiled, not seen on a client); other screens and widgets not started (w:2)
 
 ## Compatibility and tooling
 - [ ] Integrations with JEI or EMI and with popular mod recipe types such as Create (w:3)

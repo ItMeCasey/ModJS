@@ -31,6 +31,7 @@ textures and models have not been run on a real client.
 | | basicCommand, compostableRecipes, recipeTypeRegistry, specialRecipeSerializers | no |
 | ClientEvents | lang, highPriorityAssets, tick | yes / compiled |
 | | loggedIn, loggedOut | compiled |
+| | splashes, titleScreen (ModJS only) | compiled; splash and screen unchecked on a client |
 | | init, leftDebugInfo, rightDebugInfo, painterUpdated, paintScreen | no |
 | BlockEvents | broken, placed, rightClicked, leftClicked | yes (broken checked in game test) |
 | | farmlandTrampled | compiled |

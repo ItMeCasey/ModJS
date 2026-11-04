@@ -89,6 +89,15 @@ public final class DataBuilder {
             data.putJson("modjs", "lang/" + language, json);
         }
 
+        if (EventGroups.CLIENT.hasHandlers("splashes")) {
+            com.itmecasey.modjs.client.SplashEventJS splashes = new com.itmecasey.modjs.client.SplashEventJS(com.itmecasey.modjs.client.SplashEventJS.readVanilla());
+            EventGroups.CLIENT.post("splashes", splashes);
+            data.putText("minecraft", "texts/splashes.txt", splashes.toFile());
+        }
+        com.itmecasey.modjs.client.TitleScreenConfig title = new com.itmecasey.modjs.client.TitleScreenConfig();
+        EventGroups.CLIENT.post("titleScreen", title);
+        com.itmecasey.modjs.client.TitleScreenConfig.set(EventGroups.CLIENT.hasHandlers("titleScreen") ? title : null);
+
         EventGroups.CLIENT.post("generateAssets", new DataEventJS(data));
         LOGGER.info("ModJS generated {} asset file(s)", data.size());
     }

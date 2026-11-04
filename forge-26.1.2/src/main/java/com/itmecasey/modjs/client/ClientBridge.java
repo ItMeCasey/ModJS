@@ -39,6 +39,14 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        net.minecraftforge.client.event.ScreenEvent.Opening.BUS.addListener((net.minecraftforge.client.event.ScreenEvent.Opening e) -> {
+            com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.TitleScreenConfig.current();
+            if (config != null && e.getNewScreen() != null && e.getNewScreen().getClass() == net.minecraft.client.gui.screens.TitleScreen.class) {
+                e.setNewScreen(new ScriptedTitleScreen(config));
+            }
+            return false;
+        });
+
         ItemTooltipEvent.BUS.addListener((ItemTooltipEvent e) -> {
             ItemStack stack = e.getItemStack();
             String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
