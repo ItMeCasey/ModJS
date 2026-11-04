@@ -52,7 +52,8 @@ Spend: none
 - [x] Type definitions: a hand-written modjs.d.ts and jsconfig.json are written to modjs/ on launch (w:3)
 - [x] Script errors shown in chat when operators join (server and startup scripts) and to players for client scripts; no separate overlay screen (w:2)
 - [x] Item unification: canonical items, materials (ores, crushed, clumps, shards), fluids, recipe, loot and inventory unification, config file (both versions self-tested with fake mods, not real ones) (w:5)
-- [x] Ports (Forge 26.1.2, 1.21.1, 1.20.1; NeoForge 26.1.2, 1.21.1, 1.20.1): NeoForge 1.21.1 and 26.1.2 done and self-tested; Forge 1.20.1 and NeoForge 1.20.1 done and self-tested; EMI, REI, JEI on 26.1.2 blocked (w:5)
+- [x] Six ports built and self-tested: Forge 26.1.2, 1.21.1 and 1.20.1; NeoForge 26.1.2, 1.21.1 and 1.20.1 (w:5)
+- [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines and fluid art on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
 
 ## Testing and release
 - [x] Automated tests: shared unit tests plus a game-test self test in both modules (w:3)
