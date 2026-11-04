@@ -60,7 +60,9 @@ public class ModJS {
         ContentRegistry.register(context.getModBusGroup());
 
         FMLCommonSetupEvent.getBus(context.getModBusGroup()).addListener((FMLCommonSetupEvent e) ->
-            EventGroups.STARTUP.post("init", new EventJS()));
+            {
+                EventGroups.STARTUP.post("init", new EventJS());
+            });
         FMLLoadCompleteEvent.getBus(context.getModBusGroup()).addListener((FMLLoadCompleteEvent e) ->
             EventGroups.STARTUP.post("postInit", new EventJS()));
         ModJSNetwork.init();

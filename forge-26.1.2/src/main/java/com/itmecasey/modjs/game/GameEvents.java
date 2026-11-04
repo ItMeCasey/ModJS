@@ -2,6 +2,7 @@ package com.itmecasey.modjs.game;
 
 import com.itmecasey.modjs.event.EventGroup;
 import com.itmecasey.modjs.event.EventGroups;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,6 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import com.itmecasey.modjs.item.ItemModifications;
+import net.minecraftforge.event.GatherComponentsEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -45,6 +48,9 @@ public final class GameEvents {
         registerEntities();
         registerLevelAndServer();
         registerExtras();
+        registerComponentChanges();
+        net.minecraftforge.event.server.ServerAboutToStartEvent.BUS.addListener((net.minecraftforge.event.server.ServerAboutToStartEvent e) -> refreshModifiedItems());
+        net.minecraftforge.event.OnDatapackSyncEvent.BUS.addListener((net.minecraftforge.event.OnDatapackSyncEvent e) -> refreshModifiedItems());
     }
 
     private static boolean fire(EventGroup group, String name, String id, GameEventJS event) {
@@ -336,5 +342,71 @@ public final class GameEvents {
                 fire(EventGroups.SERVER, "tick", null, new GameEventJS().server(e.server()));
             }
         });
+    }
+
+    // -- item modification ---------------------------------------------------------------------------------------
+
+    public static void registerComponentChanges() {
+        GatherComponentsEvent.Item.BUS.addListener((GatherComponentsEvent.Item e) -> apply(e));
+    }
+
+    /**
+     * Rebinds the default components of every modified item. In 26.1 the game binds item components after the
+     * registries load and again on each data reload, so this runs after both (the Forge component event fires too
+     * early for vanilla items).
+     */
+    public static void refreshModifiedItems() {
+        for (String id : ItemModifications.ids()) {
+            net.minecraft.resources.Identifier key = net.minecraft.resources.Identifier.tryParse(id);
+            ItemModifications.Changes changes = ItemModifications.forItem(id);
+            if (key == null || changes == null) {
+                continue;
+            }
+            BuiltInRegistries.ITEM.get(key).ifPresent(reference -> {
+                if (!reference.areComponentsBound()) {
+                    return;
+                }
+                net.minecraft.core.component.DataComponentMap.Builder builder = net.minecraft.core.component.DataComponentMap.builder().addAll(reference.components());
+                if (changes.getMaxStackSize() != null) {
+                    builder.set(DataComponents.MAX_STACK_SIZE, changes.getMaxStackSize());
+                }
+                if (changes.getMaxDamage() != null) {
+                    builder.set(DataComponents.MAX_DAMAGE, changes.getMaxDamage());
+                }
+                if (changes.getRarity() != null) {
+                    builder.set(DataComponents.RARITY, switch (changes.getRarity().toLowerCase()) {
+                        case "uncommon" -> net.minecraft.world.item.Rarity.UNCOMMON;
+                        case "rare" -> net.minecraft.world.item.Rarity.RARE;
+                        case "epic" -> net.minecraft.world.item.Rarity.EPIC;
+                        default -> net.minecraft.world.item.Rarity.COMMON;
+                    });
+                }
+                reference.components = builder.build();
+            });
+        }
+    }
+
+    private static void apply(GatherComponentsEvent.Item e) {
+        if (!(e.getOwner() instanceof net.minecraft.world.item.Item item)) {
+            return;
+        }
+        ItemModifications.Changes changes = ItemModifications.forItem(BuiltInRegistries.ITEM.getKey(item).toString());
+        if (changes == null) {
+            return;
+        }
+        if (changes.getMaxStackSize() != null) {
+            e.register(DataComponents.MAX_STACK_SIZE, changes.getMaxStackSize());
+        }
+        if (changes.getMaxDamage() != null) {
+            e.register(DataComponents.MAX_DAMAGE, changes.getMaxDamage());
+        }
+        if (changes.getRarity() != null) {
+            e.register(DataComponents.RARITY, switch (changes.getRarity().toLowerCase()) {
+                case "uncommon" -> net.minecraft.world.item.Rarity.UNCOMMON;
+                case "rare" -> net.minecraft.world.item.Rarity.RARE;
+                case "epic" -> net.minecraft.world.item.Rarity.EPIC;
+                default -> net.minecraft.world.item.Rarity.COMMON;
+            });
+        }
     }
 }

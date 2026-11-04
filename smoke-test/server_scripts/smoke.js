@@ -32,3 +32,7 @@ ServerEvents.loaded(event => {
   console.log('oak in planks tag: ' + Items.OAK_PLANKS.getDefaultInstance().is(ItemTags.PLANKS)
     + ', birch in planks tag: ' + Items.BIRCH_PLANKS.getDefaultInstance().is(ItemTags.PLANKS));
 });
+ServerEvents.loaded(event => {
+  const Items = Java.loadClass('net.minecraft.world.item.Items');
+  console.log('ender pearl max stack: ' + Items.ENDER_PEARL.getDefaultInstance().getMaxStackSize());
+});

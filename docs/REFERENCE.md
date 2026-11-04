@@ -45,6 +45,9 @@ Everything is registered as `modjs:<id>`. Put textures at `modjs/assets/modjs/te
 `.../block/<id>.png`. Models, blockstates, lang entries and block loot tables are generated for you.
 `StartupEvents.init` and `StartupEvents.postInit` fire at common setup and load complete.
 
+Change existing items from a startup script: `ItemEvents.modification(event => event.modify('minecraft:ender_pearl', item => { item.maxStackSize = 64; item.maxDamage = 100; item.rarity = 'epic'; }))`.
+The change applies on the server and in single player; a remote client does not receive it.
+
 ## Server scripts
 
 Recipes: `shaped(result, pattern, key)`, `shapeless`, `smelting`, `blasting`, `smoking`, `campfireCooking`,

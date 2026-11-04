@@ -232,7 +232,19 @@ declare const BlockEvents: {
   leftClicked(blockId: string, handler: Handler<GameEvent>): void;
 };
 
+interface ItemChanges {
+  maxStackSize: number;
+  maxDamage: number;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic';
+}
+
+interface ItemModificationEvent extends EventBase {
+  modify(id: string | string[], change: (item: ItemChanges) => void): void;
+}
+
 declare const ItemEvents: {
+  /** Startup scripts only: change properties of existing items. */
+  modification(handler: Handler<ItemModificationEvent>): void;
   rightClicked(handler: Handler<GameEvent>): void;
   rightClicked(itemId: string, handler: Handler<GameEvent>): void;
   entityInteracted(handler: Handler<GameEvent>): void;

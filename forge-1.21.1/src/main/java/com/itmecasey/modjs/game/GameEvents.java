@@ -13,6 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
+import com.itmecasey.modjs.item.ItemModifications;
+import net.minecraftforge.event.GatherComponentsEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -46,6 +48,7 @@ public final class GameEvents {
         registerEntities();
         registerLevelAndServer();
         registerExtras();
+        registerComponentChanges();
     }
 
     private static boolean fire(EventGroup group, String name, String id, GameEventJS event) {
@@ -360,5 +363,35 @@ public final class GameEvents {
                 fire(EventGroups.SERVER, "tick", null, new GameEventJS().server(e.getServer()));
             }
         });
+    }
+
+    // -- item modification ---------------------------------------------------------------------------------------
+
+    public static void registerComponentChanges() {
+        MinecraftForge.EVENT_BUS.addListener((GatherComponentsEvent.Item e) -> apply(e));
+    }
+
+    private static void apply(GatherComponentsEvent.Item e) {
+        if (!(e.getOwner() instanceof net.minecraft.world.item.Item item)) {
+            return;
+        }
+        ItemModifications.Changes changes = ItemModifications.forItem(BuiltInRegistries.ITEM.getKey(item).toString());
+        if (changes == null) {
+            return;
+        }
+        if (changes.getMaxStackSize() != null) {
+            e.register(DataComponents.MAX_STACK_SIZE, changes.getMaxStackSize());
+        }
+        if (changes.getMaxDamage() != null) {
+            e.register(DataComponents.MAX_DAMAGE, changes.getMaxDamage());
+        }
+        if (changes.getRarity() != null) {
+            e.register(DataComponents.RARITY, switch (changes.getRarity().toLowerCase()) {
+                case "uncommon" -> net.minecraft.world.item.Rarity.UNCOMMON;
+                case "rare" -> net.minecraft.world.item.Rarity.RARE;
+                case "epic" -> net.minecraft.world.item.Rarity.EPIC;
+                default -> net.minecraft.world.item.Rarity.COMMON;
+            });
+        }
     }
 }

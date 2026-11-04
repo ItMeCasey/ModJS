@@ -35,7 +35,8 @@ textures and models have not been run on a real client.
 | | detectorChanged, detectorPowered, detectorUnpowered, farmlandTrampled, modification | no |
 | ItemEvents | rightClicked, entityInteracted, crafted, smelted, foodEaten, dropped, pickedUp | crafted checked; others compiled |
 | | tooltip (KubeJS: modifyTooltips) | compiled |
-| | firstLeftClicked, firstRightClicked, canPickUp, dynamicTooltips, modelProperties, modification, armorTierRegistry, toolTierRegistry | no |
+| | modification (max stack size, max damage, rarity) | yes, checked on both versions |
+| | firstLeftClicked, firstRightClicked, canPickUp, dynamicTooltips, modelProperties, armorTierRegistry, toolTierRegistry | no |
 | EntityEvents | hurt | yes (checked) |
 | | death, spawned | compiled |
 | | checkSpawn | no |
