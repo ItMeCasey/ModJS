@@ -147,9 +147,15 @@ Unify.skipRecipes({ mod: 'create' });                               // leave som
 Unify.skipItems(['@mekanism', 'thermal:tin_ingot']);                // never replace these
 Unify.swapInventories(true);  Unify.convertRecipes(true);           // defaults
 ```
-Kinds registered by `Unify.materials`: ingot, nugget, dust, plate, gear, rod, wire, coin, gem, raw, storage_block (tags `c:ingots/<m>`, `c:raw_materials/<m>`, and so on).
+Kinds registered by `Unify.materials`: ingot, nugget, dust, plate, gear, rod, wire, coin, gem, raw, storage_block by default (tags `c:ingots/<m>`,
+`c:raw_materials/<m>`, and so on). Opt-in kinds, listed in `kinds`: `ore` (a `<m>_ore` block that drops the raw item or gem and joins `c:ores/<m>`; it
+is not generated in the world, place it with `WorldgenEvents.addOre`), `crushed` (`c:crushed_raw_materials`), `clump`, `shard` and `dirty_dust`.
 Items Minecraft already has (iron, gold, copper ingots, diamond and so on) are skipped unless you pass `includeVanilla: true`.
 Order of choice for the canonical item: `Unify.group(..., {canonical})`, then a ModJS item built with `.unify(tag)`, then the first match in `Unify.prefer`.
+Fluids: `Unify.fluid('c:oil', {canonical: 'modjs:oil'})`, `Unify.autoFluids(true)` (every `c:` fluid tag) and `event.create('oil').unify('c:oil')` on a fluid builder.
+Fluid ids stored under `fluid`, `fluid_id` or `fluidId` keys in recipe JSON are rewritten, so mods that name fluids differently are not covered.
+No script needed: `modjs/config/unify.json` is created on first run (`registerMaterials`, `materials`, `kinds`, `includeVanilla`, `prefer`, `auto`,
+`autoFluids`, `inputs`, `skipMods`, `skipItems`, `skipRecipes`, `swapInventories`, `convertRecipes`). Scripts run after it and override it.
 What it changes: recipe outputs and item inputs (any recipe stored as JSON), loot from blocks, mobs, chests and fishing, and items already in
 player inventories (checked every two seconds). Each replaced item also gets a 1:1 crafting recipe into the canonical one, and JEI hides the
 replaced items on 1.21.1. `/modjs unify` lists every group and the totals.

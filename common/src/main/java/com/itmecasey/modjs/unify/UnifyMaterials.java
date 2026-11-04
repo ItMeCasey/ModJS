@@ -15,7 +15,7 @@ import java.util.Set;
 /** The built-in material and kind tables behind {@code Unify.materials}, including generated placeholder textures. */
 public final class UnifyMaterials {
     /** One thing to register: an item or a block with its tag. */
-    public record Entry(String id, String kind, String material, String tag, String displayName, int color, boolean block) {
+    public record Entry(String id, String kind, String material, String tag, String displayName, int color, boolean block, String dropId) {
     }
 
     /** What a {@code Unify.materials} call asked for. */
@@ -57,6 +57,11 @@ public final class UnifyMaterials {
         kind("gem", "gems", "", "", "_gem", "Gem", false);
         kind("raw", "raw_materials", "", "raw_", "", "Raw", false);
         kind("storage_block", "storage_blocks", "", "", "_block", "Block", true);
+        kind("ore", "ores", "", "", "_ore", "Ore", true);
+        kind("crushed", "crushed_raw_materials", "", "crushed_", "", "Crushed", false);
+        kind("clump", "clumps", "", "", "_clump", "Clump", false);
+        kind("shard", "shards", "", "", "_shard", "Shard", false);
+        kind("dirty_dust", "dirty_dusts", "", "", "_dirty_dust", "Dirty Dust", false);
         color("iron", 0xD8D8D8);
         color("gold", 0xFCEE4B);
         color("copper", 0xE77C56);
@@ -125,15 +130,35 @@ public final class UnifyMaterials {
                     continue;
                 }
                 String id = kind.id(material);
+                if (kindName.equals("ore")) {
+                    String dropKind = gem ? "gem" : "raw";
+                    String dropId = KINDS.get(dropKind).id(material);
+                    if (seen.add(dropId) && !(!spec.includeVanilla() && VANILLA.contains(dropKind + ":" + material))) {
+                        out.add(new Entry(dropId, dropKind, material, "c:" + KINDS.get(dropKind).folder() + "/" + material,
+                            dropKind.equals("gem") ? title(material) : "Raw " + title(material), COLORS.getOrDefault(material, hash(material)), false, null));
+                    }
+                    if (VANILLA.contains(dropKind + ":" + material) && !spec.includeVanilla()) {
+                        dropId = "minecraft:" + (gem ? material : "raw_" + material);
+                    } else {
+                        dropId = "modjs:" + dropId;
+                    }
+                    if (seen.add(id)) {
+                        out.add(new Entry(id, "ore", material, "c:ores/" + material, title(material) + " Ore",
+                            COLORS.getOrDefault(material, hash(material)), true, dropId));
+                    }
+                    continue;
+                }
                 if (seen.add(id)) {
                     String tag = "c:" + kind.folder() + "/" + material;
                     String name = title(material) + " " + (kind.label().equals("Raw") ? "(Raw)" : kind.label());
                     if (kind.label().equals("Raw")) {
                         name = "Raw " + title(material);
+                    } else if (kind.label().equals("Crushed")) {
+                        name = "Crushed " + title(material);
                     } else if (kind.name().equals("gem")) {
                         name = title(material);
                     }
-                    out.add(new Entry(id, kindName, material, tag, name, COLORS.getOrDefault(material, hash(material)), kind.block()));
+                    out.add(new Entry(id, kindName, material, tag, name, COLORS.getOrDefault(material, hash(material)), kind.block(), null));
                 }
             }
         }
@@ -242,6 +267,50 @@ public final class UnifyMaterials {
                         if (d < 4.5 + ((x * 7 + y * 3) % 3) * 0.4) {
                             image.setRGB(x, y, (((x + y) % 4 == 0) ? light : ((x * y) % 5 == 0 ? dark : base)).getRGB());
                         }
+                    }
+                }
+            }
+            case "crushed", "clump" -> {
+                for (int y = 4; y <= 12; y++) {
+                    for (int x = 3; x <= 12; x++) {
+                        double d = Math.hypot(x - 7.5, y - 8);
+                        if (d < 4.2 + ((x * 5 + y * 11) % 4) * 0.5) {
+                            image.setRGB(x, y, (((x * 3 + y) % 3 == 0) ? light : ((x + y * 2) % 4 == 0 ? dark : base)).getRGB());
+                        }
+                    }
+                }
+            }
+            case "shard" -> {
+                for (int y = 2; y <= 13; y++) {
+                    int half = Math.max(0, 5 - Math.abs(y - 8) - (y > 8 ? 1 : 0));
+                    for (int x = 8 - half / 2; x <= 8 + half / 2 + 1; x++) {
+                        image.setRGB(x, y, (x < 8 ? light : dark).getRGB());
+                    }
+                }
+            }
+            case "dirty_dust" -> {
+                for (int y = 6; y <= 12; y++) {
+                    int half = (y - 5);
+                    for (int x = 8 - half; x <= 7 + half; x++) {
+                        if (x >= 1 && x <= 14) {
+                            Color brown = new Color(0x6B5A4A);
+                            image.setRGB(x, y, ((x + y) % 3 == 0 ? base : (x + y) % 3 == 1 ? brown : dark).getRGB());
+                        }
+                    }
+                }
+            }
+            case "ore" -> {
+                for (int y = 0; y < 16; y++) {
+                    for (int x = 0; x < 16; x++) {
+                        int n = (x * 7 + y * 13 + (x * y)) % 11;
+                        image.setRGB(x, y, new Color(n < 3 ? 0x6E6E6E : n < 7 ? 0x7F7F7F : 0x8C8C8C).getRGB());
+                    }
+                }
+                int[][] specks = {{3, 3}, {4, 3}, {10, 5}, {11, 5}, {10, 6}, {5, 10}, {6, 10}, {5, 11}, {12, 12}, {3, 13}, {8, 8}};
+                for (int[] speck : specks) {
+                    image.setRGB(speck[0], speck[1], base.getRGB());
+                    if (speck[0] + 1 < 16) {
+                        image.setRGB(speck[0] + 1, speck[1], light.getRGB());
                     }
                 }
             }

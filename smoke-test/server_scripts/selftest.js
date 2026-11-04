@@ -23,3 +23,4 @@ ServerEvents.tags('item', event => {
   // pretend vanilla iron ingots are a second mod's tin ingots, so vanilla recipes exercise the unifier
   event.add('c:ingots/tin', 'minecraft:iron_ingot');
 });
+ServerEvents.tags('fluid', event => event.add('c:goo', 'minecraft:lava'));

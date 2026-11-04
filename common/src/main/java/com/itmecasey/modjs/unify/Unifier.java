@@ -27,17 +27,24 @@ public final class Unifier {
     /** Prefix of the recipe ids ModJS generates; these are never rewritten. */
     public static final String CONVERSION_PREFIX = "modjs:unify/";
 
-    private static volatile Unifier current = new Unifier(List.of(), false, List.of());
+    private static volatile Unifier current = new Unifier(List.of(), List.of(), false, List.of());
 
     private final List<Group> groups;
     private final boolean convert;
     private final List<RecipeFilter> skipRecipes;
     private final Map<String, Group> byMember = new LinkedHashMap<>();
+    private final List<Group> fluidGroups;
+    private final Map<String, String> fluidCanonical = new LinkedHashMap<>();
+    private int fluidsRewritten;
     private int inputsRewritten;
     private int outputsRewritten;
 
-    private Unifier(List<Group> groups, boolean convert, List<RecipeFilter> skipRecipes) {
+    private Unifier(List<Group> groups, List<Group> fluidGroups, boolean convert, List<RecipeFilter> skipRecipes) {
         this.groups = groups;
+        this.fluidGroups = fluidGroups;
+        for (Group group : fluidGroups) {
+            group.members().forEach(member -> fluidCanonical.putIfAbsent(member, group.canonical()));
+        }
         this.convert = convert;
         this.skipRecipes = skipRecipes;
         for (Group group : groups) {
@@ -56,12 +63,16 @@ public final class Unifier {
     }
 
     public static void clear() {
-        current = new Unifier(List.of(), false, List.of());
+        current = new Unifier(List.of(), List.of(), false, List.of());
     }
 
     // -- building ----------------------------------------------------------------------------------------------------
 
     public static Unifier build(TagIndex index, Predicate<String> itemExists) {
+        return build(index, itemExists, new TagIndex(Map.of()), id -> false);
+    }
+
+    public static Unifier build(TagIndex index, Predicate<String> itemExists, TagIndex fluidIndex, Predicate<String> fluidExists) {
         Map<String, UnifyConfig.ExplicitGroup> wanted = new LinkedHashMap<>();
         for (UnifyConfig.ExplicitGroup group : UnifyConfig.groups()) {
             wanted.putIfAbsent(group.tag(), group);
@@ -111,7 +122,68 @@ public final class Unifier {
             UnifyConfig.InputMode mode = group.inputs() != null ? group.inputs() : UnifyConfig.inputMode();
             groups.add(new Group(group.tag(), canonical, mode, others));
         }
-        return new Unifier(groups, UnifyConfig.convertRecipes(), UnifyConfig.skipRecipes());
+        return new Unifier(groups, buildFluidGroups(fluidIndex, fluidExists, skipItems), UnifyConfig.convertRecipes(), UnifyConfig.skipRecipes());
+    }
+
+    private static List<Group> buildFluidGroups(TagIndex index, Predicate<String> exists, Set<String> skip) {
+        Map<String, UnifyConfig.ExplicitGroup> wanted = new LinkedHashMap<>();
+        for (UnifyConfig.ExplicitGroup group : UnifyConfig.fluidGroups()) {
+            wanted.putIfAbsent(group.tag(), group);
+        }
+        for (String tag : UnifyConfig.canonicalFluids().keySet()) {
+            wanted.putIfAbsent(tag, new UnifyConfig.ExplicitGroup(tag, null, null));
+        }
+        if (UnifyConfig.autoFluids()) {
+            for (String tag : index.tagIds()) {
+                if (tag.startsWith("c:")) {
+                    wanted.putIfAbsent(tag, new UnifyConfig.ExplicitGroup(tag, null, null));
+                }
+            }
+        }
+        Map<String, String> ours = UnifyConfig.canonicalFluids();
+        List<String> prefer = UnifyConfig.prefer();
+        List<Group> out = new ArrayList<>();
+        Set<String> claimed = new LinkedHashSet<>();
+        for (UnifyConfig.ExplicitGroup group : wanted.values()) {
+            Set<String> members = new LinkedHashSet<>();
+            for (String id : index.resolve(group.tag())) {
+                if (exists.test(id)) {
+                    members.add(id);
+                }
+            }
+            String canonical = group.canonical() != null ? group.canonical() : ours.get(group.tag());
+            if (canonical == null) {
+                canonical = pick(members, prefer);
+            }
+            if (canonical == null || !exists.test(canonical)) {
+                continue;
+            }
+            members.add(canonical);
+            List<String> others = new ArrayList<>();
+            for (String member : members) {
+                if (!member.equals(canonical) && !skipped(member, skip) && !claimed.contains(member)) {
+                    others.add(member);
+                }
+            }
+            if (!others.isEmpty()) {
+                claimed.addAll(others);
+                claimed.add(canonical);
+                out.add(new Group(group.tag(), canonical, UnifyConfig.InputMode.CANONICAL, others));
+            }
+        }
+        return out;
+    }
+
+    public List<Group> fluidGroups() {
+        return fluidGroups;
+    }
+
+    public String fluidCanonicalFor(String fluidId) {
+        return fluidCanonical.get(fluidId);
+    }
+
+    public int fluidsRewritten() {
+        return fluidsRewritten;
     }
 
     private static String pick(Set<String> members, List<String> prefer) {
@@ -137,7 +209,7 @@ public final class Unifier {
     // -- queries ------------------------------------------------------------------------------------------------------
 
     public boolean active() {
-        return !groups.isEmpty();
+        return !groups.isEmpty() || !fluidGroups.isEmpty();
     }
 
     public List<Group> groups() {
@@ -162,7 +234,7 @@ public final class Unifier {
 
     /** Returns the same instance when nothing changed, otherwise a rewritten copy. */
     public synchronized JsonObject apply(String recipeId, JsonObject json) {
-        if (groups.isEmpty() || recipeId.startsWith(CONVERSION_PREFIX)) {
+        if (!active() || recipeId.startsWith(CONVERSION_PREFIX)) {
             return json;
         }
         for (RecipeFilter filter : skipRecipes) {
@@ -179,13 +251,17 @@ public final class Unifier {
             }
             return group.inputs() == UnifyConfig.InputMode.TAG ? "#" + group.tag() : group.canonical();
         });
+        boolean fluids = !fluidCanonical.isEmpty() && RecipeChanges.mapFluids(copy, this::fluidCanonicalFor);
+        if (fluids) {
+            fluidsRewritten++;
+        }
         if (outputs) {
             outputsRewritten++;
         }
         if (inputs) {
             inputsRewritten++;
         }
-        return outputs || inputs ? copy : json;
+        return outputs || inputs || fluids ? copy : json;
     }
 
     /** One-to-one recipes that turn each non-canonical item into the canonical one, by recipe id. */

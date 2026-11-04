@@ -24,9 +24,10 @@ StartupEvents.registry('item', event => {
   event.create('test_boots').armor('boots', 'diamond');
 });
 StartupEvents.registry('fluid', event => {
-  event.create('test_goo').color(0x44FF44).luminosity(6);
+  event.create('test_goo').color(0x44FF44).luminosity(6).unify('c:goo');
 });
 Unify.materials({ materials: ['tin', 'ruby'] });
 StartupEvents.registry('item', event => {
   event.create('test_unified_rod').unify('c:rods/test_unified');
 });
+Unify.materials({ materials: ['zinc'], kinds: ['ore', 'crushed', 'clump', 'shard', 'dirty_dust'] });

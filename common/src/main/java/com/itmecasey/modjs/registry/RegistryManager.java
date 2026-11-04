@@ -24,6 +24,7 @@ public final class RegistryManager {
     private static final Map<String, CreativeTabBuilderJS> TABS = new LinkedHashMap<>();
     private static final Map<String, com.itmecasey.modjs.unify.UnifyMaterials.Entry> UNIFY_ENTRIES = new LinkedHashMap<>();
     private static boolean contributorsInstalled;
+    private static boolean UNIFY_FILE_READ;
 
     private RegistryManager() {
     }
@@ -41,6 +42,10 @@ public final class RegistryManager {
         EventGroups.STARTUP.postExact("registry", "fluid", new RegistryEventJS<>("fluid", FLUIDS, FluidBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
+        if (!UNIFY_FILE_READ) {
+            UNIFY_FILE_READ = true;
+            com.itmecasey.modjs.unify.UnifyFile.applyStartup(com.itmecasey.modjs.script.ScriptManager.root());
+        }
         addUnifiedMaterials();
         for (ItemBuilderJS item : ITEMS.values()) {
             if (item.unifyTag() != null) {
@@ -50,6 +55,11 @@ public final class RegistryManager {
         for (BlockBuilderJS block : BLOCKS.values()) {
             if (block.unifyTag() != null) {
                 com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(block.unifyTag(), NAMESPACE + ":" + block.id());
+            }
+        }
+        for (FluidBuilderJS fluid : FLUIDS.values()) {
+            if (fluid.unifyTag() != null) {
+                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalFluid(fluid.unifyTag(), NAMESPACE + ":" + fluid.id());
             }
         }
         if (!contributorsInstalled) {
@@ -67,7 +77,11 @@ public final class RegistryManager {
                     continue;
                 }
                 if (entry.block()) {
-                    BLOCKS.put(entry.id(), new BlockBuilderJS(entry.id()).displayName(entry.displayName()).hardness(3).resistance(6).unify(entry.tag()));
+                    BlockBuilderJS block = new BlockBuilderJS(entry.id()).displayName(entry.displayName()).hardness(3).resistance(6).unify(entry.tag());
+                    if (entry.dropId() != null) {
+                        block.drops(entry.dropId()).requiresTool(true);
+                    }
+                    BLOCKS.put(entry.id(), block);
                 } else {
                     ItemBuilderJS item = new ItemBuilderJS(entry.id()).displayName(entry.displayName()).unify(entry.tag());
                     if (entry.kind().equals("rod")) {
@@ -206,6 +220,21 @@ public final class RegistryManager {
                 blockTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
             }
         }
+        for (BlockBuilderJS block : BLOCKS.values()) {
+            if (block.requiresTool()) {
+                blockTags.computeIfAbsent("minecraft:mineable/pickaxe", k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+                if (block.dropItem() != null) {
+                    blockTags.computeIfAbsent("minecraft:needs_stone_tool", k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+                }
+            }
+        }
+        Map<String, java.util.List<String>> fluidTags = new LinkedHashMap<>();
+        for (FluidBuilderJS fluid : FLUIDS.values()) {
+            if (fluid.unifyTag() != null) {
+                fluidTags.computeIfAbsent(fluid.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + fluid.id());
+            }
+        }
+        writeTags(data, "fluid", fluidTags);
         writeTags(data, "item", itemTags);
         writeTags(data, "block", blockTags);
         for (BlockBuilderJS block : BLOCKS.values()) {
@@ -215,7 +244,7 @@ public final class RegistryManager {
             if (!block.isDropsNothing()) {
                 JsonObject entry = new JsonObject();
                 entry.addProperty("type", "minecraft:item");
-                entry.addProperty("name", NAMESPACE + ":" + block.id());
+                entry.addProperty("name", block.dropItem() != null ? block.dropItem() : NAMESPACE + ":" + block.id());
                 if (block.type().equals("slab")) {
                     JsonObject setCount = new JsonObject();
                     setCount.addProperty("function", "minecraft:set_count");

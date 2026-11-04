@@ -22,15 +22,15 @@ import java.util.Map;
 public final class UnifyReload {
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
     private static final FileToIdConverter TAG_FILES = FileToIdConverter.json("tags/item");
+    private static final FileToIdConverter FLUID_TAG_FILES = FileToIdConverter.json("tags/fluid");
 
     private UnifyReload() {
     }
 
-    /** Builds and installs the {@link Unifier} for the current data. */
-    public static Unifier prepare(ResourceManager resources) {
+    private static Map<String, List<JsonObject>> readTags(ResourceManager resources, FileToIdConverter converter) {
         Map<String, List<JsonObject>> files = new HashMap<>();
-        for (Map.Entry<Identifier, List<Resource>> entry : TAG_FILES.listMatchingResourceStacks(resources).entrySet()) {
-            Identifier id = TAG_FILES.fileToId(entry.getKey());
+        for (Map.Entry<Identifier, List<Resource>> entry : converter.listMatchingResourceStacks(resources).entrySet()) {
+            Identifier id = converter.fileToId(entry.getKey());
             List<JsonObject> list = new ArrayList<>();
             for (Resource resource : entry.getValue()) {
                 try (Reader reader = resource.openAsReader()) {
@@ -44,13 +44,21 @@ public final class UnifyReload {
             }
             files.put(id.toString(), list);
         }
-        Unifier unifier = Unifier.build(new TagIndex(files), item -> {
+        return files;
+    }
+
+    /** Builds and installs the {@link Unifier} for the current data. */
+    public static Unifier prepare(ResourceManager resources) {
+        Unifier unifier = Unifier.build(new TagIndex(readTags(resources, TAG_FILES)), item -> {
             Identifier id = Identifier.tryParse(item);
             return id != null && BuiltInRegistries.ITEM.containsKey(id);
+        }, new TagIndex(readTags(resources, FLUID_TAG_FILES)), fluid -> {
+            Identifier id = Identifier.tryParse(fluid);
+            return id != null && BuiltInRegistries.FLUID.containsKey(id);
         });
         Unifier.set(unifier);
         if (unifier.active()) {
-            LOGGER.info("ModJS unified {} material group(s)", unifier.groups().size());
+            LOGGER.info("ModJS unified {} item group(s) and {} fluid group(s)", unifier.groups().size(), unifier.fluidGroups().size());
         }
         return unifier;
     }

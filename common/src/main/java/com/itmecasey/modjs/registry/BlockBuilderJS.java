@@ -14,6 +14,7 @@ public final class BlockBuilderJS {
     private boolean dropsNothing;
     private String type = "basic";
     private String unifyTag;
+    private String dropItem;
 
     BlockBuilderJS(String id) {
         this.id = id;
@@ -53,6 +54,17 @@ public final class BlockBuilderJS {
 
     public boolean isNoItem() {
         return noItem;
+    }
+
+    /** Item id dropped instead of the block itself, or null. */
+    public String dropItem() {
+        return dropItem;
+    }
+
+    /** Drops this item (for example {@code "minecraft:diamond"}) instead of the block. */
+    public BlockBuilderJS drops(String itemId) {
+        this.dropItem = itemId.contains(":") ? itemId : "minecraft:" + itemId;
+        return this;
     }
 
     public boolean isDropsNothing() {

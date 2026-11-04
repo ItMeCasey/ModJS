@@ -133,6 +133,42 @@ public final class RecipeChanges {
         return changed;
     }
 
+    /**
+     * Rewrites fluid ids stored under the keys {@code fluid}, {@code fluid_id} and {@code fluidId} anywhere in the recipe
+     * (as a string, or as an object with an {@code id}); null from {@code mapper} keeps the id.
+     */
+    public static boolean mapFluids(JsonElement element, UnaryOperator<String> mapper) {
+        boolean changed = false;
+        if (element.isJsonArray()) {
+            for (JsonElement child : element.getAsJsonArray()) {
+                changed |= mapFluids(child, mapper);
+            }
+        } else if (element.isJsonObject()) {
+            for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
+                String key = entry.getKey();
+                JsonElement value = entry.getValue();
+                boolean fluidKey = key.equals("fluid") || key.equals("fluid_id") || key.equals("fluidId");
+                if (fluidKey && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
+                    String mapped = mapper.apply(value.getAsString());
+                    if (mapped != null) {
+                        entry.setValue(new com.google.gson.JsonPrimitive(mapped));
+                        changed = true;
+                    }
+                } else if (fluidKey && value.isJsonObject() && value.getAsJsonObject().has("id")
+                    && value.getAsJsonObject().get("id").isJsonPrimitive()) {
+                    String mapped = mapper.apply(value.getAsJsonObject().get("id").getAsString());
+                    if (mapped != null) {
+                        value.getAsJsonObject().addProperty("id", mapped);
+                        changed = true;
+                    }
+                } else {
+                    changed |= mapFluids(value, mapper);
+                }
+            }
+        }
+        return changed;
+    }
+
     private static String tokenOf(JsonElement element, UnaryOperator<String> mapper) {
         String token = VersionFormat.current().ingredientToken(element);
         return token == null ? null : mapper.apply(token);

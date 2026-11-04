@@ -32,12 +32,15 @@ public final class UnifyConfig {
     // -- startup state (kept for the life of the game) -------------------------------------------------------------
 
     private static final Map<String, String> CANONICAL_ITEMS = new LinkedHashMap<>();
+    private static final Map<String, String> CANONICAL_FLUIDS = new LinkedHashMap<>();
     private static final List<UnifyMaterials.Spec> MATERIALS = new ArrayList<>();
 
     // -- server state (reset on reload) ----------------------------------------------------------------------------
 
     private static final List<String> PREFER = new ArrayList<>(List.of("modjs"));
     private static final List<ExplicitGroup> GROUPS = new ArrayList<>();
+    private static final List<ExplicitGroup> FLUID_GROUPS = new ArrayList<>();
+    private static boolean autoFluids;
     private static final Set<String> AUTO_CATEGORIES = new LinkedHashSet<>();
     private static final List<RecipeFilter> SKIP_RECIPES = new ArrayList<>();
     private static final Set<String> SKIP_ITEMS = new LinkedHashSet<>();
@@ -54,6 +57,8 @@ public final class UnifyConfig {
         PREFER.clear();
         PREFER.add("modjs");
         GROUPS.clear();
+        FLUID_GROUPS.clear();
+        autoFluids = false;
         AUTO_CATEGORIES.clear();
         SKIP_RECIPES.clear();
         SKIP_ITEMS.clear();
@@ -64,6 +69,7 @@ public final class UnifyConfig {
 
     public static synchronized void resetStartup() {
         CANONICAL_ITEMS.clear();
+        CANONICAL_FLUIDS.clear();
         MATERIALS.clear();
     }
 
@@ -73,6 +79,22 @@ public final class UnifyConfig {
 
     static synchronized List<ExplicitGroup> groups() {
         return new ArrayList<>(GROUPS);
+    }
+
+    static synchronized List<ExplicitGroup> fluidGroups() {
+        return new ArrayList<>(FLUID_GROUPS);
+    }
+
+    static synchronized boolean autoFluids() {
+        return autoFluids;
+    }
+
+    public static synchronized Map<String, String> canonicalFluids() {
+        return new LinkedHashMap<>(CANONICAL_FLUIDS);
+    }
+
+    public static synchronized void addCanonicalFluid(String tag, String fluidId) {
+        CANONICAL_FLUIDS.putIfAbsent(tag, fluidId);
     }
 
     static synchronized Set<String> autoCategories() {
@@ -112,6 +134,14 @@ public final class UnifyConfig {
         return new ArrayList<>(MATERIALS);
     }
 
+    public static synchronized void addMaterials(List<String> materials, List<String> kinds, boolean includeVanilla) {
+        MATERIALS.add(new UnifyMaterials.Spec(materials, kinds, includeVanilla));
+    }
+
+    public static synchronized void skipRecipe(RecipeFilter filter) {
+        SKIP_RECIPES.add(filter);
+    }
+
     /** Declares a group without going through a script; used by platform code and tests. */
     public static synchronized void group(String tag, String canonical) {
         GROUPS.add(new ExplicitGroup(tag, canonical, null));
@@ -138,6 +168,29 @@ public final class UnifyConfig {
 
         public void materials() {
             materials(null);
+        }
+
+        /**
+         * Unifies fluids: {@code fluid('c:oil', {canonical: 'modjs:oil'})}. Fluid ids stored under {@code fluid} keys in recipes
+         * are rewritten; a fluid built with {@code .unify(tag)} is canonical without naming it here.
+         */
+        public void fluid(String tag, Object options) {
+            String id = tag.startsWith("#") ? tag.substring(1) : tag;
+            String canonical = JsonUtil.asString(JsonUtil.property(options, "canonical"));
+            synchronized (UnifyConfig.class) {
+                FLUID_GROUPS.add(new ExplicitGroup(id.contains(":") ? id : "c:" + id, canonical, null));
+            }
+        }
+
+        public void fluid(String tag) {
+            fluid(tag, null);
+        }
+
+        /** Unifies every fluid tag in the {@code c} namespace that contains more than one fluid. */
+        public void autoFluids(boolean enabled) {
+            synchronized (UnifyConfig.class) {
+                autoFluids = enabled;
+            }
         }
 
         /** Mods whose item wins when no ModJS item exists for a group, in order. {@code modjs} is always first unless you list it. */

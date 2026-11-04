@@ -165,6 +165,16 @@ public final class SelfTest {
             && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(inSlot.getItem()).toString().equals("modjs:tin_ingot"));
         player.getInventory().setItem(5, ItemStack.EMPTY);
 
+        check("Unify fluid group picks our fluid", unifier.fluidGroups().size() == 1 && "modjs:test_goo".equals(unifier.fluidCanonicalFor("minecraft:lava")));
+        for (String blockId : new String[] {"zinc_ore"}) {
+            check("registered unify block " + blockId, net.minecraft.core.registries.BuiltInRegistries.BLOCK.stream()
+                .anyMatch(b -> net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(b).toString().equals("modjs:" + blockId)));
+        }
+        for (String itemId : new String[] {"crushed_zinc", "zinc_clump", "zinc_shard", "zinc_dirty_dust", "raw_zinc"}) {
+            check("registered unify item " + itemId, net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+                .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("modjs:" + itemId)));
+        }
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

@@ -47,6 +47,7 @@ public final class DataBuilder {
         Scheduler.reset();
         PersistentBinding.resetCache();
         com.itmecasey.modjs.unify.UnifyConfig.resetServer();
+        com.itmecasey.modjs.unify.UnifyFile.applyServer(ScriptManager.root());
         ScriptManager.of(ScriptType.SERVER).reload();
 
         EventGroups.SERVER.post("highPriorityData", new DataEventJS(data));

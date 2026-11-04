@@ -10,6 +10,7 @@ public final class FluidBuilderJS {
     private int viscosity = 1000;
     private int temperature = 300;
     private boolean noBucket;
+    private String unifyTag;
 
     FluidBuilderJS(String id) {
         this.id = id;
@@ -46,6 +47,17 @@ public final class FluidBuilderJS {
 
     public boolean isNoBucket() {
         return noBucket;
+    }
+
+    public String unifyTag() {
+        return unifyTag;
+    }
+
+    /** Makes this the canonical fluid for a tag such as {@code "c:oil"} (see {@code Unify.fluid}). */
+    public FluidBuilderJS unify(String tag) {
+        String id = tag.startsWith("#") ? tag.substring(1) : tag;
+        this.unifyTag = id.contains(":") ? id : "c:" + id;
+        return this;
     }
 
     public FluidBuilderJS displayName(String name) {
