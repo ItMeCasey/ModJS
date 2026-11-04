@@ -30,6 +30,10 @@ public final class ContentRegistry {
 
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
 
+    private static final java.util.Map<String, net.minecraft.world.item.Tier> CUSTOM_TIERS = new java.util.HashMap<>();
+    private static final java.util.Map<String, RegistryObject<net.minecraft.world.item.ArmorMaterial>> CUSTOM_ARMOR = new java.util.HashMap<>();
+    private static final DeferredRegister<net.minecraft.world.item.ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, RegistryManager.NAMESPACE);
+
     record TabEntry(String tab, RegistryObject<Item> item) {
     }
 
@@ -40,6 +44,13 @@ public final class ContentRegistry {
 
     /** Turns the collected builders into registry entries; call from the mod constructor after {@link RegistryManager#collect()}. */
     public static void register(IEventBus modBus) {
+        for (ToolTierBuilderJS tier : RegistryManager.toolTiers()) {
+            CUSTOM_TIERS.put(RegistryManager.NAMESPACE + ":" + tier.id(), new CustomTier(tier));
+        }
+        for (ArmorMaterialBuilderJS material : RegistryManager.armorMaterials()) {
+            CUSTOM_ARMOR.put(RegistryManager.NAMESPACE + ":" + material.id(), ARMOR_MATERIALS.register(material.id(), () -> armorMaterial(material)));
+        }
+        ARMOR_MATERIALS.register(modBus);
         FluidRegistry.register(modBus, BLOCKS, ITEMS, TAB_ENTRIES);
         for (BlockBuilderJS builder : RegistryManager.blocks()) {
             BlockBuilderJS b = builder;
@@ -115,7 +126,88 @@ public final class ContentRegistry {
         return new ItemStack(item);
     }
 
+    private static net.minecraft.world.item.ArmorMaterial armorMaterial(ArmorMaterialBuilderJS m) {
+        java.util.Map<net.minecraft.world.item.ArmorItem.Type, Integer> defense = new java.util.EnumMap<>(net.minecraft.world.item.ArmorItem.Type.class);
+        defense.put(net.minecraft.world.item.ArmorItem.Type.HELMET, m.defense("helmet"));
+        defense.put(net.minecraft.world.item.ArmorItem.Type.CHESTPLATE, m.defense("chestplate"));
+        defense.put(net.minecraft.world.item.ArmorItem.Type.LEGGINGS, m.defense("leggings"));
+        defense.put(net.minecraft.world.item.ArmorItem.Type.BOOTS, m.defense("boots"));
+        return new net.minecraft.world.item.ArmorMaterial(defense, m.enchantability(), net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_IRON,
+            () -> m.repair() == null ? net.minecraft.world.item.crafting.Ingredient.EMPTY
+                : net.minecraft.world.item.crafting.Ingredient.of(BuiltInRegistries.ITEM.get(ResourceLocation.parse(m.repair()))),
+            java.util.List.of(new net.minecraft.world.item.ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(RegistryManager.NAMESPACE, m.id()))),
+            m.toughness(), m.knockbackResistance());
+    }
+
+    /** A script-defined tool tier. */
+    private static final class CustomTier implements net.minecraft.world.item.Tier {
+        private final ToolTierBuilderJS tier;
+
+        CustomTier(ToolTierBuilderJS tier) {
+            this.tier = tier;
+        }
+
+        @Override
+        public int getUses() {
+            return tier.uses();
+        }
+
+        @Override
+        public float getSpeed() {
+            return tier.speed();
+        }
+
+        @Override
+        public float getAttackDamageBonus() {
+            return tier.attackDamage();
+        }
+
+        @Override
+        public net.minecraft.tags.TagKey<Block> getIncorrectBlocksForDrops() {
+            return switch (tier.level()) {
+                case "wood" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_WOODEN_TOOL;
+                case "stone" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_STONE_TOOL;
+                case "gold" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_GOLD_TOOL;
+                case "diamond" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_DIAMOND_TOOL;
+                case "netherite" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_NETHERITE_TOOL;
+                default -> net.minecraft.tags.BlockTags.INCORRECT_FOR_IRON_TOOL;
+            };
+        }
+
+        @Override
+        public int getEnchantmentValue() {
+            return tier.enchantability();
+        }
+
+        @Override
+        public net.minecraft.world.item.crafting.Ingredient getRepairIngredient() {
+            return tier.repair() == null ? net.minecraft.world.item.crafting.Ingredient.EMPTY
+                : net.minecraft.world.item.crafting.Ingredient.of(BuiltInRegistries.ITEM.get(ResourceLocation.parse(tier.repair())));
+        }
+    }
+
     private static Item armor(ItemBuilderJS b, Item.Properties properties) {
+        String custom = b.armorTier().contains(":") ? b.armorTier() : RegistryManager.NAMESPACE + ":" + b.armorTier();
+        RegistryObject<net.minecraft.world.item.ArmorMaterial> customMaterial = CUSTOM_ARMOR.get(custom);
+        if (customMaterial != null) {
+            net.minecraft.world.item.ArmorItem.Type type = switch (b.armorSlot()) {
+                case "chestplate" -> net.minecraft.world.item.ArmorItem.Type.CHESTPLATE;
+                case "leggings" -> net.minecraft.world.item.ArmorItem.Type.LEGGINGS;
+                case "boots" -> net.minecraft.world.item.ArmorItem.Type.BOOTS;
+                default -> net.minecraft.world.item.ArmorItem.Type.HELMET;
+            };
+            int multiplier = RegistryManager.armorMaterials().stream().filter(m -> (RegistryManager.NAMESPACE + ":" + m.id()).equals(custom))
+                .findFirst().map(ArmorMaterialBuilderJS::durability).orElse(15);
+            // the registry may not have the material yet when items register, so fall back to a direct holder
+            net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial> holder = customMaterial.getHolder()
+                .<net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial>>map(h -> h)
+                .orElseGet(() -> net.minecraft.core.Holder.direct(armorMaterial(RegistryManager.armorMaterials().stream()
+                    .filter(m -> (RegistryManager.NAMESPACE + ":" + m.id()).equals(custom)).findFirst().orElseThrow())));
+            return new net.minecraft.world.item.ArmorItem(holder, type, properties.durability(type.getDurability(multiplier)));
+        }
+        if (!java.util.List.of("leather", "chainmail", "iron", "gold", "diamond", "netherite").contains(b.armorTier())) {
+            throw new IllegalStateException("Item '" + b.id() + "' uses unknown armor material '" + b.armorTier() + "'");
+        }
         net.minecraft.world.item.ArmorItem.Type type = switch (b.armorSlot()) {
             case "chestplate" -> net.minecraft.world.item.ArmorItem.Type.CHESTPLATE;
             case "leggings" -> net.minecraft.world.item.ArmorItem.Type.LEGGINGS;
@@ -141,7 +233,12 @@ public final class ContentRegistry {
     }
 
     private static Item tool(ItemBuilderJS b, Item.Properties properties) {
-        net.minecraft.world.item.Tier tier = switch (b.toolTier()) {
+        String custom = b.toolTier().contains(":") ? b.toolTier() : RegistryManager.NAMESPACE + ":" + b.toolTier();
+        net.minecraft.world.item.Tier customTier = CUSTOM_TIERS.get(custom);
+        if (customTier == null && !java.util.List.of("wood", "stone", "iron", "gold", "diamond", "netherite").contains(b.toolTier())) {
+            throw new IllegalStateException("Item '" + b.id() + "' uses unknown tool tier '" + b.toolTier() + "'");
+        }
+        net.minecraft.world.item.Tier tier = customTier != null ? customTier : switch (b.toolTier()) {
             case "wood" -> net.minecraft.world.item.Tiers.WOOD;
             case "stone" -> net.minecraft.world.item.Tiers.STONE;
             case "gold" -> net.minecraft.world.item.Tiers.GOLD;

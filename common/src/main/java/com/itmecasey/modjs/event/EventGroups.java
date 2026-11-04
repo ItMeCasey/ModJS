@@ -9,7 +9,7 @@ import java.util.Map;
 public final class EventGroups {
     public static final EventGroup STARTUP = new EventGroup("StartupEvents", ScriptType.STARTUP);
     public static final EventGroup SERVER = new EventGroup("ServerEvents", ScriptType.SERVER);
-    public static final EventGroup BLOCK = new EventGroup("BlockEvents", ScriptType.SERVER);
+    public static final EventGroup BLOCK = new EventGroup("BlockEvents", null);
     public static final EventGroup ITEM = new EventGroup("ItemEvents", null);
     public static final EventGroup PLAYER = new EventGroup("PlayerEvents", ScriptType.SERVER);
     public static final EventGroup ENTITY = new EventGroup("EntityEvents", ScriptType.SERVER);

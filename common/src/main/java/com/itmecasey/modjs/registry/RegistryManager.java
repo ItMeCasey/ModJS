@@ -20,6 +20,8 @@ public final class RegistryManager {
 
     private static final Map<String, ItemBuilderJS> ITEMS = new LinkedHashMap<>();
     private static final Map<String, BlockBuilderJS> BLOCKS = new LinkedHashMap<>();
+    private static final Map<String, ToolTierBuilderJS> TIERS = new LinkedHashMap<>();
+    private static final Map<String, ArmorMaterialBuilderJS> ARMOR_MATERIALS = new LinkedHashMap<>();
     private static final Map<String, FluidBuilderJS> FLUIDS = new LinkedHashMap<>();
     private static final Map<String, CreativeTabBuilderJS> TABS = new LinkedHashMap<>();
     private static final Map<String, com.itmecasey.modjs.unify.UnifyMaterials.Entry> UNIFY_ENTRIES = new LinkedHashMap<>();
@@ -35,10 +37,16 @@ public final class RegistryManager {
         BLOCKS.clear();
         TABS.clear();
         FLUIDS.clear();
+        TIERS.clear();
+        ARMOR_MATERIALS.clear();
         UNIFY_ENTRIES.clear();
         com.itmecasey.modjs.item.ItemModifications.clear();
+        com.itmecasey.modjs.block.BlockModifications.clear();
+        EventGroups.BLOCK.post("modification", new com.itmecasey.modjs.block.BlockModifications.ModificationEventJS());
         EventGroups.ITEM.post("modification", new com.itmecasey.modjs.item.ItemModifications.ModificationEventJS());
         EventGroups.STARTUP.postExact("registry", "creative_tab", new RegistryEventJS<>("creative tab", TABS, CreativeTabBuilderJS::new));
+        EventGroups.STARTUP.postExact("registry", "tool_tier", new RegistryEventJS<>("tool tier", TIERS, ToolTierBuilderJS::new));
+        EventGroups.STARTUP.postExact("registry", "armor_material", new RegistryEventJS<>("armor material", ARMOR_MATERIALS, ArmorMaterialBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "fluid", new RegistryEventJS<>("fluid", FLUIDS, FluidBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
@@ -100,6 +108,14 @@ public final class RegistryManager {
 
     public static Collection<BlockBuilderJS> blocks() {
         return BLOCKS.values();
+    }
+
+    public static Collection<ToolTierBuilderJS> toolTiers() {
+        return TIERS.values();
+    }
+
+    public static Collection<ArmorMaterialBuilderJS> armorMaterials() {
+        return ARMOR_MATERIALS.values();
     }
 
     public static Collection<FluidBuilderJS> fluids() {
@@ -186,6 +202,9 @@ public final class RegistryManager {
             model.add("textures", textures);
             data.putJson(NAMESPACE, "models/block/" + block.id(), model);
         }
+        for (ArmorMaterialBuilderJS material : ARMOR_MATERIALS.values()) {
+            ArmorTextures.write(data, material, VersionFormat.current().usesItemDefinitions());
+        }
         for (com.itmecasey.modjs.unify.UnifyMaterials.Entry entry : UNIFY_ENTRIES.values()) {
             String path = "textures/" + (entry.block() ? "block/" : "item/") + entry.id() + ".png";
             if (!data.has(NAMESPACE, path)) {
@@ -235,6 +254,18 @@ public final class RegistryManager {
             }
         }
         writeTags(data, "fluid", fluidTags);
+        Map<String, java.util.List<String>> repairTags = new LinkedHashMap<>();
+        for (ArmorMaterialBuilderJS material : ARMOR_MATERIALS.values()) {
+            if (material.repair() != null) {
+                repairTags.computeIfAbsent(NAMESPACE + ":repairs_armor_" + material.id(), k -> new java.util.ArrayList<>()).add(material.repair());
+            }
+        }
+        for (ToolTierBuilderJS tier : TIERS.values()) {
+            if (tier.repair() != null) {
+                repairTags.computeIfAbsent(NAMESPACE + ":repairs_tool_" + tier.id(), k -> new java.util.ArrayList<>()).add(tier.repair());
+            }
+        }
+        writeTags(data, "item", repairTags);
         writeTags(data, "item", itemTags);
         writeTags(data, "block", blockTags);
         for (BlockBuilderJS block : BLOCKS.values()) {

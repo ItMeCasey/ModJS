@@ -66,6 +66,7 @@ public class ModJS {
 
         FMLCommonSetupEvent.getBus(context.getModBusGroup()).addListener((FMLCommonSetupEvent e) ->
             {
+                e.enqueueWork(com.itmecasey.modjs.game.BlockModifier::apply);
                 EventGroups.STARTUP.post("init", new EventJS());
             });
         FMLLoadCompleteEvent.getBus(context.getModBusGroup()).addListener((FMLLoadCompleteEvent e) ->

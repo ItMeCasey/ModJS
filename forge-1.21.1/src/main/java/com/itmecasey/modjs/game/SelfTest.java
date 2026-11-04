@@ -207,6 +207,18 @@ public final class SelfTest {
         check("ServerEvents.compostableRecipes sets a chance", net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.getFloat(Items.STONE) == 0.85f);
         player.getInventory().setItem(7, ItemStack.EMPTY);
 
+        BlockPos stonePos = new BlockPos(6, 100, 6);
+        level.setBlockAndUpdate(stonePos, Blocks.STONE.defaultBlockState());
+        net.minecraft.world.level.block.state.BlockState stoneState = level.getBlockState(stonePos);
+        check("BlockEvents.modification changes hardness, resistance and light",
+            stoneState.getDestroySpeed(level, stonePos) == 9.0f && Blocks.STONE.getExplosionResistance() == 77.0f && stoneState.getLightEmission() == 5);
+        level.setBlockAndUpdate(stonePos, Blocks.AIR.defaultBlockState());
+
+        ItemStack rubyPick = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("modjs:ruby_pickaxe")));
+        ItemStack rubyHelmet = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("modjs:ruby_helmet")));
+        check("custom tool tier sets durability", rubyPick.getMaxDamage() == 900);
+        check("custom armor material sets durability", rubyHelmet.getMaxDamage() == 11 * 30);
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

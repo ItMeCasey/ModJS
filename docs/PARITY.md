@@ -40,12 +40,14 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | | painterUpdated, paintScreen | no |
 | BlockEvents | broken, placed, rightClicked, leftClicked | yes (broken checked in game test) |
 | | farmlandTrampled | compiled |
-| | detectorChanged, detectorPowered, detectorUnpowered, modification | no |
+| | modification | yes (hardness, resistance, light, friction, speed, jump, tool requirement; checked) |
+| | detectorChanged, detectorPowered, detectorUnpowered | no |
 | ItemEvents | rightClicked, entityInteracted, crafted, smelted, foodEaten, dropped, pickedUp | crafted checked; others compiled |
 | | tooltip (KubeJS: modifyTooltips) | compiled |
 | | modification (max stack size, max damage, rarity) | yes, checked on both versions |
 | | firstLeftClicked, firstRightClicked, canPickUp | compiled |
-| | dynamicTooltips, modelProperties, armorTierRegistry, toolTierRegistry | no |
+| | armorTierRegistry, toolTierRegistry (as `StartupEvents.registry` `armor_material` and `tool_tier`) | yes (checked) |
+| | dynamicTooltips, modelProperties | no |
 | EntityEvents | hurt | yes (checked) |
 | | death, spawned | compiled |
 | | checkSpawn | compiled on both versions |
@@ -69,7 +71,7 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | Item (name, stack size, food, rarity, tooltip, texture, creative tab) | yes |
 | Tools (pickaxe, axe, shovel, hoe, sword with a vanilla tier) | yes (registered; models unchecked on a client) |
 | Armor (vanilla material) | yes (registered; worn look unchecked on a client) |
-| Custom tiers and armor materials | no |
+| Custom tool tiers and armor materials | yes (checked) |
 | Block (hardness, resistance, light, requires tool, texture, loot drop) | yes |
 | Block shapes: slab, stairs, wall, fence | yes (registered; models unchecked on a client) |
 | Block entities, other shapes | no |

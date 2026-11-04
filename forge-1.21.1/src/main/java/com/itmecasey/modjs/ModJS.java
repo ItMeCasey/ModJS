@@ -64,7 +64,10 @@ public class ModJS {
         com.itmecasey.modjs.unify.UnifyLootModifier.register(context.getModEventBus());
         com.itmecasey.modjs.unify.UnifyOreBiomeModifier.register(context.getModEventBus());
 
-        context.getModEventBus().addListener((FMLCommonSetupEvent e) -> EventGroups.STARTUP.post("init", new EventJS()));
+        context.getModEventBus().addListener((FMLCommonSetupEvent e) -> {
+            e.enqueueWork(com.itmecasey.modjs.game.BlockModifier::apply);
+            EventGroups.STARTUP.post("init", new EventJS());
+        });
         context.getModEventBus().addListener((FMLLoadCompleteEvent e) -> EventGroups.STARTUP.post("postInit", new EventJS()));
         ModJSNetwork.init();
         GameEvents.register();

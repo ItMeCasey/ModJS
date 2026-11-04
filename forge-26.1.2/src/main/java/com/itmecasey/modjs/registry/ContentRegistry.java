@@ -90,25 +90,31 @@ public final class ContentRegistry {
                         case "boots" -> net.minecraft.world.item.equipment.ArmorType.BOOTS;
                         default -> net.minecraft.world.item.equipment.ArmorType.HELMET;
                     };
-                    net.minecraft.world.item.equipment.ArmorMaterial armorMaterial = switch (b.armorTier()) {
+                    net.minecraft.world.item.equipment.ArmorMaterial armorMaterial = customArmor(b.armorTier());
+                    if (armorMaterial == null) {
+                        armorMaterial = switch (b.armorTier()) {
                         case "leather" -> net.minecraft.world.item.equipment.ArmorMaterials.LEATHER;
                         case "chainmail" -> net.minecraft.world.item.equipment.ArmorMaterials.CHAINMAIL;
                         case "gold" -> net.minecraft.world.item.equipment.ArmorMaterials.GOLD;
                         case "diamond" -> net.minecraft.world.item.equipment.ArmorMaterials.DIAMOND;
                         case "netherite" -> net.minecraft.world.item.equipment.ArmorMaterials.NETHERITE;
                         default -> net.minecraft.world.item.equipment.ArmorMaterials.IRON;
-                    };
+                        };
+                    }
                     properties.humanoidArmor(armorMaterial, type);
                 }
                 if (b.toolType() != null) {
-                    net.minecraft.world.item.ToolMaterial material = switch (b.toolTier()) {
+                    net.minecraft.world.item.ToolMaterial material = customTool(b.toolTier());
+                    if (material == null) {
+                        material = switch (b.toolTier()) {
                         case "wood" -> net.minecraft.world.item.ToolMaterial.WOOD;
                         case "stone" -> net.minecraft.world.item.ToolMaterial.STONE;
                         case "gold" -> net.minecraft.world.item.ToolMaterial.GOLD;
                         case "diamond" -> net.minecraft.world.item.ToolMaterial.DIAMOND;
                         case "netherite" -> net.minecraft.world.item.ToolMaterial.NETHERITE;
                         default -> net.minecraft.world.item.ToolMaterial.IRON;
-                    };
+                        };
+                    }
                     switch (b.toolType()) {
                         case "axe" -> properties.axe(material, 6.0f, -3.1f);
                         case "shovel" -> properties.shovel(material, 1.5f, -3.0f);
@@ -145,6 +151,55 @@ public final class ContentRegistry {
         Identifier id = Identifier.tryParse(itemId);
         Item item = id == null ? Items.STONE : BuiltInRegistries.ITEM.getValue(id);
         return new ItemStack(item);
+    }
+
+    private static net.minecraft.tags.TagKey<net.minecraft.world.level.block.Block> incorrectFor(String level) {
+        return switch (level) {
+            case "wood" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_WOODEN_TOOL;
+            case "stone" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_STONE_TOOL;
+            case "gold" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_GOLD_TOOL;
+            case "diamond" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_DIAMOND_TOOL;
+            case "netherite" -> net.minecraft.tags.BlockTags.INCORRECT_FOR_NETHERITE_TOOL;
+            default -> net.minecraft.tags.BlockTags.INCORRECT_FOR_IRON_TOOL;
+        };
+    }
+
+    /** The script-defined tool material, or null when {@code name} is a vanilla tier name. */
+    private static net.minecraft.world.item.ToolMaterial customTool(String name) {
+        String full = name.contains(":") ? name : RegistryManager.NAMESPACE + ":" + name;
+        for (ToolTierBuilderJS tier : RegistryManager.toolTiers()) {
+            if ((RegistryManager.NAMESPACE + ":" + tier.id()).equals(full)) {
+                return new net.minecraft.world.item.ToolMaterial(incorrectFor(tier.level()), tier.uses(), tier.speed(), tier.attackDamage(),
+                    tier.enchantability(), net.minecraft.tags.TagKey.create(Registries.ITEM,
+                        Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, "repairs_tool_" + tier.id())));
+            }
+        }
+        if (!List.of("wood", "stone", "iron", "gold", "diamond", "netherite").contains(name)) {
+            throw new IllegalStateException("Unknown tool tier '" + name + "'");
+        }
+        return null;
+    }
+
+    /** The script-defined armor material, or null when {@code name} is a vanilla material name. */
+    private static net.minecraft.world.item.equipment.ArmorMaterial customArmor(String name) {
+        String full = name.contains(":") ? name : RegistryManager.NAMESPACE + ":" + name;
+        for (ArmorMaterialBuilderJS m : RegistryManager.armorMaterials()) {
+            if ((RegistryManager.NAMESPACE + ":" + m.id()).equals(full)) {
+                java.util.Map<net.minecraft.world.item.equipment.ArmorType, Integer> defense = new java.util.EnumMap<>(net.minecraft.world.item.equipment.ArmorType.class);
+                defense.put(net.minecraft.world.item.equipment.ArmorType.HELMET, m.defense("helmet"));
+                defense.put(net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, m.defense("chestplate"));
+                defense.put(net.minecraft.world.item.equipment.ArmorType.LEGGINGS, m.defense("leggings"));
+                defense.put(net.minecraft.world.item.equipment.ArmorType.BOOTS, m.defense("boots"));
+                return new net.minecraft.world.item.equipment.ArmorMaterial(m.durability(), defense, m.enchantability(),
+                    net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_IRON, m.toughness(), m.knockbackResistance(),
+                    net.minecraft.tags.TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, "repairs_armor_" + m.id())),
+                    ResourceKey.create(net.minecraft.world.item.equipment.EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, m.id())));
+            }
+        }
+        if (!List.of("leather", "chainmail", "iron", "gold", "diamond", "netherite").contains(name)) {
+            throw new IllegalStateException("Unknown armor material '" + name + "'");
+        }
+        return null;
     }
 
     private static Rarity rarity(String name) {

@@ -42,6 +42,16 @@ StartupEvents.registry('creative_tab', event => {
 });
 ```
 
+Custom tool tiers and armor materials:
+```js
+StartupEvents.registry('tool_tier', e => e.create('ruby').uses(900).speed(8).attackDamage(3).level('diamond').enchantability(15).repair('minecraft:diamond'));
+StartupEvents.registry('armor_material', e => e.create('ruby').durability(30).defense(3, 8, 6, 3).toughness(1).repair('minecraft:diamond').color(0xD81E3C));
+StartupEvents.registry('item', e => { e.create('ruby_pickaxe').tool('pickaxe', 'modjs:ruby'); e.create('ruby_helmet').armor('helmet', 'ruby'); });
+```
+Worn armor art is the vanilla iron armor recolored with `color`; put your own textures in `assets/modjs/textures/models/armor/` (1.21.1) or `.../entity/equipment/humanoid/` (26.1.2) to replace it.
+Change existing blocks from a startup script: `BlockEvents.modification(e => e.modify('minecraft:stone', b => { b.destroySpeed = 9; b.explosionResistance = 77; b.lightEmission = 5; }))`
+(also `friction`, `speedFactor`, `jumpFactor`, `requiresTool`).
+
 Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier. Armor: `.armor('helmet' | 'chestplate' | 'leggings' | 'boots', 'leather' | 'chainmail' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla material. Add items to existing tabs: `StartupEvents.modifyCreativeTab('minecraft:tools_and_utilities', e => e.add('modjs:ruby'))`.
 
 Fluids: `StartupEvents.registry('fluid', e => e.create('goo').color(0x44FF44).luminosity(6).density(1500).noBucket())` registers `modjs:goo`, `modjs:goo_flowing`, a liquid block and `modjs:goo_bucket`; it uses the vanilla water textures tinted by `color`.

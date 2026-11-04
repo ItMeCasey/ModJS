@@ -79,8 +79,8 @@ public final class ItemBuilderJS {
             throw new IllegalArgumentException("Unknown armor slot '" + slot + "'; use helmet, chestplate, leggings or boots");
         }
         String r = tier.toLowerCase();
-        if (!java.util.List.of("leather", "chainmail", "iron", "gold", "diamond", "netherite").contains(r)) {
-            throw new IllegalArgumentException("Unknown armor tier '" + tier + "'; use leather, chainmail, iron, gold, diamond or netherite");
+        if (!java.util.List.of("leather", "chainmail", "iron", "gold", "diamond", "netherite").contains(r) && !r.matches("[a-z0-9_.-]+(:[a-z0-9_./-]+)?")) {
+            throw new IllegalArgumentException("Unknown armor tier '" + tier + "'; use leather, chainmail, iron, gold, diamond, netherite or a custom material id");
         }
         this.armorSlot = s;
         this.armorTier = r;
@@ -99,8 +99,8 @@ public final class ItemBuilderJS {
             throw new IllegalArgumentException("Unknown tool type '" + type + "'; use pickaxe, axe, shovel, hoe or sword");
         }
         String r = tier.toLowerCase();
-        if (!java.util.List.of("wood", "stone", "iron", "gold", "diamond", "netherite").contains(r)) {
-            throw new IllegalArgumentException("Unknown tool tier '" + tier + "'; use wood, stone, iron, gold, diamond or netherite");
+        if (!java.util.List.of("wood", "stone", "iron", "gold", "diamond", "netherite").contains(r) && !r.matches("[a-z0-9_.-]+(:[a-z0-9_./-]+)?")) {
+            throw new IllegalArgumentException("Unknown tool tier '" + tier + "'; use wood, stone, iron, gold, diamond, netherite or a custom tier id");
         }
         this.toolType = t;
         this.toolTier = r;

@@ -31,3 +31,10 @@ StartupEvents.registry('item', event => {
   event.create('test_unified_rod').unify('c:rods/test_unified');
 });
 Unify.materials({ materials: ['zinc'], kinds: ['ore', 'crushed', 'clump', 'shard', 'dirty_dust'] });
+BlockEvents.modification(event => event.modify('minecraft:stone', b => { b.destroySpeed = 9; b.explosionResistance = 77; b.lightEmission = 5; }));
+StartupEvents.registry('tool_tier', event => event.create('ruby').uses(900).speed(8).attackDamage(3).level('diamond').repair('minecraft:diamond'));
+StartupEvents.registry('armor_material', event => event.create('ruby').durability(30).defense(3, 8, 6, 3).toughness(1).repair('minecraft:diamond').color(0xD81E3C));
+StartupEvents.registry('item', event => {
+  event.create('ruby_pickaxe').tool('pickaxe', 'modjs:ruby');
+  event.create('ruby_helmet').armor('helmet', 'ruby');
+});
