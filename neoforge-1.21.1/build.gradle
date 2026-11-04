@@ -58,6 +58,10 @@ repositories {
         name = 'BlameJared (JEI)'
         url = 'https://maven.blamejared.com'
     }
+    maven {
+        name = 'Minecraft libraries (Brigadier for the command tests)'
+        url = 'https://libraries.minecraft.net'
+    }
 }
 
 dependencies {
@@ -69,6 +73,7 @@ dependencies {
     compileOnly "mezz.jei:jei-1.21.1-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
 
+    testImplementation "com.mojang:brigadier:1.3.10"
     testImplementation "com.google.code.gson:gson:2.11.0"
     testImplementation "org.slf4j:slf4j-api:2.0.16"
     testImplementation platform("org.junit:junit-bom:5.11.4")
