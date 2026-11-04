@@ -1,5 +1,6 @@
 package com.itmecasey.modjs.loot;
 
+import com.itmecasey.modjs.format.DataFolders;
 import com.google.gson.JsonObject;
 import com.itmecasey.modjs.event.EventJS;
 import com.itmecasey.modjs.item.ItemRef;
@@ -27,7 +28,7 @@ public final class LootEventJS extends EventJS {
         int colon = id.indexOf(':');
         String namespace = colon < 0 ? "minecraft" : id.substring(0, colon);
         String path = colon < 0 ? id : id.substring(colon + 1);
-        data.putJson(namespace, "loot_table/" + (folder.isEmpty() ? "" : folder + "/") + path, table.toJson());
+        data.putJson(namespace, DataFolders.lootTable() + "/" + (folder.isEmpty() ? "" : folder + "/") + path, table.toJson());
     }
 
     /** Builds a table for {@code id} (a block, entity type or chest id depending on the event). */
@@ -63,14 +64,14 @@ public final class LootEventJS extends EventJS {
         int colon = id.indexOf(':');
         String namespace = colon < 0 ? "minecraft" : id.substring(0, colon);
         String path = colon < 0 ? id : id.substring(colon + 1);
-        String resource = "data/" + namespace + "/loot_table/" + (folder.isEmpty() ? "" : folder + "/") + path + ".json";
+        String resource = "data/" + namespace + "/" + DataFolders.lootTable() + "/" + (folder.isEmpty() ? "" : folder + "/") + path + ".json";
         JsonObject existing = readFromClassPath(resource);
         if (existing == null) {
             throw Context.reportRuntimeError("No loot table '" + id + "' found in the game or mod jars to modify");
         }
         LootTableJS table = new LootTableJS(existing);
         configure.accept(table);
-        data.putJson(namespace, "loot_table/" + (folder.isEmpty() ? "" : folder + "/") + path, table.toJson());
+        data.putJson(namespace, DataFolders.lootTable() + "/" + (folder.isEmpty() ? "" : folder + "/") + path, table.toJson());
     }
 
     private static JsonObject readFromClassPath(String resource) {
@@ -101,6 +102,6 @@ public final class LootEventJS extends EventJS {
         int colon = id.indexOf(':');
         String namespace = colon < 0 ? "minecraft" : id.substring(0, colon);
         String path = colon < 0 ? id : id.substring(colon + 1);
-        data.putJson(namespace, "loot_table/" + (folder.isEmpty() ? "" : folder + "/") + path, object);
+        data.putJson(namespace, DataFolders.lootTable() + "/" + (folder.isEmpty() ? "" : folder + "/") + path, object);
     }
 }

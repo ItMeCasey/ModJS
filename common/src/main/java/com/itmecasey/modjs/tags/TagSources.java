@@ -38,7 +38,7 @@ final class TagSources {
 
     /** Every copy of the tag found on the class path, merged the way the game merges data packs. */
     static List<JsonElement> mergedValues(String registry, String namespace, String path) {
-        String resource = "data/" + namespace + "/tags/" + registry + "/" + path + ".json";
+        String resource = "data/" + namespace + "/" + com.itmecasey.modjs.format.DataFolders.tags(registry) + "/" + path + ".json";
         Map<String, JsonElement> merged = new LinkedHashMap<>();
         for (ClassLoader loader : new ClassLoader[] {Thread.currentThread().getContextClassLoader(), TagSources.class.getClassLoader()}) {
             if (loader == null) {

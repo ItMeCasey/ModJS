@@ -1,6 +1,8 @@
 package com.itmecasey.modjs.recipe;
 
 import com.google.gson.JsonArray;
+import com.itmecasey.modjs.format.DataFolders;
+import com.itmecasey.modjs.format.VersionFormat;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itmecasey.modjs.event.EventJS;
@@ -63,7 +65,8 @@ public final class RecipesEventJS extends EventJS {
     private RecipeBuilderJS cooking(String type, int cookingTime, Object result, Object ingredient) {
         JsonObject json = new JsonObject();
         json.add("ingredient", RecipeJson.ingredient(ingredient));
-        json.add("result", RecipeJson.result(result));
+        ItemRef cooked = ItemRef.parse(result);
+        VersionFormat.current().setCookingResult(json, cooked.id(), cooked.count());
         json.addProperty("experience", 0.0);
         json.addProperty("cookingtime", cookingTime);
         return add(type, json);
@@ -88,7 +91,8 @@ public final class RecipesEventJS extends EventJS {
     public RecipeBuilderJS stonecutting(Object result, Object ingredient) {
         JsonObject json = new JsonObject();
         json.add("ingredient", RecipeJson.ingredient(ingredient));
-        json.add("result", RecipeJson.result(result));
+        ItemRef cut = ItemRef.parse(result);
+        VersionFormat.current().setStonecuttingResult(json, cut.id(), cut.count());
         return add("minecraft:stonecutting", json);
     }
 
@@ -159,7 +163,7 @@ public final class RecipesEventJS extends EventJS {
             while (!used.add(namespace + ":" + candidate)) {
                 candidate = path + "_" + suffix++;
             }
-            data.putJson(namespace, "recipe/" + candidate, json);
+            data.putJson(namespace, DataFolders.recipe() + "/" + candidate, json);
         }
     }
 }

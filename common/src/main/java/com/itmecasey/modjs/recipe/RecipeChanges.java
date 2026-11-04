@@ -95,11 +95,12 @@ public final class RecipeChanges {
         JsonElement result = json.get("result");
         if (result != null && result.isJsonObject()) {
             JsonObject object = result.getAsJsonObject();
-            JsonElement id = object.get("id");
+            String key = object.has("id") ? "id" : "item";
+            JsonElement id = object.get(key);
             if (id != null && id.isJsonPrimitive()) {
                 String mapped = mapper.apply(id.getAsString());
                 if (mapped != null) {
-                    object.addProperty("id", mapped);
+                    object.addProperty(key, mapped);
                     return true;
                 }
             }

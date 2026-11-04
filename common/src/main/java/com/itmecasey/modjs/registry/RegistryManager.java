@@ -306,7 +306,7 @@ public final class RegistryManager {
                 pools.add(pool);
             }
             table.add("pools", pools);
-            data.putJson(NAMESPACE, "loot_table/blocks/" + block.id(), table);
+            data.putJson(NAMESPACE, com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/" + block.id(), table);
         }
     }
 
@@ -319,7 +319,7 @@ public final class RegistryManager {
             JsonArray values = new JsonArray();
             entry.getValue().forEach(values::add);
             json.add("values", values);
-            data.putJson(tag.substring(0, colon), "tags/" + registry + "/" + tag.substring(colon + 1), json);
+            data.putJson(tag.substring(0, colon), com.itmecasey.modjs.format.DataFolders.tags(registry) + "/" + tag.substring(colon + 1), json);
         }
     }
 }

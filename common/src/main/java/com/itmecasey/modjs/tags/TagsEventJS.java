@@ -116,7 +116,7 @@ public final class TagsEventJS extends EventJS {
                 }
             }
             json.add("values", values);
-            byte[] existing = data.get(namespace, "tags/" + registry + "/" + path + ".json");
+            byte[] existing = data.get(namespace, com.itmecasey.modjs.format.DataFolders.tags(registry) + "/" + path + ".json");
             if (existing != null) {
                 JsonObject previous = com.google.gson.JsonParser.parseString(new String(existing, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
                 java.util.Set<String> present = new LinkedHashSet<>();
@@ -130,7 +130,7 @@ public final class TagsEventJS extends EventJS {
                 }
                 json.addProperty("replace", replace || (previous.has("replace") && previous.get("replace").getAsBoolean()));
             }
-            data.putJson(namespace, "tags/" + registry + "/" + path, json);
+            data.putJson(namespace, com.itmecasey.modjs.format.DataFolders.tags(registry) + "/" + path, json);
         }
     }
 }

@@ -17,6 +17,16 @@ public interface VersionFormat {
     /** A recipe result object. */
     JsonObject result(String id, int count);
 
+    /** Puts the result of a smelting-style recipe into the recipe JSON. */
+    default void setCookingResult(JsonObject recipe, String id, int count) {
+        recipe.add("result", result(id, count));
+    }
+
+    /** Puts the result of a stonecutting recipe into the recipe JSON. */
+    default void setStonecuttingResult(JsonObject recipe, String id, int count) {
+        recipe.add("result", result(id, count));
+    }
+
     /** True when items need an {@code assets/<ns>/items/<id>.json} definition (Minecraft 1.21.4 and newer). */
     boolean usesItemDefinitions();
 

@@ -118,7 +118,8 @@ public final class RecipeFilter {
             return result.getAsString();
         }
         if (result.isJsonObject()) {
-            JsonElement id = result.getAsJsonObject().get("id");
+            JsonObject object = result.getAsJsonObject();
+            JsonElement id = object.has("id") ? object.get("id") : object.get("item");
             return id != null && id.isJsonPrimitive() ? id.getAsString() : null;
         }
         return null;
