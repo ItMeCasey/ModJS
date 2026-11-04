@@ -51,11 +51,7 @@ public final class DimensionEventJS extends EventJS {
      * {@code biome}), {@code "overworld"}, {@code "nether"}, {@code "end"}, or a raw generator JSON object.
      */
     public void add(String id, Object options) {
-        JsonObject stem = new JsonObject();
-        String type = JsonUtil.asString(JsonUtil.property(options, "type"));
-        stem.addProperty("type", type != null ? type : "minecraft:overworld");
-        stem.add("generator", generator(options));
-        data.putJson(namespace(id), "dimension/" + path(id), stem);
+        data.putJson(namespace(id), "dimension/" + path(id), stem(options));
     }
 
     /** Adds a dimension from a full {@code dimension/<id>.json} object. */
@@ -63,7 +59,16 @@ public final class DimensionEventJS extends EventJS {
         data.putJson(namespace(id), "dimension/" + path(id), JsonUtil.toJson(json));
     }
 
-    private JsonElement generator(Object options) {
+    /** The {@code dimension/<id>.json} object for the given options (type and generator). */
+    public static JsonObject stem(Object options) {
+        JsonObject stem = new JsonObject();
+        String type = JsonUtil.asString(JsonUtil.property(options, "type"));
+        stem.addProperty("type", type != null ? type : "minecraft:overworld");
+        stem.add("generator", generator(options));
+        return stem;
+    }
+
+    private static JsonElement generator(Object options) {
         Object raw = JsonUtil.property(options, "generator");
         String kind = raw instanceof CharSequence ? raw.toString() : raw == null ? "void" : null;
         if (kind == null) {

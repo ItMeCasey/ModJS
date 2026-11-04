@@ -50,6 +50,7 @@ public class ModJS {
             ScriptableObject.putProperty(scope, "Utils", Context.javaToJS(new UtilsBinding(), scope));
             ScriptableObject.putProperty(scope, "Text", Context.javaToJS(new TextBinding(), scope));
             ScriptableObject.putProperty(scope, "GameRule", Context.javaToJS(new GameRuleBinding(), scope));
+            ScriptableObject.putProperty(scope, "Dimensions", Context.javaToJS(new com.itmecasey.modjs.game.DimensionManager(), scope));
             ScriptableObject.putProperty(scope, "Network", Context.javaToJS(new NetworkBinding(), scope));
         });
         ScriptManager.setRoot(FMLPaths.GAMEDIR.get().resolve(MOD_ID));

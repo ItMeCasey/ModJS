@@ -125,6 +125,23 @@ public final class SelfTest {
         }
         check("DimensionEvents.drop removes a dimension", com.itmecasey.modjs.pack.GeneratedData.SERVER.get("modjs", "dimension/dropped.json") == null);
 
+        DimensionManager dimensions = new DimensionManager();
+        org.mozilla.javascript.NativeObject spec = new org.mozilla.javascript.NativeObject();
+        spec.put("generator", spec, "void");
+        dimensions.delete("modjs:selftest_world");
+        boolean created = dimensions.create("modjs:selftest_world", spec);
+        check("Dimensions.create builds a dimension at run time", created && dimensions.exists("modjs:selftest_world"));
+        check("Dimensions.create refuses a duplicate id", !dimensions.create("modjs:selftest_world", spec));
+        ServerLevel runtime = server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,
+            net.minecraft.resources.Identifier.parse("modjs:selftest_world")));
+        check("run-time dimension is a real level", runtime != null && runtime.getBlockState(new BlockPos(0, 64, 0)).isAir());
+        if (runtime != null) {
+            runtime.setBlockAndUpdate(new BlockPos(0, 64, 0), Blocks.STONE.defaultBlockState());
+            check("run-time dimension keeps blocks", runtime.getBlockState(new BlockPos(0, 64, 0)).is(Blocks.STONE));
+            check("Dimensions.teleport rejects an unknown dimension", !dimensions.teleport(player, "modjs:no_such_world", 0, 64, 0));
+        }
+        check("Dimensions.delete removes it", dimensions.delete("modjs:selftest_world") && !dimensions.exists("modjs:selftest_world"));
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

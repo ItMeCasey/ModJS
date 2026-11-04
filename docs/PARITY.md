@@ -47,6 +47,7 @@ textures and models have not been run on a real client.
 | | loggedOut, respawned, tick, advancement, inventoryOpened, inventoryClosed | compiled |
 | | chestOpened, chestClosed | compiled |
 | | decorateChat, inventoryChanged | no |
+| Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in headless self test; teleport with a real player and restart persistence unchecked |
 | DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
 | NetworkEvents | dataReceived | compiled |
 | RecipeViewerEvents | all eight | no |

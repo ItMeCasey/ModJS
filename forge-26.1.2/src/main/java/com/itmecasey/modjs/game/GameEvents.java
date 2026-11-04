@@ -359,6 +359,7 @@ public final class GameEvents {
 
         ServerStartedEvent.BUS.addListener((ServerStartedEvent e) -> {
             ServerState.set(e.getServer());
+            DimensionManager.restore(e.getServer());
             if (wants(EventGroups.SERVER, "loaded")) {
                 fire(EventGroups.SERVER, "loaded", null, new GameEventJS().server(e.getServer()));
             }
@@ -368,6 +369,7 @@ public final class GameEvents {
             if (wants(EventGroups.SERVER, "unloaded")) {
                 fire(EventGroups.SERVER, "unloaded", null, new GameEventJS().server(e.getServer()));
             }
+            DimensionManager.clear();
             ServerState.clear();
         });
 

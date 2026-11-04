@@ -90,6 +90,24 @@ DimensionEvents.add(event => {
 `addRaw(id, json)` and `addTypeRaw(id, json)` take full JSON. Dimensions from the game or other mods cannot be removed, only replaced with `edit`.
 Reach one with `/execute in mymod:void run tp @s 0 100 0`.
 
+Dimensions at run time (no restart): the `Dimensions` global builds, moves into and removes dimensions while the server runs. Options are the same as `DimensionEvents.add`.
+Created dimensions are remembered in `modjs_dimensions.json` in the world folder and come back on the next start with their chunks.
+```js
+// A hub plus one private void dimension per player
+ServerEvents.loaded(() => {
+  Dimensions.create('mymod:hub', { generator: 'flat', layers: [{ block: 'minecraft:stone', height: 4 }] });
+});
+PlayerEvents.loggedIn(event => {
+  const id = 'mymod:player_' + event.player.getStringUUID().replace(/-/g, '');
+  if (Dimensions.create(id, { generator: 'void' })) {
+    event.runCommand('execute in ' + id + ' run setblock 0 63 0 minecraft:stone');   // first visit: build a platform
+  }
+  Dimensions.teleport(event.player, id, 0.5, 64, 0.5);
+});
+```
+`Dimensions.create(id, options)` (false if it exists), `exists(id)`, `list()`, `created()`, `teleport(player, id, x, y, z)` and `delete(id)`.
+`delete` sends players inside to the overworld spawn, unloads the level and deletes its folder; it only works on dimensions made with `create`.
+
 Raw data: `ServerEvents.generateData(event => event.addJson('mymod:loot_table/x', {...}))`.
 
 Commands: `ServerEvents.commandRegistry(event => event.register(Java.loadClass('net.minecraft.commands.Commands').literal('hi').executes(ctx => 1)))`.
