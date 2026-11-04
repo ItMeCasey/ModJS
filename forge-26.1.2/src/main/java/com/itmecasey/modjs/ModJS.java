@@ -14,6 +14,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ScriptableObject;
 import com.itmecasey.modjs.command.ModJSCommands;
 import com.itmecasey.modjs.game.GameEvents;
+import com.itmecasey.modjs.game.GameRuleBinding;
 import com.itmecasey.modjs.game.SelfTest;
 import com.itmecasey.modjs.network.ModJSNetwork;
 import com.itmecasey.modjs.pack.ModJSPacks;
@@ -48,6 +49,7 @@ public class ModJS {
         ExtraBindings.register((type, cx, scope) -> {
             ScriptableObject.putProperty(scope, "Utils", Context.javaToJS(new UtilsBinding(), scope));
             ScriptableObject.putProperty(scope, "Text", Context.javaToJS(new TextBinding(), scope));
+            ScriptableObject.putProperty(scope, "GameRule", Context.javaToJS(new GameRuleBinding(), scope));
             ScriptableObject.putProperty(scope, "Network", Context.javaToJS(new NetworkBinding(), scope));
         });
         ScriptManager.setRoot(FMLPaths.GAMEDIR.get().resolve(MOD_ID));

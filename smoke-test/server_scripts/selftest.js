@@ -4,3 +4,10 @@ PlayerEvents.loggedIn(e => console.log('SELFTEST script: loggedIn ' + e.playerNa
 ItemEvents.crafted(e => console.log('SELFTEST script: crafted ' + e.itemId));
 EntityEvents.hurt(e => { console.log('SELFTEST script: hurt amount ' + e.amount); e.setAmount(e.amount * 2); });
 console.log("SELFTEST script: globals " + new Vec3(1, 2, 3).x + " " + new BlockPos(4, 5, 6).y + " " + (UUID.randomUUID().toString().length) + " " + Direction.UP);
+ServerEvents.loaded(e => {
+  const before = GameRule.get('keepInventory');
+  GameRule.set('keepInventory', !before);
+  const after = GameRule.get('keepInventory');
+  console.log('SELFTEST script: gamerule ' + before + ' -> ' + after + ' of ' + GameRule.list().length);
+  GameRule.set('keepInventory', before);
+});

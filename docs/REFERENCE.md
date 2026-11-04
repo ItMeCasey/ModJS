@@ -95,6 +95,7 @@ Gameplay events (`BlockEvents`, `ItemEvents`, `PlayerEvents`, `EntityEvents`, `L
 
 `Item.of`, `Ingredient.of`, `Text.of/red/green/...`, `Utils.runAfter(ticks, fn)`, `Utils.runEvery(ticks, fn)`,
 `Utils.server`, `Utils.randomInt`, `Utils.rollChance`, `Utils.runCommand`, `JsonIO.read/write/exists` (inside `modjs/`),
+`GameRule.get(name)`, `GameRule.set(name, value)`, `GameRule.list()` (names match with or without underscores and case, so `keepInventory` and `keep_inventory` both work; server scripts only, once a world is loaded),
 `Persistent.get/set/has/remove`, `Persistent.store(name)`, `Persistent.player(uuid)`, `Persistent.entity(uuid)`,
 `Network.sendToServer/sendToPlayer/sendToAll` with `NetworkEvents.dataReceived('channel', event => event.data)`,
 `Platform.mcVersion/isClient()/isLoaded(modId)`, `global` (shared between script types), `console`, `Java.loadClass`.

@@ -76,7 +76,7 @@ Mod-specific recipe schemas (for example Create): no.
 | Name | Status |
 |---|---|
 | `console`, `global`, `Java`, `Item`, `Ingredient`, `Text`, `JsonIO`, `Utils`, `Platform`, `SECOND`, `MINUTE`, `HOUR` | yes (partial APIs) |
-| `Persistent` (ModJS only) and `Network` | yes |
+| `Persistent` (ModJS only), `Network`, `GameRule` (ModJS only) | yes |
 | `UUID`, `ResourceLocation`, `Direction`, `Facing`, `AABB`, `BlockPos`, `Vec3`, `JavaMath`, `Blocks`, `Items`, `Fluids`, `EntityType`, `MobEffects`, `Mth` and a few more | yes, as Java classes (checked: `Vec3`, `BlockPos`, `UUID`, `Direction`) |
 | `Block`, `NBT`, `NBTIO`, `Fluid`, `Color`, `BlockStatePredicate`, `Stats`, `DamageSource`, `string#namespace` | no |
 
