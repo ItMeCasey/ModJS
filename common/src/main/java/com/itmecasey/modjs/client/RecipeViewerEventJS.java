@@ -43,6 +43,39 @@ public final class RecipeViewerEventJS {
         }
     }
 
+    /** One named group of items a viewer shows together. */
+    public record ItemGroup(String name, String icon, List<String> selectors) {
+    }
+
+    /**
+     * {@code RecipeViewerEvents.groupItems(event => event.group('Gems', ['minecraft:diamond', '#c:gems'], {icon: 'minecraft:diamond'}))}.
+     * For viewers that can fold several items into one entry (Barely Enough Items); viewers without grouping ignore it.
+     */
+    public static final class GroupItems extends EventJS {
+        private final List<ItemGroup> groups = new ArrayList<>();
+
+        /** Groups items under a name. {@code items} are ids, {@code #tags} or {@code @mods}. The optional icon is an item id shown for the group. */
+        public void group(String name, Object items, Object options) {
+            List<String> selectors = new ArrayList<>();
+            for (Object entry : com.itmecasey.modjs.recipe.RecipeJson.asList(items)) {
+                String text = com.itmecasey.modjs.json.JsonUtil.asString(entry);
+                if (text != null) {
+                    selectors.add(text);
+                }
+            }
+            String icon = options == null ? null : com.itmecasey.modjs.json.JsonUtil.asString(com.itmecasey.modjs.json.JsonUtil.property(options, "icon"));
+            groups.add(new ItemGroup(name, icon, selectors));
+        }
+
+        public void group(String name, Object items) {
+            group(name, items, null);
+        }
+
+        public List<ItemGroup> groups() {
+            return groups;
+        }
+    }
+
     /** {@code RecipeViewerEvents.hideCategories(event => event.hide('minecraft:crafting'))} */
     public static final class HideCategories extends EventJS {
         private final List<String> ids = new ArrayList<>();

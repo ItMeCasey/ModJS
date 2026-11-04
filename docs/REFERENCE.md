@@ -243,8 +243,9 @@ A screen config has the same methods as `ClientEvents.titleScreen` plus `input(i
 RecipeViewerEvents.hideItems(event => event.hide('minecraft:dirt', '#minecraft:wool', '@create'));   // id, #tag or @mod
 RecipeViewerEvents.addInformation(event => event.add('minecraft:diamond', 'Found deep underground.', 'Needs an iron pickaxe.'));
 RecipeViewerEvents.hideCategories(event => event.hide('minecraft:campfire_cooking'));
+RecipeViewerEvents.groupItems(event => event.group('Gems', ['minecraft:diamond', '#c:gems'], { icon: 'minecraft:diamond' }));   // viewers with grouping (Barely Enough Items)
 ```
-Works with JEI on Minecraft 1.21.1 only. See `docs/PARITY.md` for why EMI, REI and 26.1.2 are not covered. These hide entries in the viewer; they do not remove items or recipes from the game (use `ServerEvents.recipes` for that).
+`groupItems` is read only by viewers that can group items (Barely Enough Items); JEI ignores it. Hiding and info pages work with JEI on Minecraft 1.21.1. See `docs/PARITY.md` for why EMI, REI and 26.1.2 are not covered. These hide entries in the viewer; they do not remove items or recipes from the game (use `ServerEvents.recipes` for that).
 
 ## Helpers
 

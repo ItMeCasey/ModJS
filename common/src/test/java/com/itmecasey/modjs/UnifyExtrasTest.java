@@ -107,6 +107,18 @@ class UnifyExtrasTest {
     }
 
     @Test
+    void itemGroupsCollectNamesIconsAndSelectors() {
+        com.itmecasey.modjs.client.RecipeViewerEventJS.GroupItems event = new com.itmecasey.modjs.client.RecipeViewerEventJS.GroupItems();
+        event.group("Gems", List.of("minecraft:diamond", "#c:gems/ruby", "@mymod"));
+        event.group("Ores", "#c:ores", null);
+        assertEquals(2, event.groups().size());
+        assertEquals("Gems", event.groups().get(0).name());
+        assertEquals(List.of("minecraft:diamond", "#c:gems/ruby", "@mymod"), event.groups().get(0).selectors());
+        assertEquals(null, event.groups().get(0).icon());
+        assertEquals(List.of("#c:ores"), event.groups().get(1).selectors());
+    }
+
+    @Test
     void fluidsAreRewrittenInRecipes() {
         UnifyConfig.addCanonicalFluid("c:oil", "modjs:oil");
         TagIndex fluids = new TagIndex(Map.of("c:oil", List.of(json("{\"values\":[\"mymod:oil\",\"othermod:crude\",\"modjs:oil\"]}"))));
