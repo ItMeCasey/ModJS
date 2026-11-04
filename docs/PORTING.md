@@ -10,11 +10,13 @@ what a new port has to provide and every gap that exists because a version could
 | `forge-26.1.2` | 26.1.2 | Forge 64.1.6 | full; self test passes |
 | `forge-1.21.1` | 1.21.1 | Forge 52.1.21 | full; self test passes |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 52 self-test checks and 59 unit tests pass |
+| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full except F3 debug lines and the fluid art; the same 52 self-test checks and 59 unit tests pass |
 
 The NeoForge module copies the Forge 1.21.1 one and changes only loader API names: events on `NeoForge.EVENT_BUS` with `net.neoforged` packages, `PlayerTickEvent.Post` and friends for ticks, `LivingIncomingDamageEvent` for hurt,
 `ItemEntityPickupEvent.Pre`, `ModifyDefaultComponentsEvent` for item changes, payload handlers instead of a channel for networking, `DeferredHolder` instead of `RegistryObject`, `BaseFlowingFluid`,
 and `neoforge:` ids and data folders (`LoaderNames`). Build files use ModDevGradle with Gradle 9.3.1, Rhino on `additionalRuntimeClasspath` and as Jar-in-Jar.
-Fluid client art still uses the deprecated `FluidType.initializeClient`; move it to `RegisterClientExtensionsEvent` when a later NeoForge removes it.
+On NeoForge 26.1.2 `ClientEvents.leftDebugInfo` and `rightDebugInfo` do nothing (the loader has no F3 text event any more), and a script fluid has no custom client art (the old texture methods are gone; fluid models are not wired up yet). JEI has no 26.1.2 build. Block breaking uses `BreakBlockEvent`, reload listeners `AddServerReloadListenersEvent`, and the client can only send with `ClientPacketDistributor`.
+On NeoForge 1.21.1 fluid client art still uses the deprecated `FluidType.initializeClient`; move it to `RegisterClientExtensionsEvent` when a later NeoForge removes it.
 
 ## What a port provides
 

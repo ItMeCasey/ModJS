@@ -17,6 +17,8 @@ jobs:
             java: 21
           - module: neoforge-1.21.1
             java: 21
+          - module: neoforge-26.1.2
+            java: 25
     runs-on: ubuntu-latest
     defaults:
       run:
