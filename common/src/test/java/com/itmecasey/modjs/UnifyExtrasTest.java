@@ -73,6 +73,18 @@ class UnifyExtrasTest {
     }
 
     @Test
+    void colorsCanBeSetAndTextureIsStillAValidPng() {
+        UnifyConfig.setColor("mythril", 0x7FD6F5);
+        List<UnifyMaterials.Entry> entries = UnifyMaterials.expand(new UnifyMaterials.Spec(List.of("mythril"), List.of("ingot"), false));
+        assertEquals(0x7FD6F5, entries.get(0).color());
+        byte[] png = UnifyMaterials.texture("ingot", entries.get(0).color());
+        assertTrue(png.length > 50 && png[1] == 'P');
+        for (String kind : List.of("plate", "gear", "coin", "dust", "gem", "raw", "ore")) {
+            assertTrue(UnifyMaterials.texture(kind, 0x7FD6F5).length > 50, kind);
+        }
+    }
+
+    @Test
     void fluidsAreRewrittenInRecipes() {
         UnifyConfig.addCanonicalFluid("c:oil", "modjs:oil");
         TagIndex fluids = new TagIndex(Map.of("c:oil", List.of(json("{\"values\":[\"mymod:oil\",\"othermod:crude\",\"modjs:oil\"]}"))));

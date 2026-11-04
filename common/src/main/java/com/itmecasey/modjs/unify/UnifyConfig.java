@@ -34,6 +34,7 @@ public final class UnifyConfig {
     private static final Map<String, String> CANONICAL_ITEMS = new LinkedHashMap<>();
     private static final Map<String, String> CANONICAL_FLUIDS = new LinkedHashMap<>();
     private static final List<UnifyMaterials.Spec> MATERIALS = new ArrayList<>();
+    private static final Map<String, Integer> COLORS = new LinkedHashMap<>();
 
     // -- server state (reset on reload) ----------------------------------------------------------------------------
 
@@ -75,6 +76,7 @@ public final class UnifyConfig {
         CANONICAL_ITEMS.clear();
         CANONICAL_FLUIDS.clear();
         MATERIALS.clear();
+        COLORS.clear();
     }
 
     static synchronized List<String> prefer() {
@@ -151,6 +153,15 @@ public final class UnifyConfig {
         return new ArrayList<>(MATERIALS);
     }
 
+    /** The color a script or the config file set for a material, or null. */
+    public static synchronized Integer colorOf(String material) {
+        return COLORS.get(material);
+    }
+
+    public static synchronized void setColor(String material, int rgb) {
+        COLORS.put(material, rgb & 0xFFFFFF);
+    }
+
     public static synchronized void addMaterials(List<String> materials, List<String> kinds, boolean includeVanilla) {
         MATERIALS.add(new UnifyMaterials.Spec(materials, kinds, includeVanilla));
     }
@@ -222,6 +233,21 @@ public final class UnifyConfig {
         public void autoFluids(boolean enabled) {
             synchronized (UnifyConfig.class) {
                 autoFluids = enabled;
+            }
+        }
+
+        /**
+         * Startup: sets the color generated art is tinted with, for new or existing materials:
+         * {@code Unify.colors({tin: 0xC9D3D9, mythril: 0x7FD6F5})}. The art is the game's own textures recolored through a five-tone ramp.
+         */
+        public void colors(Object colors) {
+            com.google.gson.JsonElement json = JsonUtil.toJson(colors);
+            if (json.isJsonObject()) {
+                for (Map.Entry<String, com.google.gson.JsonElement> entry : json.getAsJsonObject().entrySet()) {
+                    if (entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isNumber()) {
+                        setColor(entry.getKey().toLowerCase(), entry.getValue().getAsInt());
+                    }
+                }
             }
         }
 

@@ -168,6 +168,10 @@ Unify.swapInventories(true);  Unify.convertRecipes(true);           // defaults
 Kinds registered by `Unify.materials`: ingot, nugget, dust, plate, gear, rod, wire, coin, gem, raw, storage_block by default (tags `c:ingots/<m>`,
 `c:raw_materials/<m>`, and so on). Opt-in kinds, listed in `kinds`: `ore` (a `<m>_ore` block that drops the raw item or gem and joins `c:ores/<m>`; it
 is not generated in the world, place it with `WorldgenEvents.addOre`), `crushed` (`c:crushed_raw_materials`), `clump`, `shard` and `dirty_dust`.
+Generated art is the game's own textures recolored (so it keeps vanilla's outline and shading): ingots from the iron ingot, ores from iron ore (only the ore
+specks change), dust from gunpowder, shards from amethyst, and so on; plates, gears and coins are drawn sprites in the same style. Set a material's color with
+`Unify.colors({ tin: 0xC9D3D9, mythril: 0x7FD6F5 })` (startup) or `colors` in `unify.json`. Without the game's textures (a dedicated server) simple drawn sprites are used, and any PNG
+you put in `assets/modjs/textures/item/` wins.
 Items Minecraft already has (iron, gold, copper ingots, diamond and so on) are skipped unless you pass `includeVanilla: true`.
 Order of choice for the canonical item: `Unify.group(..., {canonical})`, then a ModJS item built with `.unify(tag)`, then the first match in `Unify.prefer`.
 Ores in the world: `Unify.ores()` (server script, or `oreWorldgen` / `oreChunks` in `unify.json`) forces the canonical ore block. `worldgen` (default true)

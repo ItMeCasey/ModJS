@@ -41,6 +41,7 @@ public final class UnifyFile {
         json.add("materials", new JsonArray());
         json.add("kinds", new JsonArray());
         json.addProperty("includeVanilla", false);
+        json.add("colors", new JsonObject());
         JsonArray prefer = new JsonArray();
         prefer.add("modjs");
         json.add("prefer", prefer);
@@ -88,6 +89,13 @@ public final class UnifyFile {
     /** Startup part: registers the materials. Call once before registry events are collected. */
     public static void applyStartup(Path root) {
         JsonObject json = read(root);
+        if (json.has("colors") && json.get("colors").isJsonObject()) {
+            for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("colors").entrySet()) {
+                if (entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isNumber()) {
+                    UnifyConfig.setColor(entry.getKey().toLowerCase(), entry.getValue().getAsInt());
+                }
+            }
+        }
         if (json.has("registerMaterials") && json.get("registerMaterials").getAsBoolean()) {
             UnifyConfig.addMaterials(strings(json, "materials"), strings(json, "kinds"),
                 json.has("includeVanilla") && json.get("includeVanilla").getAsBoolean());

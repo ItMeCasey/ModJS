@@ -135,7 +135,7 @@ public final class UnifyMaterials {
                     String dropId = KINDS.get(dropKind).id(material);
                     if (seen.add(dropId) && !(!spec.includeVanilla() && VANILLA.contains(dropKind + ":" + material))) {
                         out.add(new Entry(dropId, dropKind, material, "c:" + KINDS.get(dropKind).folder() + "/" + material,
-                            dropKind.equals("gem") ? title(material) : "Raw " + title(material), COLORS.getOrDefault(material, hash(material)), false, null));
+                            dropKind.equals("gem") ? title(material) : "Raw " + title(material), colorFor(material), false, null));
                     }
                     if (VANILLA.contains(dropKind + ":" + material) && !spec.includeVanilla()) {
                         dropId = "minecraft:" + (gem ? material : "raw_" + material);
@@ -144,7 +144,7 @@ public final class UnifyMaterials {
                     }
                     if (seen.add(id)) {
                         out.add(new Entry(id, "ore", material, "c:ores/" + material, title(material) + " Ore",
-                            COLORS.getOrDefault(material, hash(material)), true, dropId));
+                            colorFor(material), true, dropId));
                     }
                     continue;
                 }
@@ -158,7 +158,7 @@ public final class UnifyMaterials {
                     } else if (kind.name().equals("gem")) {
                         name = title(material);
                     }
-                    out.add(new Entry(id, kindName, material, tag, name, COLORS.getOrDefault(material, hash(material)), kind.block(), null));
+                    out.add(new Entry(id, kindName, material, tag, name, colorFor(material), kind.block(), null));
                 }
             }
         }
@@ -181,6 +181,11 @@ public final class UnifyMaterials {
         return out.toString().trim();
     }
 
+    private static int colorFor(String material) {
+        Integer custom = UnifyConfig.colorOf(material);
+        return custom != null ? custom : COLORS.getOrDefault(material, hash(material));
+    }
+
     private static int hash(String material) {
         int h = material.hashCode();
         return 0x606060 | (h & 0x9F9F9F);
@@ -188,8 +193,36 @@ public final class UnifyMaterials {
 
     // -- generated placeholder art ---------------------------------------------------------------------------------
 
-    /** A 16x16 PNG for the kind in the given color; replaced by any texture the pack provides. */
+    /** The vanilla texture each kind is recolored from. */
+    private static final Map<String, String> VANILLA_SOURCE = Map.ofEntries(
+        Map.entry("ingot", "item/iron_ingot"), Map.entry("nugget", "item/iron_nugget"), Map.entry("raw", "item/raw_iron"),
+        Map.entry("crushed", "item/raw_copper"), Map.entry("clump", "item/raw_gold"), Map.entry("gem", "item/diamond"),
+        Map.entry("storage_block", "block/iron_block"), Map.entry("ore", "block/iron_ore"), Map.entry("dust", "item/gunpowder"),
+        Map.entry("dirty_dust", "item/gunpowder"), Map.entry("rod", "item/stick"), Map.entry("wire", "item/string"),
+        Map.entry("shard", "item/amethyst_shard"));
+
+    /**
+     * A 16x16 PNG for the kind in the given color; replaced by any texture the pack provides. Uses the game's own textures,
+     * recolored, when they are on hand, and drawn sprites otherwise.
+     */
     public static byte[] texture(String kind, int rgb) {
+        BufferedImage vanilla = VANILLA_SOURCE.containsKey(kind) ? ArtStyle.vanilla(VANILLA_SOURCE.get(kind)) : null;
+        BufferedImage image = switch (kind) {
+            case "plate" -> ArtStyle.shaped(ArtStyle.plate(), rgb);
+            case "gear" -> ArtStyle.shaped(ArtStyle.gear(), rgb);
+            case "coin" -> ArtStyle.shaped(ArtStyle.disc(5.2), rgb);
+            default -> vanilla != null ? ArtStyle.recolor(vanilla, rgb, kind.equals("ore"), kind.equals("dirty_dust")) : fallback(kind, rgb);
+        };
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            javax.imageio.ImageIO.write(image, "png", out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /** Simple drawn sprites for when the game's textures are not available (a dedicated server). */
+    private static BufferedImage fallback(String kind, int rgb) {
         BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         Color base = new Color(rgb);
         Color light = base.brighter();
@@ -324,12 +357,7 @@ public final class UnifyMaterials {
                 }
             }
         }
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            javax.imageio.ImageIO.write(image, "png", out);
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        return image;
     }
 
     private static void circle(BufferedImage image, int cx, int cy, int radius, Color base, Color light, Color dark) {

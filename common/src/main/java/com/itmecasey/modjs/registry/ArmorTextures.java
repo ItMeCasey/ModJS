@@ -7,7 +7,6 @@ import com.itmecasey.modjs.pack.GeneratedData;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /** Worn-armor art for custom materials: the vanilla iron armor, recolored, or a plain fill when the game assets are not on hand. */
 final class ArmorTextures {
@@ -46,32 +45,16 @@ final class ArmorTextures {
     }
 
     private static byte[] tinted(String resource, int rgb) {
-        BufferedImage source = null;
-        for (ClassLoader loader : new ClassLoader[] {Thread.currentThread().getContextClassLoader(), ArmorTextures.class.getClassLoader()}) {
-            if (loader == null || source != null) {
-                continue;
-            }
-            try (InputStream in = loader.getResourceAsStream(resource)) {
-                if (in != null) {
-                    source = javax.imageio.ImageIO.read(in);
+        BufferedImage source = ArtStyleBridge.load(resource);
+        BufferedImage out;
+        if (source != null) {
+            out = ArtStyleBridge.recolor(source, rgb);
+        } else {
+            out = new BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB);
+            for (int y = 0; y < 32; y++) {
+                for (int x = 0; x < 64; x++) {
+                    out.setRGB(x, y, 0xFF000000 | rgb);
                 }
-            } catch (IOException e) {
-                // fall back to a plain fill
-            }
-        }
-        BufferedImage out = new BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB);
-        for (int y = 0; y < 32; y++) {
-            for (int x = 0; x < 64; x++) {
-                int argb = source != null && x < source.getWidth() && y < source.getHeight() ? source.getRGB(x, y) : 0xFF000000 | rgb;
-                int alpha = argb >>> 24;
-                if (alpha == 0) {
-                    continue;
-                }
-                // vanilla iron armor is roughly 0xB4B4B4 on average; scale each channel so that maps to the material color
-                int r = Math.min(255, ((argb >> 16) & 0xFF) * ((rgb >> 16) & 0xFF) / 180);
-                int g = Math.min(255, ((argb >> 8) & 0xFF) * ((rgb >> 8) & 0xFF) / 180);
-                int bl = Math.min(255, (argb & 0xFF) * (rgb & 0xFF) / 180);
-                out.setRGB(x, y, (alpha << 24) | (r << 16) | (g << 8) | bl);
             }
         }
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
