@@ -245,7 +245,7 @@ RecipeViewerEvents.addInformation(event => event.add('minecraft:diamond', 'Found
 RecipeViewerEvents.hideCategories(event => event.hide('minecraft:campfire_cooking'));
 RecipeViewerEvents.groupItems(event => event.group('Gems', ['minecraft:diamond', '#c:gems'], { icon: 'minecraft:diamond' }));   // viewers with grouping (Barely Enough Items)
 ```
-`groupItems` is read only by viewers that can group items (Barely Enough Items); JEI ignores it. Hiding and info pages work with JEI on Minecraft 1.21.1. See `docs/PARITY.md` for why EMI, REI and 26.1.2 are not covered. These hide entries in the viewer; they do not remove items or recipes from the game (use `ServerEvents.recipes` for that).
+`groupItems` is read only by viewers that can group items (Barely Enough Items); JEI ignores it. Hiding and info pages work with JEI on Minecraft 1.21.1. See `docs/PARITY.md` for why EMI, REI and 26.1.2 are not covered. Barely Enough Items (Forge 26.1.2) reads all four events; its `hideCategories` can only hide plugin categories unless BEI is installed on the server too. These hide entries in the viewer; they do not remove items or recipes from the game (use `ServerEvents.recipes` for that).
 
 ## Helpers
 

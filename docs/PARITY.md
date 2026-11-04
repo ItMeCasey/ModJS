@@ -64,6 +64,7 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | RecipeViewerEvents | hideItems, addInformation, hideCategories | JEI on 1.21.1: compiles against JEI 19.70.0.469, not run with JEI |
 | | groupItems (for viewers with grouping, such as Barely Enough Items) | event defined and unit tested; read by BEI, ignored by JEI |
 | | the other four (custom categories, recipe hiding, and so on) | no |
+| | Barely Enough Items (26.1.2) | reads hideItems, addInformation, hideCategories and groupItems by reflection; tested by the BEI session in a dev client for the first three, groupItems untested |
 | | EMI, REI | blocked: no Forge build to compile against. EMI's published Forge builds stop at 1.20.x and its 1.21.1 build is NeoForge only; REI's Forge artifacts stop at 12.x (1.20.x) and REI 16 for Forge 1.21.1 is not on a Maven. |
 | | JEI on 26.1.2 | blocked: JEI lists 26.1.2 for NeoForge and Fabric, no Forge artifact on its Maven |
 
