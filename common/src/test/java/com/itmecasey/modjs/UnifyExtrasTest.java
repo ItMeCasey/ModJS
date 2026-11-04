@@ -63,6 +63,16 @@ class UnifyExtrasTest {
     }
 
     @Test
+    void rodsAreAMaterialKindWithTheirOwnTag() {
+        List<UnifyMaterials.Entry> entries = UnifyMaterials.expand(new UnifyMaterials.Spec(List.of("tin", "steel"), List.of("rod"), false));
+        assertEquals(List.of("tin_rod", "steel_rod"), entries.stream().map(UnifyMaterials.Entry::id).toList());
+        assertEquals("c:rods/steel", entries.get(1).tag());
+        assertEquals("Steel Rod", entries.get(1).displayName());
+        assertTrue(UnifyMaterials.texture("rod", 0x6C7380).length > 50);
+        assertTrue(UnifyMaterials.expand(new UnifyMaterials.Spec(List.of("tin"), List.of(), false)).stream().anyMatch(e -> e.id().equals("tin_rod")));
+    }
+
+    @Test
     void fluidsAreRewrittenInRecipes() {
         UnifyConfig.addCanonicalFluid("c:oil", "modjs:oil");
         TagIndex fluids = new TagIndex(Map.of("c:oil", List.of(json("{\"values\":[\"mymod:oil\",\"othermod:crude\",\"modjs:oil\"]}"))));
