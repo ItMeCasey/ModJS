@@ -88,7 +88,7 @@ Gameplay events (`BlockEvents`, `ItemEvents`, `PlayerEvents`, `EntityEvents`, `L
 
 ## Client scripts
 
-`ClientEvents.lang('en_us', event => event.add('key', 'Value'))`, `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
+`ClientEvents.lang('en_us', event => event.add('key', 'Value'))`; rename existing things with `event.renameItem('minecraft:diamond', 'Shiny Rock')`, `renameBlock`, `renameEntity` (display names only; F3+T to apply), `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
 `ClientEvents.keyPressed(event => ...)`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
 
 ## Helpers
