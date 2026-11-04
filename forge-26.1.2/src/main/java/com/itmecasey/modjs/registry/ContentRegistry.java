@@ -82,6 +82,23 @@ public final class ContentRegistry {
                     }
                     properties.food(food.build());
                 }
+                if (b.armorSlot() != null) {
+                    net.minecraft.world.item.equipment.ArmorType type = switch (b.armorSlot()) {
+                        case "chestplate" -> net.minecraft.world.item.equipment.ArmorType.CHESTPLATE;
+                        case "leggings" -> net.minecraft.world.item.equipment.ArmorType.LEGGINGS;
+                        case "boots" -> net.minecraft.world.item.equipment.ArmorType.BOOTS;
+                        default -> net.minecraft.world.item.equipment.ArmorType.HELMET;
+                    };
+                    net.minecraft.world.item.equipment.ArmorMaterial armorMaterial = switch (b.armorTier()) {
+                        case "leather" -> net.minecraft.world.item.equipment.ArmorMaterials.LEATHER;
+                        case "chainmail" -> net.minecraft.world.item.equipment.ArmorMaterials.CHAINMAIL;
+                        case "gold" -> net.minecraft.world.item.equipment.ArmorMaterials.GOLD;
+                        case "diamond" -> net.minecraft.world.item.equipment.ArmorMaterials.DIAMOND;
+                        case "netherite" -> net.minecraft.world.item.equipment.ArmorMaterials.NETHERITE;
+                        default -> net.minecraft.world.item.equipment.ArmorMaterials.IRON;
+                    };
+                    properties.humanoidArmor(armorMaterial, type);
+                }
                 if (b.toolType() != null) {
                     net.minecraft.world.item.ToolMaterial material = switch (b.toolTier()) {
                         case "wood" -> net.minecraft.world.item.ToolMaterial.WOOD;
@@ -144,6 +161,13 @@ public final class ContentRegistry {
         for (TabEntry entry : TAB_ENTRIES) {
             if (entry.tab().equals(tabId)) {
                 event.accept(entry.item().get());
+            }
+        }
+        if (com.itmecasey.modjs.event.EventGroups.STARTUP.hasHandlers("modifyCreativeTab")) {
+            ModifyTabEventJS script = new ModifyTabEventJS(tabId);
+            com.itmecasey.modjs.event.EventGroups.STARTUP.post("modifyCreativeTab", tabId, script);
+            for (String itemId : script.added()) {
+                event.accept(iconFor(itemId).getItem());
             }
         }
     }

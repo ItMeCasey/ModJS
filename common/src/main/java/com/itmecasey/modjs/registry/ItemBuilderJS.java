@@ -18,6 +18,8 @@ public final class ItemBuilderJS {
     private boolean alwaysEdible;
     private String toolType;
     private String toolTier = "iron";
+    private String armorSlot;
+    private String armorTier = "iron";
     private final List<String> tooltips = new ArrayList<>();
 
     ItemBuilderJS(String id) {
@@ -43,6 +45,31 @@ public final class ItemBuilderJS {
     /** Tool kind: pickaxe, axe, shovel, hoe or sword; null for a plain item. */
     public String toolType() {
         return toolType;
+    }
+
+    /** Armor slot: helmet, chestplate, leggings or boots; null for a non-armor item. */
+    public String armorSlot() {
+        return armorSlot;
+    }
+
+    public String armorTier() {
+        return armorTier;
+    }
+
+    /** Makes the item armor of a vanilla material: leather, chainmail, iron, gold, diamond or netherite. */
+    public ItemBuilderJS armor(String slot, String tier) {
+        String s = slot.toLowerCase();
+        if (!java.util.List.of("helmet", "chestplate", "leggings", "boots").contains(s)) {
+            throw new IllegalArgumentException("Unknown armor slot '" + slot + "'; use helmet, chestplate, leggings or boots");
+        }
+        String r = tier.toLowerCase();
+        if (!java.util.List.of("leather", "chainmail", "iron", "gold", "diamond", "netherite").contains(r)) {
+            throw new IllegalArgumentException("Unknown armor tier '" + tier + "'; use leather, chainmail, iron, gold, diamond or netherite");
+        }
+        this.armorSlot = s;
+        this.armorTier = r;
+        this.maxStackSize = 1;
+        return this;
     }
 
     public String toolTier() {

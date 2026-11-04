@@ -81,6 +81,9 @@ public final class ContentRegistry {
                 if (b.toolType() != null) {
                     return tool(b, properties);
                 }
+                if (b.armorSlot() != null) {
+                    return armor(b, properties);
+                }
                 return new Item(properties);
             });
             TAB_ENTRIES.add(new TabEntry(b.tab(), item));
@@ -109,6 +112,31 @@ public final class ContentRegistry {
         ResourceLocation id = ResourceLocation.tryParse(itemId);
         Item item = id == null ? Items.STONE : BuiltInRegistries.ITEM.get(id);
         return new ItemStack(item);
+    }
+
+    private static Item armor(ItemBuilderJS b, Item.Properties properties) {
+        net.minecraft.world.item.ArmorItem.Type type = switch (b.armorSlot()) {
+            case "chestplate" -> net.minecraft.world.item.ArmorItem.Type.CHESTPLATE;
+            case "leggings" -> net.minecraft.world.item.ArmorItem.Type.LEGGINGS;
+            case "boots" -> net.minecraft.world.item.ArmorItem.Type.BOOTS;
+            default -> net.minecraft.world.item.ArmorItem.Type.HELMET;
+        };
+        net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial> material = switch (b.armorTier()) {
+            case "leather" -> net.minecraft.world.item.ArmorMaterials.LEATHER;
+            case "chainmail" -> net.minecraft.world.item.ArmorMaterials.CHAIN;
+            case "gold" -> net.minecraft.world.item.ArmorMaterials.GOLD;
+            case "diamond" -> net.minecraft.world.item.ArmorMaterials.DIAMOND;
+            case "netherite" -> net.minecraft.world.item.ArmorMaterials.NETHERITE;
+            default -> net.minecraft.world.item.ArmorMaterials.IRON;
+        };
+        int multiplier = switch (b.armorTier()) {
+            case "leather" -> 5;
+            case "chainmail", "iron" -> 15;
+            case "gold" -> 7;
+            case "diamond" -> 33;
+            default -> 37;
+        };
+        return new net.minecraft.world.item.ArmorItem(material, type, properties.durability(type.getDurability(multiplier)));
     }
 
     private static Item tool(ItemBuilderJS b, Item.Properties properties) {
@@ -144,6 +172,13 @@ public final class ContentRegistry {
         for (TabEntry entry : TAB_ENTRIES) {
             if (entry.tab().equals(tabId)) {
                 event.accept(entry.item().get());
+            }
+        }
+        if (com.itmecasey.modjs.event.EventGroups.STARTUP.hasHandlers("modifyCreativeTab")) {
+            ModifyTabEventJS script = new ModifyTabEventJS(tabId);
+            com.itmecasey.modjs.event.EventGroups.STARTUP.post("modifyCreativeTab", tabId, script);
+            for (String itemId : script.added()) {
+                event.accept(iconFor(itemId).getItem());
             }
         }
     }

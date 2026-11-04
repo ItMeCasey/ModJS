@@ -22,7 +22,7 @@ textures and models have not been run on a real client.
 |---|---|---|
 | StartupEvents | registry | yes (item, block, creative_tab) |
 | | init, postInit | compiled |
-| | modifyCreativeTab | no |
+| | modifyCreativeTab (add only) | compiled |
 | ServerEvents | recipes, tags, generateData, highPriorityData | yes |
 | | blockLootTables, entityLootTables, chestLootTables, genericLootTables | yes (ModJS names; KubeJS names may differ) |
 | | commandRegistry, loaded, unloaded, tick | yes |
@@ -56,7 +56,8 @@ textures and models have not been run on a real client.
 |---|---|
 | Item (name, stack size, food, rarity, tooltip, texture, creative tab) | yes |
 | Tools (pickaxe, axe, shovel, hoe, sword with a vanilla tier) | yes (registered; models unchecked on a client) |
-| Armor and custom tiers | no |
+| Armor (vanilla material) | yes (registered; worn look unchecked on a client) |
+| Custom tiers and armor materials | no |
 | Block (hardness, resistance, light, requires tool, texture, loot drop) | yes |
 | Block shapes: slab, stairs, wall, fence | yes (registered; models unchecked on a client) |
 | Block entities, other shapes | no |

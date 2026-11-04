@@ -18,3 +18,8 @@ StartupEvents.registry('item', event => {
   event.create('test_pickaxe').tool('pickaxe', 'diamond');
   event.create('test_sword').tool('sword', 'iron');
 });
+StartupEvents.modifyCreativeTab('minecraft:tools_and_utilities', e => e.add('minecraft:apple'));
+StartupEvents.registry('item', event => {
+  event.create('test_helmet').armor('helmet', 'iron');
+  event.create('test_boots').armor('boots', 'diamond');
+});

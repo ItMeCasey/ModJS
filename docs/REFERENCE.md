@@ -41,7 +41,7 @@ StartupEvents.registry('creative_tab', event => {
 });
 ```
 
-Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier.
+Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier. Armor: `.armor('helmet' | 'chestplate' | 'leggings' | 'boots', 'leather' | 'chainmail' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla material. Add items to existing tabs: `StartupEvents.modifyCreativeTab('minecraft:tools_and_utilities', e => e.add('modjs:ruby'))`.
 
 Everything is registered as `modjs:<id>`. Put textures at `modjs/assets/modjs/textures/item/<id>.png` and
 `.../block/<id>.png`. Models, blockstates, lang entries and block loot tables are generated for you.

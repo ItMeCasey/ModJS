@@ -80,7 +80,7 @@ public final class SelfTest {
             check("registered shaped block " + shaped, found);
         }
 
-        for (String tool : new String[] {"test_pickaxe", "test_sword"}) {
+        for (String tool : new String[] {"test_pickaxe", "test_sword", "test_helmet", "test_boots"}) {
             String key = "modjs:" + tool;
             boolean found = net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
                 .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals(key));
