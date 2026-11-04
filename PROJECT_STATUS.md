@@ -11,6 +11,7 @@ Spend: none
 - [x] Script sandbox: class allow/deny filter and per-script error reporting to log and in-game (w:3)
 - [~] Event system: priority, cancel, once/off, and JS-side listener registration (w:3)
 - [~] `/modjs reload` command for script hot reload (w:2)
+- [~] Item commands `/modjs hand`, `toolbar` and `inventory` list held item ids (registered, not yet run by a player) (w:1)
 
 ## Startup scripts
 - [~] Registry events for items, blocks, fluids, block entities, entity types, and creative tabs (w:5)

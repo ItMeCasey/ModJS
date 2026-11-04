@@ -12,24 +12,27 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.RegisterCommandsEvent;
 
-/** {@code /modjs reload}, {@code /modjs errors}, {@code /modjs status}. */
+import java.util.function.Predicate;
+
+/** {@code /modjs reload}, {@code errors}, {@code status} (operators) plus the item commands (everyone). */
 public final class ModJSCommands {
     private ModJSCommands() {
     }
 
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("modjs")
-            .requires(source -> source.hasPermission(2));
+        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("modjs");
+        Predicate<CommandSourceStack> admin = source -> source.hasPermission(2);
+        ItemListCommands.addTo(root);
 
-        root.then(Commands.literal("reload").executes(context -> {
+        root.then(Commands.literal("reload").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();
             source.sendSuccess(() -> Component.literal("Reloading data packs and server scripts..."), true);
             source.getServer().getCommands().performPrefixedCommand(source, "reload");
             return 1;
         }));
 
-        root.then(Commands.literal("errors").executes(context -> {
+        root.then(Commands.literal("errors").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();
             int total = 0;
             for (ScriptType type : ScriptType.values()) {
@@ -45,7 +48,7 @@ public final class ModJSCommands {
             return total;
         }));
 
-        root.then(Commands.literal("status").executes(context -> {
+        root.then(Commands.literal("status").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();
             for (ScriptType type : ScriptType.values()) {
                 ScriptManager manager = ScriptManager.of(type);
