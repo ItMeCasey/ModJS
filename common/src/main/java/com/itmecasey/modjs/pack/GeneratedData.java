@@ -44,6 +44,11 @@ public final class GeneratedData {
         return files.containsKey(namespace + "/" + path);
     }
 
+    /** Removes a file; returns true if it existed. {@code path} includes the extension. */
+    public boolean remove(String namespace, String path) {
+        return files.remove(namespace + "/" + path) != null;
+    }
+
     public int size() {
         return files.size();
     }

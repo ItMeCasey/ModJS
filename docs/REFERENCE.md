@@ -75,6 +75,21 @@ Tables offer `addPool(pool => pool.rolls(2).addItem(item, count, weight).randomC
 Worldgen: `WorldgenEvents.add(event => event.addOre({id, block, size, count, minY, maxY, biomes}))`, `addFeature`,
 `removeFeature`, `addSpawn`, `removeSpawn`. These write Forge biome modifiers.
 
+Dimensions (server scripts; applied when a world loads, so restart rather than `/reload`):
+```js
+DimensionEvents.add(event => {
+  event.addType('mymod:bright', { base: 'minecraft:overworld', set: { ambient_light: 0.5, coordinate_scale: 4 } });
+  event.add('mymod:void', { generator: 'void' });                          // void, flat, overworld, nether, end or a JSON object
+  event.add('mymod:flat', { generator: 'flat', layers: [{ block: 'minecraft:stone', height: 3 }], biome: 'minecraft:plains', type: 'mymod:bright' });
+  event.edit('minecraft:the_nether', { generator: 'nether', type: 'mymod:bright' }); // replace an existing dimension
+  event.duplicate('minecraft:the_nether', 'mymod:nether_two');             // copy a script-made, data pack or vanilla dimension
+  event.duplicateType('minecraft:overworld', 'mymod:dark', { ambient_light: 0 });
+  event.drop('mymod:old');                                                 // removes script-made and modjs/data dimensions
+});
+```
+`addRaw(id, json)` and `addTypeRaw(id, json)` take full JSON. Dimensions from the game or other mods cannot be removed, only replaced with `edit`.
+Reach one with `/execute in mymod:void run tp @s 0 100 0`.
+
 Raw data: `ServerEvents.generateData(event => event.addJson('mymod:loot_table/x', {...}))`.
 
 Commands: `ServerEvents.commandRegistry(event => event.register(Java.loadClass('net.minecraft.commands.Commands').literal('hi').executes(ctx => 1)))`.

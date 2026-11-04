@@ -11,3 +11,11 @@ ServerEvents.loaded(e => {
   console.log('SELFTEST script: gamerule ' + before + ' -> ' + after + ' of ' + GameRule.list().length);
   GameRule.set('keepInventory', before);
 });
+DimensionEvents.add(event => {
+  event.addType('modjs:bright', { base: 'minecraft:overworld', set: { ambient_light: 0.5 } });
+  event.add('modjs:void_test', { generator: 'void' });
+  event.add('modjs:flat_test', { generator: 'flat', layers: [{ block: 'minecraft:stone', height: 3 }], type: 'modjs:bright' });
+  event.duplicate('minecraft:the_nether', 'modjs:nether_copy');
+  event.add('modjs:dropped', { generator: 'void' });
+  event.drop('modjs:dropped');
+});

@@ -111,6 +111,20 @@ public final class SelfTest {
         }
         check("no block entity on plain blocks", new UtilsBinding().blockEntity("minecraft:overworld", 0, 100, 0) == null);
 
+        var ops = net.minecraft.resources.RegistryOps.create(com.mojang.serialization.JsonOps.INSTANCE, server.registryAccess());
+        for (String name : new String[] {"void_test", "flat_test", "nether_copy"}) {
+            byte[] bytes = com.itmecasey.modjs.pack.GeneratedData.SERVER.get("modjs", "dimension/" + name + ".json");
+            boolean ok = false;
+            if (bytes != null) {
+                var json = com.google.gson.JsonParser.parseString(new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+                var result = net.minecraft.world.level.dimension.LevelStem.CODEC.parse(ops, json);
+                result.error().ifPresent(e -> LOGGER.info("SELFTEST dimension {} error: {}", name, e.message()));
+                ok = result.result().isPresent();
+            }
+            check("generated dimension " + name + " parses as a level stem", ok);
+        }
+        check("DimensionEvents.drop removes a dimension", com.itmecasey.modjs.pack.GeneratedData.SERVER.get("modjs", "dimension/dropped.json") == null);
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

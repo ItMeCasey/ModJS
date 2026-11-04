@@ -47,6 +47,7 @@ textures and models have not been run on a real client.
 | | loggedOut, respawned, tick, advancement, inventoryOpened, inventoryClosed | compiled |
 | | chestOpened, chestClosed | compiled |
 | | decorateChat, inventoryChanged | no |
+| DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
 | NetworkEvents | dataReceived | compiled |
 | RecipeViewerEvents | all eight | no |
 

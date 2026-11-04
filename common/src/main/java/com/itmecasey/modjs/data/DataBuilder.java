@@ -66,6 +66,7 @@ public final class DataBuilder {
         EventGroups.SERVER.post("chestLootTables", new LootEventJS("chests", "minecraft:chest", data));
         EventGroups.SERVER.post("genericLootTables", new LootEventJS("", "minecraft:generic", data));
         EventGroups.WORLDGEN.post("add", new WorldgenEventJS(data));
+        EventGroups.DIMENSION.post("add", new com.itmecasey.modjs.worldgen.DimensionEventJS(data));
 
         EventGroups.SERVER.post("generateData", new DataEventJS(data));
         writePackMetadata(data);
