@@ -61,6 +61,7 @@ public class ModJS {
         ScriptManager.of(ScriptType.STARTUP).reload();
         RegistryManager.collect();
         ContentRegistry.register(context.getModBusGroup());
+        com.itmecasey.modjs.unify.UnifyLootModifier.register(context.getModBusGroup());
 
         FMLCommonSetupEvent.getBus(context.getModBusGroup()).addListener((FMLCommonSetupEvent e) ->
             {

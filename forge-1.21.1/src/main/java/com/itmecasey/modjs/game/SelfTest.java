@@ -150,6 +150,22 @@ public final class SelfTest {
         check("Unify added a conversion recipe", unifier.conversionRecipes().containsKey("modjs:unify/modjs_tin_ingot_from_minecraft_iron_ingot")
             && server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().equals("modjs:unify/modjs_tin_ingot_from_minecraft_iron_ingot")));
 
+        var modifier = new com.itmecasey.modjs.unify.UnifyLootModifier(new net.minecraft.world.level.storage.loot.predicates.LootItemCondition[0]);
+        it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemStack> drops = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+        drops.add(new ItemStack(Items.IRON_INGOT, 3));
+        drops.add(new ItemStack(Items.STICK, 2));
+        var replaced = modifier.apply(drops, null);
+        check("Unify replaces non-canonical drops", replaced.size() == 2 && replaced.get(0).getCount() == 3
+            && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(replaced.get(0).getItem()).toString().equals("modjs:tin_ingot")
+            && replaced.get(1).is(Items.STICK));
+
+        player.getInventory().setItem(5, new ItemStack(Items.IRON_INGOT, 7));
+        int swapped = com.itmecasey.modjs.unify.InventoryUnifier.swap(player);
+        ItemStack inSlot = player.getInventory().getItem(5);
+        check("Unify swaps inventory stacks", swapped >= 1 && inSlot.getCount() == 7
+            && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(inSlot.getItem()).toString().equals("modjs:tin_ingot"));
+        player.getInventory().setItem(5, ItemStack.EMPTY);
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

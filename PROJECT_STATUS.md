@@ -51,6 +51,7 @@ Spend: none
 - [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); EMI, REI and 26.1.2 blocked by missing Forge builds; Create recipe types not started (w:3)
 - [x] Type definitions: a hand-written modjs.d.ts and jsconfig.json are written to modjs/ on launch (w:3)
 - [ ] In-game error overlay at startup and on script error (w:2)
+- [x] Item unification: canonical items, materials, recipe, loot and inventory unification (both versions self-tested with a fake mod, not with real mods) (w:4)
 - [ ] Port to more Minecraft versions and loaders, closing the gaps listed in docs/PORTING.md (EMI, REI, JEI on 26.1.2, checkSpawn) (w:5)
 
 ## Testing and release

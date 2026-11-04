@@ -198,6 +198,9 @@ public final class GameEvents {
         });
 
         TickEvent.PlayerTickEvent.Post.BUS.addListener((TickEvent.PlayerTickEvent.Post e) -> {
+            if (e.side() == LogicalSide.SERVER && e.player().tickCount % com.itmecasey.modjs.unify.InventoryUnifier.INTERVAL == 0) {
+                com.itmecasey.modjs.unify.InventoryUnifier.swap(e.player());
+            }
             if (e.side() == LogicalSide.SERVER && wants(EventGroups.PLAYER, "tick")) {
                 fire(EventGroups.PLAYER, "tick", null, new GameEventJS().player(e.player()));
             }

@@ -32,6 +32,10 @@ Look at `forge-1.21.1/` for the older API shape and `forge-26.1.2/` for the newe
 | Title screen | Vanilla panorama background only on 1.21.1 | `PanoramaRenderer` was removed in 26.1.2. |
 | Item modification | Applies on the server and single player, not to a remote client | Components are not synced. |
 
+Unification needs from a port: the item tag folder name (`tags/item`), an item-exists check, the recipe reload hook calling
+`UnifyReload.prepare`, a loot modifier (`UnifyLootModifier`), an inventory sweep (`InventoryUnifier`) and the `/modjs unify` command.
+Everything else (`common/unify`) is shared.
+
 ## Version-specific pitfalls already met
 
 - Dimension, recipe, tag and loot JSON formats change between versions; read vanilla's own JSON from the game jar instead

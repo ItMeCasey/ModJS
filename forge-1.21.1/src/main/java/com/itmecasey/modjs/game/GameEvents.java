@@ -211,6 +211,9 @@ public final class GameEvents {
         });
 
         MinecraftForge.EVENT_BUS.addListener((TickEvent.PlayerTickEvent e) -> {
+            if (e.phase == TickEvent.Phase.END && e.side.isServer() && e.player.tickCount % com.itmecasey.modjs.unify.InventoryUnifier.INTERVAL == 0) {
+                com.itmecasey.modjs.unify.InventoryUnifier.swap(e.player);
+            }
             if (e.phase == TickEvent.Phase.END && e.side.isServer() && wants(EventGroups.PLAYER, "tick")) {
                 fire(EventGroups.PLAYER, "tick", null, new GameEventJS().player(e.player));
             }

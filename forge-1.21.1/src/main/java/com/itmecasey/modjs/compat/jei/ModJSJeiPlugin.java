@@ -59,6 +59,19 @@ public final class ModJSJeiPlugin implements IModPlugin {
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime runtime) {
+        com.itmecasey.modjs.unify.Unifier unifier = com.itmecasey.modjs.unify.Unifier.current();
+        if (unifier.active()) {
+            List<ItemStack> replaced = new ArrayList<>();
+            unifier.groups().forEach(group -> group.members().forEach(member -> {
+                ResourceLocation id = ResourceLocation.tryParse(member);
+                if (id != null) {
+                    BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> replaced.add(new ItemStack(item)));
+                }
+            }));
+            if (!replaced.isEmpty()) {
+                runtime.getIngredientManager().removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK, replaced);
+            }
+        }
         if (EventGroups.RECIPE_VIEWER.hasHandlers("hideItems")) {
             RecipeViewerEventJS.HideItems event = new RecipeViewerEventJS.HideItems();
             EventGroups.RECIPE_VIEWER.post("hideItems", event);

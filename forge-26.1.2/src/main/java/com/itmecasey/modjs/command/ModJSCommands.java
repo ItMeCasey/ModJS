@@ -57,6 +57,23 @@ public final class ModJSCommands {
                 return 1;
             })));
 
+        root.then(Commands.literal("unify").requires(admin).executes(context -> {
+            CommandSourceStack source = context.getSource();
+            com.itmecasey.modjs.unify.Unifier unifier = com.itmecasey.modjs.unify.Unifier.current();
+            if (!unifier.active()) {
+                source.sendSuccess(() -> Component.literal("No unified materials. Use Unify.materials(), Unify.group() or Unify.auto() in scripts."), false);
+                return 0;
+            }
+            for (com.itmecasey.modjs.unify.Unifier.Group group : unifier.groups()) {
+                String line = group.tag() + " -> " + group.canonical() + "  (" + group.members().size() + " replaced: " + String.join(", ", group.members()) + ")";
+                source.sendSuccess(() -> Component.literal(line), false);
+            }
+            String totals = unifier.groups().size() + " group(s); recipes rewritten: " + unifier.outputsRewritten() + " outputs, " + unifier.inputsRewritten()
+                + " inputs; conversion recipes: " + unifier.conversionRecipes().size();
+            source.sendSuccess(() -> Component.literal(totals), false);
+            return unifier.groups().size();
+        }));
+
         root.then(Commands.literal("status").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();
             for (ScriptType type : ScriptType.values()) {

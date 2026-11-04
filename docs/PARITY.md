@@ -94,3 +94,4 @@ Mod-specific recipe schemas (for example Create): no.
 - Gameplay events pass real Minecraft objects (`player`, `level`, `item`) instead of KubeJS wrapper classes.
 - Recipe, tag, loot and worldgen changes are written as a generated data pack, so they work with any other data pack.
 - On 26.1.2, a script that holds a Minecraft `Block` object (for example `Blocks.STONE`) crashes a dedicated server, because the script engine inspects client-only classes. Use id strings there.
+- `Unify` (ModJS only, an Ore Dictionary replacement): recipe, loot and inventory unification and generated materials were checked in the headless self test on both versions with a fake second mod (vanilla iron ingots as tin). Not checked with real mods that use custom recipe types.

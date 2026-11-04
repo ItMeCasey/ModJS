@@ -128,6 +128,34 @@ A block entity gives `id`, `blockId`, `x/y/z`, `hasInventory`, `size`, `getItemI
 `ClientEvents.lang('en_us', event => event.add('key', 'Value'))`; rename existing things with `event.renameItem('minecraft:diamond', 'Shiny Rock')`, `renameBlock`, `renameEntity` (display names only; F3+T to apply), `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
 `ClientEvents.keyPressed(event => ...)`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
 
+### Unifying items (Ore Dictionary style)
+
+One canonical item per material: every recipe, drop and inventory that holds another mod's version ends up with it.
+```js
+// startup_scripts: register ModJS items for materials (placeholder textures are generated; your own in assets/modjs/textures/ win)
+Unify.materials({ materials: ['tin', 'zinc', 'ruby'] });          // omit materials for the built-in list; kinds default per material
+StartupEvents.registry('item', event => {
+  event.create('steel_gear').unify('c:gears/steel');               // any item you build can be the canonical one for a tag
+});
+
+// server_scripts
+Unify.auto('all');                                                  // every c:<kind>/* tag; or Unify.auto(['ingots', 'dusts'])
+Unify.group('c:ingots/lead', { canonical: 'thermal:lead_ingot' });  // pick an existing item instead of ours
+Unify.prefer(['modjs', 'create', 'thermal']);                       // who wins when no ModJS item exists
+Unify.inputs('tag');                                                // inputs become #c:... so every member still works (default: 'canonical')
+Unify.skipRecipes({ mod: 'create' });                               // leave some recipes alone
+Unify.skipItems(['@mekanism', 'thermal:tin_ingot']);                // never replace these
+Unify.swapInventories(true);  Unify.convertRecipes(true);           // defaults
+```
+Kinds registered by `Unify.materials`: ingot, nugget, dust, plate, gear, rod, wire, coin, gem, raw, storage_block (tags `c:ingots/<m>`, `c:raw_materials/<m>`, and so on).
+Items Minecraft already has (iron, gold, copper ingots, diamond and so on) are skipped unless you pass `includeVanilla: true`.
+Order of choice for the canonical item: `Unify.group(..., {canonical})`, then a ModJS item built with `.unify(tag)`, then the first match in `Unify.prefer`.
+What it changes: recipe outputs and item inputs (any recipe stored as JSON), loot from blocks, mobs, chests and fishing, and items already in
+player inventories (checked every two seconds). Each replaced item also gets a 1:1 crafting recipe into the canonical one, and JEI hides the
+replaced items on 1.21.1. `/modjs unify` lists every group and the totals.
+Not changed: recipe types whose ingredients are not plain item or tag values (some mod machines), items on the ground, world generation (ores keep
+coming from the mods that generate them, but they drop the canonical item).
+
 ### Splash text and the main menu
 
 ```js
