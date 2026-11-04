@@ -53,6 +53,7 @@ public class ModJS {
             ScriptableObject.putProperty(scope, "Dimensions", Context.javaToJS(new com.itmecasey.modjs.game.DimensionManager(), scope));
             ScriptableObject.putProperty(scope, "Network", Context.javaToJS(new NetworkBinding(), scope));
         });
+        com.itmecasey.modjs.unify.ColorSampler.setFinder(com.itmecasey.modjs.unify.ModTextureFinder.create());
         ScriptManager.setRoot(FMLPaths.GAMEDIR.get().resolve(MOD_ID));
         LOGGER.info("ModJS loading scripts from {}", ScriptManager.root());
         ScriptFolders.prepare(ScriptManager.root());

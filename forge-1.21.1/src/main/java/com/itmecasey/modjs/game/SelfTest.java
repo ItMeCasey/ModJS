@@ -229,6 +229,10 @@ public final class SelfTest {
         }
         level.setBlockAndUpdate(cratePos, Blocks.AIR.defaultBlockState());
 
+        Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
+        LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
+        check("Unify samples a material color from the game's textures", copperColor != null);
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

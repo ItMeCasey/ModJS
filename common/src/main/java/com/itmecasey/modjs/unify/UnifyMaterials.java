@@ -183,7 +183,14 @@ public final class UnifyMaterials {
 
     private static int colorFor(String material) {
         Integer custom = UnifyConfig.colorOf(material);
-        return custom != null ? custom : COLORS.getOrDefault(material, hash(material));
+        if (custom != null) {
+            return custom;
+        }
+        Integer sampled = ColorSampler.sample(material);
+        if (sampled != null) {
+            return sampled;
+        }
+        return COLORS.getOrDefault(material, hash(material));
     }
 
     private static int hash(String material) {

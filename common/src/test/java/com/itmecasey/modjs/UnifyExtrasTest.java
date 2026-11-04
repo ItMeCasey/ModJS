@@ -85,6 +85,28 @@ class UnifyExtrasTest {
     }
 
     @Test
+    void colorsAreSampledFromTexturesTheGameAlreadyHas() {
+        java.awt.image.BufferedImage ingot = new java.awt.image.BufferedImage(4, 4, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                // dark outline on the edge, light highlight on one pixel, the material tone elsewhere
+                int rgb = (y == 0) ? 0x101010 : (x == 3 && y == 3) ? 0xFFFFFF : 0x80A0C0;
+                ingot.setRGB(x, y, 0xFF000000 | rgb);
+            }
+        }
+        com.itmecasey.modjs.unify.ColorSampler.setFinder(path -> path.equals("textures/item/mythril_ingot.png") ? ingot : null);
+        try {
+            assertEquals(0x80A0C0, com.itmecasey.modjs.unify.ColorSampler.sample("mythril"));
+            assertEquals(null, com.itmecasey.modjs.unify.ColorSampler.sample("unknownium"));
+            assertEquals(0x80A0C0, UnifyMaterials.expand(new UnifyMaterials.Spec(List.of("mythril"), List.of("dust"), false)).get(0).color());
+            UnifyConfig.setColor("mythril", 0x123456);
+            assertEquals(0x123456, UnifyMaterials.expand(new UnifyMaterials.Spec(List.of("mythril"), List.of("dust"), false)).get(0).color());
+        } finally {
+            com.itmecasey.modjs.unify.ColorSampler.setFinder(path -> null);
+        }
+    }
+
+    @Test
     void fluidsAreRewrittenInRecipes() {
         UnifyConfig.addCanonicalFluid("c:oil", "modjs:oil");
         TagIndex fluids = new TagIndex(Map.of("c:oil", List.of(json("{\"values\":[\"mymod:oil\",\"othermod:crude\",\"modjs:oil\"]}"))));

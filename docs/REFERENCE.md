@@ -169,7 +169,9 @@ Kinds registered by `Unify.materials`: ingot, nugget, dust, plate, gear, rod, wi
 `c:raw_materials/<m>`, and so on). Opt-in kinds, listed in `kinds`: `ore` (a `<m>_ore` block that drops the raw item or gem and joins `c:ores/<m>`; it
 is not generated in the world, place it with `WorldgenEvents.addOre`), `crushed` (`c:crushed_raw_materials`), `clump`, `shard` and `dirty_dust`.
 Generated art is the game's own textures recolored (so it keeps vanilla's outline and shading): ingots from the iron ingot, ores from iron ore (only the ore
-specks change), dust from gunpowder, shards from amethyst, and so on; plates, gears and coins are drawn sprites in the same style. Set a material's color with
+specks change), dust from gunpowder, shards from amethyst, and so on; plates, gears and coins are drawn sprites in the same style. Colors are found automatically: for tin, ModJS looks for `tin_ingot`, `tin_dust`, `tin_nugget`, `raw_tin`, `tin_ore` and similar textures in every loaded
+mod and the game, and uses the base tone of the first one it finds (so a material another mod already has matches that mod's look). Only when nothing is found does it
+use a small built-in fallback, then a color derived from the name. Override any material with
 `Unify.colors({ tin: 0xC9D3D9, mythril: 0x7FD6F5 })` (startup) or `colors` in `unify.json`. Without the game's textures (a dedicated server) simple drawn sprites are used, and any PNG
 you put in `assets/modjs/textures/item/` wins.
 Items Minecraft already has (iron, gold, copper ingots, diamond and so on) are skipped unless you pass `includeVanilla: true`.
