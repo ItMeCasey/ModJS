@@ -25,6 +25,10 @@ public final class ExtraBindings {
     static void install(ScriptType type, Context cx, ScriptableObject scope) {
         ScriptableObject.putProperty(scope, "Item", Context.javaToJS(new ItemBinding(), scope));
         ScriptableObject.putProperty(scope, "Ingredient", Context.javaToJS(new IngredientBinding(), scope));
+        ScriptableObject.putProperty(scope, "Platform", Context.javaToJS(new PlatformBinding(), scope));
+        ScriptableObject.putProperty(scope, "SECOND", 1000);
+        ScriptableObject.putProperty(scope, "MINUTE", 60_000);
+        ScriptableObject.putProperty(scope, "HOUR", 3_600_000);
         ScriptableObject.putProperty(scope, "JsonIO", Context.javaToJS(new JsonIOBinding(), scope));
         ScriptableObject.putProperty(scope, "Persistent", Context.javaToJS(new PersistentBinding(), scope));
         for (BindingProvider provider : PROVIDERS) {

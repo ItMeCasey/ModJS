@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent;
@@ -19,9 +20,11 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -41,6 +44,7 @@ public final class GameEvents {
         registerPlayers();
         registerEntities();
         registerLevelAndServer();
+        registerExtras();
     }
 
     private static boolean fire(EventGroup group, String name, String id, GameEventJS event) {
@@ -259,6 +263,41 @@ public final class GameEvents {
                 e.setAmount(js.finalAmount());
             }
             return cancelled;
+        });
+    }
+
+    // -- more KubeJS events --------------------------------------------------------------------------------------
+
+    private static void registerExtras() {
+        LevelEvent.Unload.BUS.addListener((LevelEvent.Unload e) -> {
+            if (e.getLevel() instanceof Level level && !level.isClientSide() && wants(EventGroups.LEVEL, "unloaded")) {
+                fire(EventGroups.LEVEL, "unloaded", level.dimension().identifier().toString(), new GameEventJS().level(level));
+            }
+        });
+
+        ExplosionEvent.Start.BUS.addListener((ExplosionEvent.Start e) -> {
+            if (e.getLevel().isClientSide() || !wants(EventGroups.LEVEL, "beforeExplosion")) {
+                return false;
+            }
+            return fire(EventGroups.LEVEL, "beforeExplosion", null, new GameEventJS().level(e.getLevel()));
+        });
+
+        ExplosionEvent.Detonate.BUS.addListener((ExplosionEvent.Detonate e) -> {
+            if (!e.getLevel().isClientSide() && wants(EventGroups.LEVEL, "afterExplosion")) {
+                fire(EventGroups.LEVEL, "afterExplosion", null, new GameEventJS().level(e.getLevel()));
+            }
+        });
+
+        PlayerContainerEvent.Open.BUS.addListener((PlayerContainerEvent.Open e) -> {
+            if (!e.getEntity().level().isClientSide() && wants(EventGroups.PLAYER, "inventoryOpened")) {
+                fire(EventGroups.PLAYER, "inventoryOpened", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        PlayerContainerEvent.Close.BUS.addListener((PlayerContainerEvent.Close e) -> {
+            if (!e.getEntity().level().isClientSide() && wants(EventGroups.PLAYER, "inventoryClosed")) {
+                fire(EventGroups.PLAYER, "inventoryClosed", null, new GameEventJS().player(e.getEntity()));
+            }
         });
     }
 

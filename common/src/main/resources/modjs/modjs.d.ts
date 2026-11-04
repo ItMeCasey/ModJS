@@ -194,6 +194,8 @@ interface CreativeTabBuilder {
 }
 
 declare const StartupEvents: {
+  init(handler: Handler<EventBase>): void;
+  postInit(handler: Handler<EventBase>): void;
   registry(type: 'creative_tab', handler: Handler<RegistryEvent<CreativeTabBuilder>>): void;
   registry(type: 'item', handler: Handler<RegistryEvent<ItemBuilder>>): void;
   registry(type: 'block', handler: Handler<RegistryEvent<BlockBuilder>>): void;
@@ -209,6 +211,7 @@ declare const ServerEvents: {
   chestLootTables(handler: Handler<LootEvent>): void;
   genericLootTables(handler: Handler<LootEvent>): void;
   commandRegistry(handler: Handler<CommandRegistryEvent>): void;
+  afterRecipes(handler: Handler<EventBase>): void;
   loaded(handler: Handler<GameEvent>): void;
   unloaded(handler: Handler<GameEvent>): void;
   tick(handler: Handler<GameEvent>): void;
@@ -257,6 +260,8 @@ declare const PlayerEvents: {
   death(handler: Handler<GameEvent>): void;
   advancement(handler: Handler<GameEvent>): void;
   advancement(advancementId: string, handler: Handler<GameEvent>): void;
+  inventoryOpened(handler: Handler<GameEvent>): void;
+  inventoryClosed(handler: Handler<GameEvent>): void;
 };
 
 declare const EntityEvents: {
@@ -273,6 +278,10 @@ declare const LevelEvents: {
   tick(dimensionId: string, handler: Handler<GameEvent>): void;
   loaded(handler: Handler<GameEvent>): void;
   loaded(dimensionId: string, handler: Handler<GameEvent>): void;
+  unloaded(handler: Handler<GameEvent>): void;
+  unloaded(dimensionId: string, handler: Handler<GameEvent>): void;
+  beforeExplosion(handler: Handler<GameEvent>): void;
+  afterExplosion(handler: Handler<GameEvent>): void;
 };
 
 declare const ClientEvents: {
@@ -280,6 +289,8 @@ declare const ClientEvents: {
   highPriorityAssets(handler: Handler<DataEvent>): void;
   generateAssets(handler: Handler<DataEvent>): void;
   tick(handler: Handler<ClientEvent>): void;
+  loggedIn(handler: Handler<ClientEvent>): void;
+  loggedOut(handler: Handler<ClientEvent>): void;
   keyPressed(handler: Handler<ClientEvent>): void;
   keyPressed(keyCode: string, handler: Handler<ClientEvent>): void;
 };
@@ -379,3 +390,14 @@ declare const JsonIO: {
   write(path: string, value: any): void;
   exists(path: string): boolean;
 };
+
+declare const Platform: {
+  mcVersion: string;
+  loader: string;
+  isClient(): boolean;
+  isLoaded(modId: string): boolean;
+};
+
+declare const SECOND: 1000;
+declare const MINUTE: 60000;
+declare const HOUR: 3600000;

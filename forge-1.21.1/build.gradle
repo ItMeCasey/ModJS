@@ -53,6 +53,9 @@ minecraft {
         }
 
         gameTestServer {
+            // Enables the in-game event self test; see SelfTest.java and run/modjs/server_scripts/selftest.js.
+            property 'modjs.selftest', 'true'
+            property 'forge.enabledGameTestNamespaces', mod_id
         }
 
         data {

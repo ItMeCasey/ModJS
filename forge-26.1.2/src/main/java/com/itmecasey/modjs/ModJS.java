@@ -1,16 +1,20 @@
 package com.itmecasey.modjs;
 
 import com.itmecasey.modjs.client.ClientBridge;
+import com.itmecasey.modjs.event.EventGroups;
+import com.itmecasey.modjs.event.EventJS;
 import com.itmecasey.modjs.format.ModernFormat;
 import com.itmecasey.modjs.format.VersionFormat;
 import com.itmecasey.modjs.game.TextBinding;
 import com.itmecasey.modjs.game.UtilsBinding;
 import com.itmecasey.modjs.network.NetworkBinding;
 import com.itmecasey.modjs.script.ExtraBindings;
+import com.itmecasey.modjs.script.PlatformBinding;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ScriptableObject;
 import com.itmecasey.modjs.command.ModJSCommands;
 import com.itmecasey.modjs.game.GameEvents;
+import com.itmecasey.modjs.game.SelfTest;
 import com.itmecasey.modjs.network.ModJSNetwork;
 import com.itmecasey.modjs.pack.ModJSPacks;
 import com.itmecasey.modjs.script.ScriptFolders;
@@ -24,7 +28,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -37,6 +44,7 @@ public class ModJS {
 
     public ModJS(FMLJavaModLoadingContext context) {
         VersionFormat.use(new ModernFormat());
+        PlatformBinding.configure("26.1.2", FMLEnvironment.dist == Dist.CLIENT, ModList::isLoaded);
         ExtraBindings.register((type, cx, scope) -> {
             ScriptableObject.putProperty(scope, "Utils", Context.javaToJS(new UtilsBinding(), scope));
             ScriptableObject.putProperty(scope, "Text", Context.javaToJS(new TextBinding(), scope));
@@ -51,8 +59,13 @@ public class ModJS {
         RegistryManager.collect();
         ContentRegistry.register(context.getModBusGroup());
 
+        FMLCommonSetupEvent.getBus(context.getModBusGroup()).addListener((FMLCommonSetupEvent e) ->
+            EventGroups.STARTUP.post("init", new EventJS()));
+        FMLLoadCompleteEvent.getBus(context.getModBusGroup()).addListener((FMLLoadCompleteEvent e) ->
+            EventGroups.STARTUP.post("postInit", new EventJS()));
         ModJSNetwork.init();
         GameEvents.register();
+        SelfTest.register();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientBridge.register();
         }

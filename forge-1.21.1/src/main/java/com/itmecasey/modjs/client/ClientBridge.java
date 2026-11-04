@@ -7,6 +7,7 @@ import com.itmecasey.modjs.registry.RegistryManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -52,6 +53,18 @@ public final class ClientBridge {
             }
             if (EventGroups.ITEM.hasHandlers("tooltip")) {
                 EventGroups.ITEM.post("tooltip", new TooltipEventJS(stack, e.getToolTip()));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingIn e) -> {
+            if (EventGroups.CLIENT.hasHandlers("loggedIn")) {
+                EventGroups.CLIENT.post("loggedIn", new ClientEventJS(0, 0));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> {
+            if (EventGroups.CLIENT.hasHandlers("loggedOut")) {
+                EventGroups.CLIENT.post("loggedOut", new ClientEventJS(0, 0));
             }
         });
 

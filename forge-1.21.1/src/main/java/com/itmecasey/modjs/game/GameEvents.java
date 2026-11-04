@@ -22,9 +22,11 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -43,6 +45,7 @@ public final class GameEvents {
         registerPlayers();
         registerEntities();
         registerLevelAndServer();
+        registerExtras();
     }
 
     private static boolean fire(EventGroup group, String name, String id, GameEventJS event) {
@@ -278,6 +281,43 @@ public final class GameEvents {
                 e.setCanceled(true);
             } else if (js.amountChanged()) {
                 e.setAmount(js.finalAmount());
+            }
+        });
+    }
+
+    // -- more KubeJS events --------------------------------------------------------------------------------------
+
+    private static void registerExtras() {
+        MinecraftForge.EVENT_BUS.addListener((LevelEvent.Unload e) -> {
+            if (e.getLevel() instanceof Level level && !level.isClientSide() && wants(EventGroups.LEVEL, "unloaded")) {
+                fire(EventGroups.LEVEL, "unloaded", level.dimension().location().toString(), new GameEventJS().level(level));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((ExplosionEvent.Start e) -> {
+            if (e.getLevel().isClientSide() || !wants(EventGroups.LEVEL, "beforeExplosion")) {
+                return;
+            }
+            if (fire(EventGroups.LEVEL, "beforeExplosion", null, new GameEventJS().level(e.getLevel()))) {
+                e.setCanceled(true);
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((ExplosionEvent.Detonate e) -> {
+            if (!e.getLevel().isClientSide() && wants(EventGroups.LEVEL, "afterExplosion")) {
+                fire(EventGroups.LEVEL, "afterExplosion", null, new GameEventJS().level(e.getLevel()));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((PlayerContainerEvent.Open e) -> {
+            if (!e.getEntity().level().isClientSide() && wants(EventGroups.PLAYER, "inventoryOpened")) {
+                fire(EventGroups.PLAYER, "inventoryOpened", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((PlayerContainerEvent.Close e) -> {
+            if (!e.getEntity().level().isClientSide() && wants(EventGroups.PLAYER, "inventoryClosed")) {
+                fire(EventGroups.PLAYER, "inventoryClosed", null, new GameEventJS().player(e.getEntity()));
             }
         });
     }

@@ -1,6 +1,8 @@
 package com.itmecasey.modjs.recipe;
 
 import com.google.gson.JsonElement;
+import com.itmecasey.modjs.event.EventGroups;
+import com.itmecasey.modjs.event.EventJS;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.logging.LogUtils;
@@ -78,6 +80,7 @@ public final class RecipeReloadHook {
         protected void apply(Void prepared, ResourceManager resources, ProfilerFiller profiler) {
             RecipeChanges changes = RecipeChanges.current();
             if (changes.isEmpty()) {
+                EventGroups.SERVER.post("afterRecipes", new EventJS());
                 return;
             }
             Map<Identifier, JsonObject> sources = readSources(resources);
@@ -114,6 +117,7 @@ public final class RecipeReloadHook {
                 }
             }
             manager.recipes = RecipeMap.create(result);
+            EventGroups.SERVER.post("afterRecipes", new EventJS());
             LOGGER.info("ModJS recipes: {} loaded, {} removed, {} rewritten, {} without a source file",
                 before, changes.removedCount(), changes.replacedCount(), withoutSource);
         }

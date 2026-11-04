@@ -2,9 +2,13 @@ package com.itmecasey.modjs;
 
 import com.itmecasey.modjs.client.ClientBridge;
 import com.itmecasey.modjs.command.ModJSCommands;
+import com.itmecasey.modjs.event.EventGroups;
+import com.itmecasey.modjs.event.EventJS;
 import com.itmecasey.modjs.format.LegacyFormat;
 import com.itmecasey.modjs.format.VersionFormat;
 import com.itmecasey.modjs.game.GameEvents;
+import com.itmecasey.modjs.game.SelfTest;
+import com.itmecasey.modjs.game.SelfTestCases;
 import com.itmecasey.modjs.game.TextBinding;
 import com.itmecasey.modjs.game.UtilsBinding;
 import com.itmecasey.modjs.network.ModJSNetwork;
@@ -14,13 +18,18 @@ import com.itmecasey.modjs.recipe.RecipeReloadHook;
 import com.itmecasey.modjs.registry.ContentRegistry;
 import com.itmecasey.modjs.registry.RegistryManager;
 import com.itmecasey.modjs.script.ExtraBindings;
+import com.itmecasey.modjs.script.PlatformBinding;
 import com.itmecasey.modjs.script.ScriptFolders;
 import com.itmecasey.modjs.script.ScriptManager;
 import com.itmecasey.modjs.script.ScriptType;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterGameTestsEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -35,6 +44,7 @@ public class ModJS {
 
     public ModJS(FMLJavaModLoadingContext context) {
         VersionFormat.use(new LegacyFormat());
+        PlatformBinding.configure("1.21.1", FMLEnvironment.dist == Dist.CLIENT, id -> ModList.get().isLoaded(id));
         ExtraBindings.register((type, cx, scope) -> {
             ScriptableObject.putProperty(scope, "Utils", Context.javaToJS(new UtilsBinding(), scope));
             ScriptableObject.putProperty(scope, "Text", Context.javaToJS(new TextBinding(), scope));
@@ -49,8 +59,14 @@ public class ModJS {
         RegistryManager.collect();
         ContentRegistry.register(context.getModEventBus());
 
+        context.getModEventBus().addListener((FMLCommonSetupEvent e) -> EventGroups.STARTUP.post("init", new EventJS()));
+        context.getModEventBus().addListener((FMLLoadCompleteEvent e) -> EventGroups.STARTUP.post("postInit", new EventJS()));
         ModJSNetwork.init();
         GameEvents.register();
+        SelfTest.register();
+        if (Boolean.getBoolean("modjs.selftest")) {
+            context.getModEventBus().addListener((RegisterGameTestsEvent e) -> e.register(SelfTestCases.class));
+        }
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientBridge.register();
         }
