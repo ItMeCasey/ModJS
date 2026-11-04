@@ -119,6 +119,11 @@ public final class GameEventJS extends EventJS {
         return l != null ? l.getServer() : null;
     }
 
+    /** The block entity (chest, furnace...) at the event's block, or null when the block has none. */
+    public BlockEntityJS getBlockEntity() {
+        return BlockEntityJS.at(level, pos);
+    }
+
     public Entity getEntity() {
         return entity;
     }

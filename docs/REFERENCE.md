@@ -83,8 +83,12 @@ Commands: `ServerEvents.commandRegistry(event => event.register(Java.loadClass('
 
 Gameplay events (`BlockEvents`, `ItemEvents`, `PlayerEvents`, `EntityEvents`, `LevelEvents`) hand you a `GameEvent` with
 `player`, `playerName`, `level`, `entity`, `entityId`, `item`, `itemId`, `blockId`, `x`, `y`, `z`, `message`, `amount`,
-`tell(text)` and `runCommand(command)`. Chat can be rewritten with `event.message = '...'`; hurt damage with
+`tell(text)`, `runCommand(command)` and `blockEntity` (the chest, furnace or sign at the event's block, or null). Chat can be rewritten with `event.message = '...'`; hurt damage with
 `event.setAmount(n)`.
+
+A block entity gives `id`, `blockId`, `x/y/z`, `hasInventory`, `size`, `getItemId(slot)`, `getCount(slot)`, `items` (list of `{slot, id, count}`),
+`setItem(slot, id, count)`, `clearSlot(slot)` and `nbt` (SNBT text). Example:
+`BlockEvents.rightClicked('minecraft:chest', e => { const be = e.blockEntity; if (be) e.tell(be.items.length + ' stacks'); })`.
 
 ## Client scripts
 
@@ -94,7 +98,7 @@ Gameplay events (`BlockEvents`, `ItemEvents`, `PlayerEvents`, `EntityEvents`, `L
 ## Helpers
 
 `Item.of`, `Ingredient.of`, `Text.of/red/green/...`, `Utils.runAfter(ticks, fn)`, `Utils.runEvery(ticks, fn)`,
-`Utils.server`, `Utils.randomInt`, `Utils.rollChance`, `Utils.runCommand`, `JsonIO.read/write/exists` (inside `modjs/`),
+`Utils.server`, `Utils.randomInt`, `Utils.rollChance`, `Utils.runCommand`, `Utils.blockEntity(dimension, x, y, z)`, `JsonIO.read/write/exists` (inside `modjs/`),
 `GameRule.get(name)`, `GameRule.set(name, value)`, `GameRule.list()` (names match with or without underscores and case, so `keepInventory` and `keep_inventory` both work; server scripts only, once a world is loaded),
 `Persistent.get/set/has/remove`, `Persistent.store(name)`, `Persistent.player(uuid)`, `Persistent.entity(uuid)`,
 `Network.sendToServer/sendToPlayer/sendToAll` with `NetworkEvents.dataReceived('channel', event => event.data)`,

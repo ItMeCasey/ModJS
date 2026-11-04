@@ -46,6 +46,20 @@ public final class UtilsBinding {
         return true;
     }
 
+    /** The block entity at a position in a dimension ({@code 'minecraft:overworld'}), or null. */
+    public BlockEntityJS blockEntity(String dimension, int x, int y, int z) {
+        MinecraftServer server = ServerState.get();
+        if (server == null) {
+            return null;
+        }
+        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            if (level.dimension().identifier().toString().equals(dimension)) {
+                return BlockEntityJS.at(level, new net.minecraft.core.BlockPos(x, y, z));
+            }
+        }
+        return null;
+    }
+
     public long currentTimeMillis() {
         return System.currentTimeMillis();
     }

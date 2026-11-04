@@ -99,6 +99,18 @@ public final class SelfTest {
         check("registered bucket test_goo_bucket", net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
             .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("modjs:test_goo_bucket")));
 
+        BlockPos chestPos = new BlockPos(2, 100, 2);
+        level.setBlockAndUpdate(chestPos, Blocks.CHEST.defaultBlockState());
+        BlockEntityJS chest = new UtilsBinding().blockEntity("minecraft:overworld", 2, 100, 2);
+        check("block entity found at a chest", chest != null && chest.getId().equals("minecraft:chest"));
+        if (chest != null) {
+            chest.setItem(3, "minecraft:diamond", 5);
+            check("block entity inventory round trip", chest.hasInventory() && chest.getSize() == 27
+                && chest.getItemId(3).equals("minecraft:diamond") && chest.getCount(3) == 5 && chest.getItems().size() == 1);
+            check("block entity nbt readable", chest.getNbt().contains("minecraft:diamond"));
+        }
+        check("no block entity on plain blocks", new UtilsBinding().blockEntity("minecraft:overworld", 0, 100, 0) == null);
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }
