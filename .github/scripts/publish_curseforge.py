@@ -128,7 +128,8 @@ def main():
         if not folder.is_dir():
             sys.exit(f"Missing build folder {folder}")
         jar = pick_jar(folder, module, args.version)
-        ids = [resolve(versions, minecraft), resolve(versions, loader)]
+        # CurseForge also wants an environment (Client and Server): ModJS runs on both.
+        ids = [resolve(versions, minecraft), resolve(versions, loader), resolve(versions, "Client"), resolve(versions, "Server")]
         try:
             ids.append(resolve(versions, java))
         except SystemExit:
