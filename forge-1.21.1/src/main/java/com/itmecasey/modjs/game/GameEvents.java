@@ -313,6 +313,14 @@ public final class GameEvents {
             }
         });
 
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.level.ChunkEvent.Load e) -> {
+            if (e.getLevel().isClientSide() || !com.itmecasey.modjs.unify.UnifyConfig.oreChunks()
+                || !(e.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk)) {
+                return;
+            }
+            com.itmecasey.modjs.unify.OreUnifier.convertChunk(chunk, com.itmecasey.modjs.unify.OreUnifier.blockMap());
+        });
+
         MinecraftForge.EVENT_BUS.addListener((LevelEvent.Unload e) -> {
             if (e.getLevel() instanceof Level level && !level.isClientSide() && wants(EventGroups.LEVEL, "unloaded")) {
                 fire(EventGroups.LEVEL, "unloaded", level.dimension().location().toString(), new GameEventJS().level(level));

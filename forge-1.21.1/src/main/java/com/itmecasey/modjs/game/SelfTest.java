@@ -176,6 +176,30 @@ public final class SelfTest {
                 .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("modjs:" + itemId)));
         }
 
+        var oreBlocks = com.itmecasey.modjs.unify.OreUnifier.blockMap();
+        check("Unify maps foreign ores to the canonical ore", oreBlocks.get(Blocks.COAL_ORE) != null
+            && net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(oreBlocks.get(Blocks.COAL_ORE)).toString().equals("modjs:zinc_ore"));
+        boolean zincInWorldgen = false;
+        boolean coalInWorldgen = false;
+        for (var biome : server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)) {
+            for (var step : biome.getGenerationSettings().features()) {
+                for (var placed : step) {
+                    if (placed.value().feature().value().config() instanceof net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration ore) {
+                        for (var target : ore.targetStates) {
+                            zincInWorldgen |= target.state.is(net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(net.minecraft.resources.ResourceLocation.parse("modjs:zinc_ore")));
+                            coalInWorldgen |= target.state.is(Blocks.COAL_ORE) || target.state.is(Blocks.DEEPSLATE_COAL_ORE);
+                        }
+                    }
+                }
+            }
+        }
+        check("Unify swaps ore features in biomes", zincInWorldgen && !coalInWorldgen);
+        BlockPos orePos = new BlockPos(4, 100, 4);
+        level.setBlockAndUpdate(orePos, Blocks.COAL_ORE.defaultBlockState());
+        int converted = com.itmecasey.modjs.unify.OreUnifier.convertChunk(level.getChunkAt(orePos), oreBlocks);
+        check("Unify converts ore blocks in a chunk", converted >= 1 && net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(level.getBlockState(orePos).getBlock()).toString().equals("modjs:zinc_ore"));
+        level.setBlockAndUpdate(orePos, Blocks.AIR.defaultBlockState());
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

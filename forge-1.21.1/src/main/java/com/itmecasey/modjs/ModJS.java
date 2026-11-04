@@ -62,6 +62,7 @@ public class ModJS {
         RegistryManager.collect();
         ContentRegistry.register(context.getModEventBus());
         com.itmecasey.modjs.unify.UnifyLootModifier.register(context.getModEventBus());
+        com.itmecasey.modjs.unify.UnifyOreBiomeModifier.register(context.getModEventBus());
 
         context.getModEventBus().addListener((FMLCommonSetupEvent e) -> EventGroups.STARTUP.post("init", new EventJS()));
         context.getModEventBus().addListener((FMLLoadCompleteEvent e) -> EventGroups.STARTUP.post("postInit", new EventJS()));

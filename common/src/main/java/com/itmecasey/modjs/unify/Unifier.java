@@ -222,6 +222,19 @@ public final class Unifier {
         return group == null ? null : group.canonical();
     }
 
+    /** Non-canonical id to canonical id for the groups in {@code c:ores/*}; block ids equal item ids for block items. */
+    public Map<String, String> oreReplacements() {
+        Map<String, String> out = new LinkedHashMap<>();
+        for (Group group : groups) {
+            if (group.tag().startsWith("c:ores/") || group.tag().equals("c:ores")) {
+                for (String member : group.members()) {
+                    out.put(member, group.canonical());
+                }
+            }
+        }
+        return out;
+    }
+
     public int inputsRewritten() {
         return inputsRewritten;
     }

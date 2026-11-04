@@ -278,6 +278,14 @@ public final class GameEvents {
     // -- more KubeJS events --------------------------------------------------------------------------------------
 
     private static void registerExtras() {
+        net.minecraftforge.event.level.ChunkEvent.Load.BUS.addListener((net.minecraftforge.event.level.ChunkEvent.Load e) -> {
+            if (!com.itmecasey.modjs.unify.UnifyConfig.oreChunks() || !(e.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
+                || chunk.getLevel().isClientSide()) {
+                return;
+            }
+            com.itmecasey.modjs.unify.OreUnifier.convertChunk(chunk, com.itmecasey.modjs.unify.OreUnifier.blockMap());
+        });
+
         LevelEvent.Unload.BUS.addListener((LevelEvent.Unload e) -> {
             if (e.getLevel() instanceof Level level && !level.isClientSide() && wants(EventGroups.LEVEL, "unloaded")) {
                 fire(EventGroups.LEVEL, "unloaded", level.dimension().identifier().toString(), new GameEventJS().level(level));

@@ -22,5 +22,7 @@ DimensionEvents.add(event => {
 ServerEvents.tags('item', event => {
   // pretend vanilla iron ingots are a second mod's tin ingots, so vanilla recipes exercise the unifier
   event.add('c:ingots/tin', 'minecraft:iron_ingot');
+  event.add('c:ores/zinc', ['minecraft:coal_ore', 'minecraft:deepslate_coal_ore']);   // fake foreign zinc ores
 });
 ServerEvents.tags('fluid', event => event.add('c:goo', 'minecraft:lava'));
+Unify.ores();

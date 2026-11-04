@@ -34,7 +34,7 @@ Look at `forge-1.21.1/` for the older API shape and `forge-26.1.2/` for the newe
 
 Unification needs from a port: the item tag folder name (`tags/item`), an item-exists check, the recipe reload hook calling
 `UnifyReload.prepare`, a loot modifier (`UnifyLootModifier`), an inventory sweep (`InventoryUnifier`) and the `/modjs unify` command.
-Everything else (`common/unify`) is shared.
+Ore swapping needs a biome modifier (`UnifyOreBiomeModifier`), `OreUnifier` and a chunk-load listener. Everything else (`common/unify`) is shared.
 
 ## Version-specific pitfalls already met
 

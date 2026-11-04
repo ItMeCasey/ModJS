@@ -46,6 +46,8 @@ public final class UnifyFile {
         json.add("prefer", prefer);
         json.add("auto", new JsonArray());
         json.addProperty("autoFluids", false);
+        json.addProperty("oreWorldgen", false);
+        json.addProperty("oreChunks", false);
         json.addProperty("inputs", "canonical");
         json.add("skipMods", new JsonArray());
         json.add("skipItems", new JsonArray());
@@ -107,6 +109,9 @@ public final class UnifyFile {
         if (json.has("autoFluids")) {
             binding.autoFluids(json.get("autoFluids").getAsBoolean());
         }
+        boolean worldgen = json.has("oreWorldgen") && json.get("oreWorldgen").getAsBoolean();
+        boolean chunks = json.has("oreChunks") && json.get("oreChunks").getAsBoolean();
+        UnifyConfig.setOres(worldgen, chunks);
         if (json.has("inputs")) {
             try {
                 binding.inputs(json.get("inputs").getAsString());

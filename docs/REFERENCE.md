@@ -152,6 +152,12 @@ Kinds registered by `Unify.materials`: ingot, nugget, dust, plate, gear, rod, wi
 is not generated in the world, place it with `WorldgenEvents.addOre`), `crushed` (`c:crushed_raw_materials`), `clump`, `shard` and `dirty_dust`.
 Items Minecraft already has (iron, gold, copper ingots, diamond and so on) are skipped unless you pass `includeVanilla: true`.
 Order of choice for the canonical item: `Unify.group(..., {canonical})`, then a ModJS item built with `.unify(tag)`, then the first match in `Unify.prefer`.
+Ores in the world: `Unify.ores()` (server script, or `oreWorldgen` / `oreChunks` in `unify.json`) forces the canonical ore block. `worldgen` (default true)
+swaps the ore features of every biome, so new chunks place the canonical block (the same vein size, count and height; every stone and deepslate variant becomes the one
+canonical block). `chunks` (default true) converts ore blocks already in chunks as they load. Both only touch ores in unified `c:ores/*` groups.
+`Unify.ores({ chunks: false })` leaves existing chunks alone. Worldgen swaps apply when the world or server starts, not on `/reload`.
+Not covered: ores a mod places with custom code or as part of structures, and mod ore blocks that carry block state properties (they become the canonical default state).
+
 Fluids: `Unify.fluid('c:oil', {canonical: 'modjs:oil'})`, `Unify.autoFluids(true)` (every `c:` fluid tag) and `event.create('oil').unify('c:oil')` on a fluid builder.
 Fluid ids stored under `fluid`, `fluid_id` or `fluidId` keys in recipe JSON are rewritten, so mods that name fluids differently are not covered.
 No script needed: `modjs/config/unify.json` is created on first run (`registerMaterials`, `materials`, `kinds`, `includeVanilla`, `prefer`, `auto`,

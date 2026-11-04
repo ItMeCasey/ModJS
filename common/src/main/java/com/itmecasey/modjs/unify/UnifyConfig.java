@@ -41,6 +41,8 @@ public final class UnifyConfig {
     private static final List<ExplicitGroup> GROUPS = new ArrayList<>();
     private static final List<ExplicitGroup> FLUID_GROUPS = new ArrayList<>();
     private static boolean autoFluids;
+    private static boolean oreWorldgen;
+    private static boolean oreChunks;
     private static final Set<String> AUTO_CATEGORIES = new LinkedHashSet<>();
     private static final List<RecipeFilter> SKIP_RECIPES = new ArrayList<>();
     private static final Set<String> SKIP_ITEMS = new LinkedHashSet<>();
@@ -59,6 +61,8 @@ public final class UnifyConfig {
         GROUPS.clear();
         FLUID_GROUPS.clear();
         autoFluids = false;
+        oreWorldgen = false;
+        oreChunks = false;
         AUTO_CATEGORIES.clear();
         SKIP_RECIPES.clear();
         SKIP_ITEMS.clear();
@@ -83,6 +87,19 @@ public final class UnifyConfig {
 
     static synchronized List<ExplicitGroup> fluidGroups() {
         return new ArrayList<>(FLUID_GROUPS);
+    }
+
+    public static synchronized boolean oreWorldgen() {
+        return oreWorldgen;
+    }
+
+    public static synchronized boolean oreChunks() {
+        return oreChunks;
+    }
+
+    public static synchronized void setOres(boolean worldgen, boolean chunks) {
+        oreWorldgen = worldgen;
+        oreChunks = chunks;
     }
 
     static synchronized boolean autoFluids() {
@@ -184,6 +201,21 @@ public final class UnifyConfig {
 
         public void fluid(String tag) {
             fluid(tag, null);
+        }
+
+        /**
+         * Forces the canonical ore block into the world, for groups in {@code c:ores/*}. {@code worldgen} (default true) swaps other
+         * mods' ore features for the canonical block in new chunks; {@code chunks} (default true) also converts ore blocks already
+         * in chunks as they load. Changes to worldgen apply when the world or server starts.
+         */
+        public void ores(Object options) {
+            Object worldgen = options == null ? null : JsonUtil.property(options, "worldgen");
+            Object chunks = options == null ? null : JsonUtil.property(options, "chunks");
+            setOres(worldgen == null || Boolean.TRUE.equals(worldgen), chunks == null || Boolean.TRUE.equals(chunks));
+        }
+
+        public void ores() {
+            ores(null);
         }
 
         /** Unifies every fluid tag in the {@code c} namespace that contains more than one fluid. */
