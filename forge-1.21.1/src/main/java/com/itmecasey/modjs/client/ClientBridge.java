@@ -40,6 +40,9 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        net.minecraft.client.Minecraft toastHost = net.minecraft.client.Minecraft.getInstance();
+        toastHost.execute(() -> ClientTweaks.installToastComponent(new ScriptedToasts(toastHost)));
+
         com.itmecasey.modjs.client.ScriptedScreens.setHooks(name -> {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
             com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.ScriptedScreens.get(name);
@@ -67,6 +70,10 @@ public final class ClientBridge {
         });
 
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ScreenEvent.Opening e) -> {
+            if (com.itmecasey.modjs.client.ClientTweaks.autoConfirmExperimental(e.getNewScreen())) {
+                e.setCanceled(true);
+                return;
+            }
             com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.TitleScreenConfig.current();
             if (config != null && e.getNewScreen() != null && e.getNewScreen().getClass() == net.minecraft.client.gui.screens.TitleScreen.class) {
                 e.setNewScreen(new ScriptedTitleScreen(config));

@@ -41,6 +41,14 @@ public final class SelfTest {
         // The 1.21.1 game test server only starts when a test exists, so the checks run inside one; see SelfTestCases.
     }
 
+    private static int runCommand(com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack> dispatcher, String line, net.minecraft.commands.CommandSourceStack source) {
+        try {
+            return dispatcher.execute(line, source);
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            return -1;
+        }
+    }
+
     private static void check(String name, boolean ok) {
         if (!ok) {
             failures++;
@@ -232,6 +240,45 @@ public final class SelfTest {
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);
+
+
+        com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack> dispatcher = server.getCommands().getDispatcher();
+        net.minecraft.commands.CommandSourceStack operator = server.createCommandSourceStack();
+        net.minecraft.commands.CommandSourceStack anyone = server.createCommandSourceStack().withPermission(0);
+        check("commandRegistry add runs a script command with an argument", runCommand(dispatcher, "selftest_hello bob", operator) == 7);
+        check("commandRegistry add rejects a bad argument", runCommand(dispatcher, "selftest_hello", operator) == -1);
+        check("commandRegistry add with a number range", runCommand(dispatcher, "selftest_pick 5", operator) == 5 && runCommand(dispatcher, "selftest_pick 500", operator) == -1);
+        com.mojang.brigadier.tree.CommandNode<net.minecraft.commands.CommandSourceStack> secret = dispatcher.getRoot().getChild("selftest_secret");
+        check("commandRegistry add keeps a permission level", secret != null && secret.canUse(operator) && !secret.canUse(anyone));
+        check("commandRegistry alias runs the same command", runCommand(dispatcher, "selftest_hi alice", operator) == 7);
+        check("commandRegistry remove drops a vanilla command and its aliases", dispatcher.getRoot().getChild("seed") == null
+            && dispatcher.getRoot().getChild("teleport") == null && dispatcher.getRoot().getChild("tp") == null);
+        check("commandRegistry remove drops a sub-command", dispatcher.getRoot().getChild("time") != null && dispatcher.getRoot().getChild("time").getChild("query") == null
+            && dispatcher.getRoot().getChild("time").getChild("set") != null);
+        com.mojang.brigadier.tree.CommandNode<net.minecraft.commands.CommandSourceStack> list = dispatcher.getRoot().getChild("list");
+        check("commandRegistry edit changes who may use a command", list != null && list.canUse(operator) && !list.canUse(anyone));
+        check("commandRegistry edit replaces what a command does", runCommand(dispatcher, "help", operator) == 42);
+        check("commandRegistry rename moves a command", dispatcher.getRoot().getChild("kill") == null && dispatcher.getRoot().getChild("selftest_kill") != null);
+
+        ScoreboardBinding board = new ScoreboardBinding();
+        check("Scoreboard script call set and added a score", board.get("Alice", "st_points") == 8 && board.has("Alice", "st_points"));
+        board.set(player, "st_points", 11);
+        check("Scoreboard takes a player as holder", board.get(player.getScoreboardName(), "st_points") == 11);
+        check("Scoreboard add returns the new total", board.add("Alice", "st_points", -3) == 5);
+        check("Scoreboard scores lists highest first", board.scores("st_points").size() == 2 && board.scores("st_points").get(0).getScore() == 11);
+        board.setDisplay("sidebar", "st_points");
+        check("Scoreboard shows an objective in a display slot", "st_points".equals(board.getDisplay("sidebar")));
+        board.setDisplay("sidebar", null);
+        check("Scoreboard clears a display slot", board.getDisplay("sidebar") == null);
+        check("Scoreboard teams hold members", "st_team".equals(board.teamOf("Alice")) && board.teamMembers("st_team").contains("Alice"));
+        board.reset("Alice", "st_points");
+        check("Scoreboard reset removes a score", !board.has("Alice", "st_points") && board.get("Alice", "st_points") == 0);
+        board.reset(player.getScoreboardName());
+        board.removeObjective("st_points");
+        check("Scoreboard removeObjective deletes it", !board.hasObjective("st_points"));
+        board.leaveTeam("Alice");
+        board.removeTeam("st_team");
+        check("Scoreboard removeTeam deletes it", board.teams().stream().noneMatch("st_team"::equals));
 
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }

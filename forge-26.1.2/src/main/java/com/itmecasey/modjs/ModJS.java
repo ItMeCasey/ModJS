@@ -50,6 +50,7 @@ public class ModJS {
             ScriptableObject.putProperty(scope, "Utils", Context.javaToJS(new UtilsBinding(), scope));
             ScriptableObject.putProperty(scope, "Text", Context.javaToJS(new TextBinding(), scope));
             ScriptableObject.putProperty(scope, "GameRule", Context.javaToJS(new GameRuleBinding(), scope));
+            ScriptableObject.putProperty(scope, "Scoreboard", Context.javaToJS(new com.itmecasey.modjs.game.ScoreboardBinding(), scope));
             ScriptableObject.putProperty(scope, "Dimensions", Context.javaToJS(new com.itmecasey.modjs.game.DimensionManager(), scope));
             ScriptableObject.putProperty(scope, "Network", Context.javaToJS(new NetworkBinding(), scope));
         });
@@ -84,6 +85,6 @@ public class ModJS {
         }
         AddPackFindersEvent.BUS.addListener(ModJSPacks::onAddPackFinders);
         AddReloadListenerEvent.BUS.addListener(RecipeReloadHook::onAddReloadListeners);
-        RegisterCommandsEvent.BUS.addListener(ModJSCommands::register);
+        RegisterCommandsEvent.BUS.addListener(net.minecraftforge.eventbus.api.listener.Priority.LOWEST, ModJSCommands::register);
     }
 }

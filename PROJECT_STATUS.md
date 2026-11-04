@@ -63,3 +63,4 @@ Spend: none
 - [x] Deploy the ModJS wiki to the droplet and check it live (w:1)
 - [x] Logo, banners, section headers and CurseForge description in branding/ and curseforge/ (not yet pushed or uploaded) (w:2)
 - [~] Create the CurseForge and Modrinth projects and upload the jars (CurseForge project 1783874 created; no jars uploaded, Modrinth not created) (w:3)
+- [x] Command editing (add, remove, edit, alias, rename), Scoreboard global, toast hiding and editing, tutorial and experimental-warning switches; 20 new self-test checks and 12 unit tests pass on all six builds (client parts compiled, not seen on a client) (w:4)

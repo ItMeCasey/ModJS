@@ -30,3 +30,25 @@ Unify.ores();
 ServerEvents.compostableRecipes(event => event.add(0.85, 'minecraft:stone'));
 PlayerEvents.inventoryChanged(e => console.log('SELFTEST script: inventoryChanged slot ' + e.slot + ' ' + e.itemId));
 ServerEvents.loaded(() => { if (Platform.mcVersion.startsWith('26')) { console.log('SELFTEST script: facade ' + Blocks.STONE.id); } });
+ServerEvents.commandRegistry(event => {
+  event.add('selftest_hello <name:word>', ctx => { ctx.reply('hello ' + ctx.arg('name')); return 7; });
+  event.add('selftest_pick <n:integer:1:100>', ctx => ctx.arg('n'));
+  event.add('selftest_secret', { permission: 4, run: ctx => 1 });
+  event.alias('selftest_hello', 'selftest_hi');
+  event.remove('seed');
+  event.remove('teleport');
+  event.remove('time query');
+  event.edit('list', { permission: 2 });
+  event.edit('help', { run: ctx => { ctx.reply('help was replaced'); return 42; } });
+  event.rename('kill', 'selftest_kill');
+  console.log('SELFTEST script: commands exist ' + event.exists('time set') + ' ' + event.exists('nope') + ' ' + (event.list().length > 10));
+});
+ServerEvents.loaded(() => {
+  Scoreboard.addObjective('st_points', 'Points');
+  Scoreboard.set('Alice', 'st_points', 5);
+  Scoreboard.add('Alice', 'st_points', 3);
+  Scoreboard.addTeam('st_team');
+  Scoreboard.joinTeam('Alice', 'st_team');
+  Scoreboard.setTeamColor('st_team', 'red');
+  console.log('SELFTEST script: scoreboard ' + Scoreboard.get('Alice', 'st_points') + ' ' + Scoreboard.teamOf('Alice'));
+});

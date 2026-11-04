@@ -122,7 +122,20 @@ PlayerEvents.loggedIn(event => {
 
 Raw data: `ServerEvents.generateData(event => event.addJson('mymod:loot_table/x', {...}))`.
 
-Commands: `ServerEvents.commandRegistry(event => event.register(Java.loadClass('net.minecraft.commands.Commands').literal('hi').executes(ctx => 1)))`.
+Commands: `ServerEvents.commandRegistry` runs each time the command tree is built (world load and `/reload`), after every other mod has registered.
+```js
+ServerEvents.commandRegistry(event => {
+  event.add('warp <place:word>', { permission: 2, run: ctx => { ctx.reply('Warping to ' + ctx.arg('place')); return 1; } });
+  event.add('home set', ctx => 1);                   // words that share a first word share one command
+  event.remove('gamemode');                          // also removes aliases such as /tp for /teleport
+  event.remove('time query');                        // a sub-command
+  event.edit('list', { permission: 2 });             // who may use it; `requires: player => ...` also works
+  event.edit('help', { run: ctx => { ctx.reply('Ask in Discord'); return 1; } });
+  event.alias('teleport', 'warpto');  event.rename('gamemode', 'gm');
+  // event.exists('time set'), event.list(), and event.register(brigadierLiteral) for raw Brigadier
+});
+```
+Argument types in a usage string: `word`, `string`, `text` (rest of line), `integer`, `long`, `float`, `double` (with limits, `<n:integer:1:100>`), `bool`, `player`, `players`, `entity`, `entities`. A handler gets `ctx.player`, `ctx.source`, `ctx.input`, `ctx.arg(name)`, `ctx.has(name)`, `ctx.reply(text)` and `ctx.fail(text)`; its number is the command result. Brigadier cannot remove or change nodes, so `remove` and `edit` reach into its command tree by reflection.
 
 `ServerEvents.command("gamemode", e => e.cancel())` runs for every command typed, filtered by command name (`e.message` is the full line).
 
@@ -236,6 +249,17 @@ ClientEvents.keyPressed(e => { if (e.key === 72 && e.action === 1) Client.openSc
 A screen config has the same methods as `ClientEvents.titleScreen` plus `input(id, options)` and `closeOnEsc(bool)`; a button callback receives the screen
 (`getValue(id)`, `setValue(id, text)`, `close()`, `open(name)`). Button actions also include `close` and `open:<name>`. `Client.openScreen(name)` and `Client.closeScreen()` work from any client script.
 
+### Toasts, tutorial and warnings
+
+```js
+Client.hideToasts('tutorial', 'recipe');                 // also system, advancement, all, or a system toast id
+ClientEvents.toast(e => { if (e.id === 'unsecure_server_warning') e.setMessage('Chat is not signed here'); });  // e.type, e.id, e.title, e.message, e.hide()
+Client.showToast('Title', 'Message');  Client.clearToasts();
+Client.disableTutorial();                                // sets the game's tutorial option to none
+Client.skipExperimentalWarning();                        // answers "proceed" on the experimental settings warning
+```
+All of this reaches the game by reflection and class names, so a version that renamed something logs a warning and does nothing. Not checked on a real client.
+
 ### Recipe viewers (JEI)
 
 ```js
@@ -251,6 +275,7 @@ RecipeViewerEvents.groupItems(event => event.group('Gems', ['minecraft:diamond',
 
 `Item.of`, `Ingredient.of`, `Text.of/red/green/...`, `Utils.runAfter(ticks, fn)`, `Utils.runEvery(ticks, fn)`,
 `Utils.server`, `Utils.randomInt`, `Utils.rollChance`, `Utils.runCommand`, `Utils.blockEntity(dimension, x, y, z)`, `JsonIO.read/write/exists` (inside `modjs/`),
+`Scoreboard` (server scripts: `addObjective(name[, displayName[, criteria]])`, `removeObjective`, `objectives()`, `get/set/add/reset(holder, objective)`, `has`, `scores(objective)`, `holders()`, `setDisplay(slot, objective)`, teams with `addTeam`, `removeTeam`, `joinTeam`, `leaveTeam`, `teamOf`, `teamMembers`, `setTeamColor`, `setTeamPrefix`, `setTeamSuffix`, `setFriendlyFire`; a holder is a name or a player),
 `GameRule.get(name)`, `GameRule.set(name, value)`, `GameRule.list()` (names match with or without underscores and case, so `keepInventory` and `keep_inventory` both work; server scripts only, once a world is loaded),
 `Persistent.get/set/has/remove`, `Persistent.store(name)`, `Persistent.player(uuid)`, `Persistent.entity(uuid)`,
 `Network.sendToServer/sendToPlayer/sendToAll` with `NetworkEvents.dataReceived('channel', event => event.data)`,

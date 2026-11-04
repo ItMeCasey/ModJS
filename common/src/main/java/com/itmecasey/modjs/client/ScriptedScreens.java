@@ -80,5 +80,41 @@ public final class ScriptedScreens {
         public void closeScreen() {
             closer.run();
         }
+
+        /**
+         * Stops these kinds of toast from showing: {@code system}, {@code tutorial}, {@code recipe}, {@code advancement}, the id of a
+         * system toast such as {@code unsecure_server_warning}, or {@code all}. Use {@code ClientEvents.toast} to decide per toast.
+         */
+        public void hideToasts(String... kinds) {
+            ClientTweaks.hideToasts(kinds);
+        }
+
+        /** Shows a toast with a title and an optional message. */
+        public void showToast(String title, String message) {
+            ClientTweaks.showToast(title, message);
+        }
+
+        public void showToast(String title) {
+            ClientTweaks.showToast(title, null);
+        }
+
+        /** Removes every toast on screen or waiting. */
+        public void clearToasts() {
+            ClientTweaks.clearToasts();
+        }
+
+        /** Turns off the tutorial hints, and with them their toasts. This changes the game's own tutorial setting. */
+        public void disableTutorial() {
+            ClientTweaks.disableTutorial();
+        }
+
+        /** Skips the "this world uses experimental settings" warning by answering it with "proceed". */
+        public void skipExperimentalWarning(boolean skip) {
+            ClientTweaks.setSkipExperimentalWarning(skip);
+        }
+
+        public void skipExperimentalWarning() {
+            ClientTweaks.setSkipExperimentalWarning(true);
+        }
     }
 }
