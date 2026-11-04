@@ -1,7 +1,7 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-03
+Updated: 2026-11-04
 Summary: ModJS runs KubeJS-style scripts on Rhino in Forge 26.1.2 and 1.21.1; both are built, self-tested in a headless server and built by CI, while client scripts and networking are untested on a real client.
 Spend: none
 

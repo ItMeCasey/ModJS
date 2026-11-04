@@ -1,0 +1,161 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+Minecraft Maven is up-to-date, took 0:02.500
+
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :slimeLauncherMetadataForForge UP-TO-DATE
+
+> Task :runGameTestServer
+Slime Launcher setup is up-to-date, took 233ms
+Launching using main class: net.minecraftforge.bootstrap.ForgeBootstrap
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by net.minecraftforge.unsafe.UnsafeHacks (file:/C:/Users/casey/.gradle/caches/modules-2/files-2.1/net.minecraftforge/unsafe/0.9.2/33bad02861cabd77c54a8c9d1205e8638bbbbb4f/unsafe-0.9.2.jar)
+WARNING: Please consider reporting this to the maintainers of class net.minecraftforge.unsafe.UnsafeHacks
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.freetype.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-freetype/3.4.1/a677b4a7bba84f925b4cc4f52a58c5248974bdeb/lwjgl-freetype-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.freetype.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-freetype/3.4.1/81431d868bcf162d4c915b9c39b2c7aae155ad4f/lwjgl-freetype-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.glfw.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-glfw/3.4.1/196101d96d9b2aa73264a96ae1dc8944a1446cee/lwjgl-glfw-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.glfw.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-glfw/3.4.1/a48bbdd544f00c88f8906e9d09e3f31bc1c17fac/lwjgl-glfw-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.jemalloc.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-jemalloc/3.4.1/662e0926dd990f679e1cfb31d710d22d175bdabc/lwjgl-jemalloc-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.jemalloc.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-jemalloc/3.4.1/d8cf69e1155df83260f9bbe01944fe91f8ca3955/lwjgl-jemalloc-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.openal.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-openal/3.4.1/4b996cc3321a807ee34e7ce53aba7fe529dc485a/lwjgl-openal-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.openal.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-openal/3.4.1/9e4bab87e9b89876fa77ea3c19e1b45334b97c10/lwjgl-openal-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.opengl.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-opengl/3.4.1/4b6a9c5d7d5325312b740d9886087b7292b43bf9/lwjgl-opengl-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.opengl.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-opengl/3.4.1/cfd47352b758a0c9f7046de467b103182ec77eb1/lwjgl-opengl-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.stb.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-stb/3.4.1/7f4c39b3d56c7bae4900ee6e59d8f75432bdb18f/lwjgl-stb-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.stb.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-stb/3.4.1/e091cd3b25ab7db88f0e34a0d2797dc396a528fa/lwjgl-stb-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.tinyfd.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-tinyfd/3.4.1/9c93b8211856bfe682f3225ccac811e74243f98e/lwjgl-tinyfd-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.tinyfd.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-tinyfd/3.4.1/f585da74a17695ba38351697712c03784ee1348b/lwjgl-tinyfd-3.4.1-natives-windows-x86.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl/3.4.1/d1d3a7052da47ccde2a5fdf3a1bd45d801c3157c/lwjgl-3.4.1-natives-windows-arm64.jar!/]
+Ignoring duplicate module on SecureModuleFinder: org.lwjgl.natives: Jar[jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl/3.4.1/65de43bd52507e108a58247c0da57a50ce3ee6f6/lwjgl-3.4.1-natives-windows-x86.jar!/]
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in module com.sun.jna (jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.17.0/33d12735bef894440780fce64f9758d420c7bae2/jna-5.17.0.jar!/)
+WARNING: Use --enable-native-access=com.sun.jna to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.jline.nativ.JLineNativeLoader in module org.jline.nativ (jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.jline/jline-native/3.25.1/7f58e474f7d94db5bf87b1fddf4fa646475779f2/jline-native-3.25.1.jar!/)
+WARNING: Use --enable-native-access=org.jline.nativ to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-11-04T09:52:52.999215Z main WARN Advanced terminal features are not available in this environment
+[03:52:53] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--gameDir, ., --launchTarget, forge_userdev_server_gametest]
+[03:52:53] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Microsoft OpenJDK 64-Bit Server VM 25.0.4+7-LTS
+[03:52:53] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 10.2.6 starting: java version 25.0.4 by Microsoft; OS Windows 10 arch amd64 version 10.0
+[03:52:53] [main/INFO] [ne.mi.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forge_userdev_server_gametest
+[03:52:53] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=jar:file:///C:/Users/casey/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.7/8ab114ac385e6dbdad5efafe28aba4df8120915f/mixin-0.8.7.jar!/ Service=ModLauncher Env=SERVER
+[03:52:54] [main/INFO] [ne.mi.fm.lo.mo.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[03:52:54] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forge_userdev_server_gametest' with arguments [--gameDir, .]
+[03:52:54] [main/INFO] [minecraft/GameTestMainUtil]: Running GameTestMain with cwd 'C:\Users\casey\Desktop\ModJS\forge-26.1.2\run', universe path 'gametestserver'
+[03:52:59] [modloading-worker-0/INFO] [co.it.mo.ModJS/]: ModJS loading scripts from C:\Users\casey\Desktop\ModJS\forge-26.1.2\run\modjs
+[03:52:59] [modloading-worker-0/INFO] [ne.mi.co.ForgeMod/FORGEMOD]: Forge mod loading, version 64.1.6, for MC 26.1.2 with MCP 20260409.101008
+[03:52:59] [modloading-worker-0/INFO] [ne.mi.co.MinecraftForge/FORGE]: MinecraftForge v64.1.6 Initialized
+[03:52:59] [modloading-worker-0/INFO] [ne.mi.co.ForgeMod/FORGEMOD]: Opening jdk.naming.dns/com.sun.jndi.dns to java.naming
+[03:53:00] [modloading-worker-0/INFO] [modjs/]: [STARTUP] smoke test: startup script ran, Java sandbox check next
+[03:53:00] [modloading-worker-0/INFO] [modjs/]: [STARTUP] loaded 1 script(s), 0 error(s)
+[03:53:00] [Forge Version Check/INFO] [ne.mi.fm.VersionChecker/]: [forge] Starting version check at https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json
+[03:53:00] [Forge Version Check/INFO] [ne.mi.fm.VersionChecker/]: [forge] Found status: AHEAD Current: 64.1.6 Target: null
+[03:53:01] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/casey/Desktop/ModJS/forge-26.1.2/.gradle/mavenizer/repo/net/minecraftforge/forge/26.1.2-64.1.6/forge-26.1.2-64.1.6.jar%230!/assets/.mcassetsroot' uses unexpected schema
+[03:53:01] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/casey/Desktop/ModJS/forge-26.1.2/.gradle/mavenizer/repo/net/minecraftforge/forge/26.1.2-64.1.6/forge-26.1.2-64.1.6.jar%230!/data/.mcassetsroot' uses unexpected schema
+[03:53:01] [main/INFO] [modjs/]: [SERVER] SELFTEST script: globals 1 5 36 up
+[03:53:01] [main/INFO] [modjs/]: [SERVER] server script loaded
+[03:53:01] [main/INFO] [modjs/]: [SERVER] loaded 2 script(s), 0 error(s)
+[03:53:01] [main/INFO] [modjs/]: ModJS generated 12 data file(s)
+[03:53:01] [main/INFO] [modjs/]: [SERVER] SELFTEST script: globals 1 5 36 up
+[03:53:01] [main/INFO] [modjs/]: [SERVER] server script loaded
+[03:53:01] [main/INFO] [modjs/]: [SERVER] loaded 2 script(s), 0 error(s)
+[03:53:01] [main/INFO] [modjs/]: ModJS generated 12 data file(s)
+[03:53:02] [main/INFO] [minecraft/RecipeManager]: Loaded 1517 recipes
+[03:53:02] [main/INFO] [minecraft/AdvancementTree]: Loaded 1617 advancements
+[03:53:03] [main/INFO] [co.it.mo.re.RecipeReloadHook/]: ModJS recipes: 1517 loaded, 1 removed, 1 rewritten, 0 without a source file
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Configuration file gametestserver\gametestworld\serverconfig\forge-server.toml is not correct. Correcting
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server was corrected from null to its default, SynchronizedConfig{DataHolder:{}}. 
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.removeErroringBlockEntities was corrected from null to its default, false. 
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.removeErroringEntities was corrected from null to its default, false. 
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.fullBoundingBoxLadders was corrected from null to its default, false. 
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.permissionHandler was corrected from null to its default, forge:default_handler. 
+[03:53:03] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.advertiseDedicatedServerToLan was corrected from null to its default, true. 
+[03:53:03] [Server thread/INFO] [minecraft/LoggingLevelLoadListener]: Selecting global world spawn...
+[03:53:03] [Server thread/INFO] [minecraft/LoggingLevelLoadListener]: Loading 0 persistent chunks...
+[03:53:03] [Server thread/INFO] [minecraft/LoggingLevelLoadListener]: Preparing spawn area: 100%
+[03:53:03] [Server thread/INFO] [minecraft/LoggingLevelLoadListener]: Time elapsed: 384 ms
+[03:53:03] [Server thread/INFO] [minecraft/GameTestServer]: Started game test server
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] server loaded; recipes = 1516
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] oak in planks tag: false, birch in planks tag: true
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] ender pearl max stack: 64
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: broken minecraft:stone by ModJSTester
+[03:53:03] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.broken cancel
+[03:53:03] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.broken id filter leaves other blocks alone
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: chat "hello there"
+[03:53:03] [Server thread/INFO] [modjs/]: SELFTEST PASS PlayerEvents.chat rewrites the message
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: loggedIn ModJSTester
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: crafted minecraft:stick
+[03:53:03] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: hurt amount 3
+[03:53:03] [Server thread/INFO] [modjs/]: SELFTEST PASS EntityEvents.hurt changes the amount
+[03:53:03] [Server thread/INFO] [modjs/]: SELFTEST DONE failures=0
+[03:53:03] [Server thread/INFO] [minecraft/GameTestServer]: 1 tests are now running at position 2288255, -59, 2347771!
+[03:53:04] [Server thread/INFO] [minecraft/GameTestRunner]: Running test environment 'minecraft:default' batch 0 (1 tests)...
+[03:53:04] [Server thread/INFO] [modjs/]: [SERVER] scheduled task ran
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: [+]
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: ========= 1 GAME TESTS COMPLETE IN 543.9 ms ======================
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: All 1 required tests passed :)
+[03:53:04] [Server thread/INFO] [minecraft/GameTestServer]: ====================================================
+[03:53:04] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[03:53:04] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[03:53:04] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[03:53:04] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:overworld
+[03:53:05] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_end
+[03:53:05] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_nether
+[03:53:05] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[03:53:05] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[03:53:05] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[03:53:05] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[03:53:06] [Server thread/INFO] [minecraft/GameTestServer]: Game test server shutting down
+
+BUILD SUCCESSFUL in 30s
+4 actionable tasks: 1 executed, 3 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.1/userguide/configuration_cache_enabling.html

@@ -305,6 +305,27 @@ public final class GameEvents {
                 fire(EventGroups.PLAYER, "inventoryClosed", null, new GameEventJS().player(e.getEntity()));
             }
         });
+
+        PlayerContainerEvent.Open.BUS.addListener((PlayerContainerEvent.Open e) -> {
+            if (!e.getEntity().level().isClientSide() && e.getContainer() instanceof net.minecraft.world.inventory.ChestMenu && wants(EventGroups.PLAYER, "chestOpened")) {
+                fire(EventGroups.PLAYER, "chestOpened", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        PlayerContainerEvent.Close.BUS.addListener((PlayerContainerEvent.Close e) -> {
+            if (!e.getEntity().level().isClientSide() && e.getContainer() instanceof net.minecraft.world.inventory.ChestMenu && wants(EventGroups.PLAYER, "chestClosed")) {
+                fire(EventGroups.PLAYER, "chestClosed", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        BlockEvent.FarmlandTrampleEvent.BUS.addListener((BlockEvent.FarmlandTrampleEvent e) -> {
+            if (e.getLevel().isClientSide() || !wants(EventGroups.BLOCK, "farmlandTrampled")) {
+                return false;
+            }
+            GameEventJS js = new GameEventJS().entity(e.getEntity()).block(e.getPos(), e.getState());
+            js.level((net.minecraft.world.level.Level) e.getLevel());
+            return fire(EventGroups.BLOCK, "farmlandTrampled", blockId(e.getState()), js);
+        });
     }
 
     // -- levels and server ---------------------------------------------------------------------------------------

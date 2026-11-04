@@ -31,6 +31,7 @@ public final class ExtraBindings {
         ScriptableObject.putProperty(scope, "HOUR", 3_600_000);
         ScriptableObject.putProperty(scope, "JsonIO", Context.javaToJS(new JsonIOBinding(), scope));
         ScriptableObject.putProperty(scope, "Persistent", Context.javaToJS(new PersistentBinding(), scope));
+        ClassGlobals.install(scope);
         for (BindingProvider provider : PROVIDERS) {
             provider.install(type, cx, scope);
         }

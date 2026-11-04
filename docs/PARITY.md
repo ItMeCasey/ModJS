@@ -32,18 +32,20 @@ textures and models have not been run on a real client.
 | | loggedIn, loggedOut | compiled |
 | | init, leftDebugInfo, rightDebugInfo, painterUpdated, paintScreen | no |
 | BlockEvents | broken, placed, rightClicked, leftClicked | yes (broken checked in game test) |
-| | detectorChanged, detectorPowered, detectorUnpowered, farmlandTrampled, modification | no |
+| | farmlandTrampled | compiled |
+| | detectorChanged, detectorPowered, detectorUnpowered, modification | no |
 | ItemEvents | rightClicked, entityInteracted, crafted, smelted, foodEaten, dropped, pickedUp | crafted checked; others compiled |
 | | tooltip (KubeJS: modifyTooltips) | compiled |
 | | modification (max stack size, max damage, rarity) | yes, checked on both versions |
 | | firstLeftClicked, firstRightClicked, canPickUp, dynamicTooltips, modelProperties, armorTierRegistry, toolTierRegistry | no |
 | EntityEvents | hurt | yes (checked) |
 | | death, spawned | compiled |
-| | checkSpawn | no |
+| | checkSpawn | compiled on 1.21.1 only; no on 26.1.2 |
 | LevelEvents | tick, loaded, unloaded, beforeExplosion, afterExplosion | compiled |
 | PlayerEvents | chat, loggedIn | yes (checked) |
 | | loggedOut, respawned, tick, advancement, inventoryOpened, inventoryClosed | compiled |
-| | chestOpened, chestClosed, decorateChat, inventoryChanged | no |
+| | chestOpened, chestClosed | compiled |
+| | decorateChat, inventoryChanged | no |
 | NetworkEvents | dataReceived | compiled |
 | RecipeViewerEvents | all eight | no |
 
@@ -68,10 +70,12 @@ Mod-specific recipe schemas (for example Create): no.
 |---|---|
 | `console`, `global`, `Java`, `Item`, `Ingredient`, `Text`, `JsonIO`, `Utils`, `Platform`, `SECOND`, `MINUTE`, `HOUR` | yes (partial APIs) |
 | `Persistent` (ModJS only) and `Network` | yes |
-| `Block`, `NBT`, `NBTIO`, `UUID`, `ResourceLocation`, `Direction`, `Facing`, `AABB`, `Fluid`, `Color`, `BlockStatePredicate`, `Blocks`, `Items`, `Stats`, `BlockPos`, `DamageSource`, `Vec3`, `JavaMath`, `string#namespace` | no (the Minecraft classes are reachable through `Java.loadClass`) |
+| `UUID`, `ResourceLocation`, `Direction`, `Facing`, `AABB`, `BlockPos`, `Vec3`, `JavaMath`, `Blocks`, `Items`, `Fluids`, `EntityType`, `MobEffects`, `Mth` and a few more | yes, as Java classes (checked: `Vec3`, `BlockPos`, `UUID`, `Direction`) |
+| `Block`, `NBT`, `NBTIO`, `Fluid`, `Color`, `BlockStatePredicate`, `Stats`, `DamageSource`, `string#namespace` | no |
 
 ## Known behavior differences
 
 - Tag removal and loot-table editing read the original files from the game and mod jars, not from world data packs.
 - Gameplay events pass real Minecraft objects (`player`, `level`, `item`) instead of KubeJS wrapper classes.
 - Recipe, tag, loot and worldgen changes are written as a generated data pack, so they work with any other data pack.
+- On 26.1.2, a script that holds a Minecraft `Block` object (for example `Blocks.STONE`) crashes a dedicated server, because the script engine inspects client-only classes. Use id strings there.

@@ -30,6 +30,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 
@@ -321,6 +324,39 @@ public final class GameEvents {
         MinecraftForge.EVENT_BUS.addListener((PlayerContainerEvent.Close e) -> {
             if (!e.getEntity().level().isClientSide() && wants(EventGroups.PLAYER, "inventoryClosed")) {
                 fire(EventGroups.PLAYER, "inventoryClosed", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((BlockEvent.FarmlandTrampleEvent e) -> {
+            if (e.getLevel().isClientSide() || !wants(EventGroups.BLOCK, "farmlandTrampled")) {
+                return;
+            }
+            GameEventJS js = new GameEventJS().entity(e.getEntity()).block(e.getPos(), e.getState());
+            js.level((Level) e.getLevel());
+            if (fire(EventGroups.BLOCK, "farmlandTrampled", blockId(e.getState()), js)) {
+                e.setCanceled(true);
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((PlayerContainerEvent.Open e) -> {
+            if (!e.getEntity().level().isClientSide() && e.getContainer() instanceof ChestMenu && wants(EventGroups.PLAYER, "chestOpened")) {
+                fire(EventGroups.PLAYER, "chestOpened", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((PlayerContainerEvent.Close e) -> {
+            if (!e.getEntity().level().isClientSide() && e.getContainer() instanceof ChestMenu && wants(EventGroups.PLAYER, "chestClosed")) {
+                fire(EventGroups.PLAYER, "chestClosed", null, new GameEventJS().player(e.getEntity()));
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((MobSpawnEvent.PositionCheck e) -> {
+            if (e.getLevel().isClientSide() || !wants(EventGroups.ENTITY, "checkSpawn")) {
+                return;
+            }
+            GameEventJS js = new GameEventJS().entity(e.getEntity()).level(e.getLevel().getLevel());
+            if (fire(EventGroups.ENTITY, "checkSpawn", entityId(e.getEntity()), js)) {
+                e.setResult(Event.Result.DENY);
             }
         });
     }
