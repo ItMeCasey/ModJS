@@ -62,7 +62,8 @@ textures and models have not been run on a real client.
 | Block shapes: slab, stairs, wall, fence | yes (registered; models unchecked on a client) |
 | Block entities, other shapes | no |
 | Creative tab | yes |
-| Fluid, entity type, block entity, sound, enchantment, and the rest | no |
+| Fluid (source, flowing, block, bucket, tint) | yes (registered; look and behavior unchecked on a client) |
+| Entity type, block entity, sound, enchantment, and the rest | no (entity types are not in KubeJS core either) |
 
 ## Recipes
 

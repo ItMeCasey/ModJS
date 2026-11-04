@@ -30,7 +30,7 @@ public final class ContentRegistry {
 
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
 
-    private record TabEntry(String tab, RegistryObject<Item> item) {
+    record TabEntry(String tab, RegistryObject<Item> item) {
     }
 
     private static final List<TabEntry> TAB_ENTRIES = new ArrayList<>();
@@ -40,6 +40,7 @@ public final class ContentRegistry {
 
     /** Turns the collected builders into registry entries; call from the mod constructor after {@link RegistryManager#collect()}. */
     public static void register(BusGroup modBusGroup) {
+        FluidRegistry.register(modBusGroup, BLOCKS, ITEMS, TAB_ENTRIES);
         for (BlockBuilderJS builder : RegistryManager.blocks()) {
             BlockBuilderJS b = builder;
             RegistryObject<Block> block = BLOCKS.register(b.id(), () -> {

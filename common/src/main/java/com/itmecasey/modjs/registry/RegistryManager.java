@@ -20,6 +20,7 @@ public final class RegistryManager {
 
     private static final Map<String, ItemBuilderJS> ITEMS = new LinkedHashMap<>();
     private static final Map<String, BlockBuilderJS> BLOCKS = new LinkedHashMap<>();
+    private static final Map<String, FluidBuilderJS> FLUIDS = new LinkedHashMap<>();
     private static final Map<String, CreativeTabBuilderJS> TABS = new LinkedHashMap<>();
     private static boolean contributorsInstalled;
 
@@ -31,9 +32,11 @@ public final class RegistryManager {
         ITEMS.clear();
         BLOCKS.clear();
         TABS.clear();
+        FLUIDS.clear();
         com.itmecasey.modjs.item.ItemModifications.clear();
         EventGroups.ITEM.post("modification", new com.itmecasey.modjs.item.ItemModifications.ModificationEventJS());
         EventGroups.STARTUP.postExact("registry", "creative_tab", new RegistryEventJS<>("creative tab", TABS, CreativeTabBuilderJS::new));
+        EventGroups.STARTUP.postExact("registry", "fluid", new RegistryEventJS<>("fluid", FLUIDS, FluidBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
         if (!contributorsInstalled) {
@@ -49,6 +52,10 @@ public final class RegistryManager {
 
     public static Collection<BlockBuilderJS> blocks() {
         return BLOCKS.values();
+    }
+
+    public static Collection<FluidBuilderJS> fluids() {
+        return FLUIDS.values();
     }
 
     public static Collection<CreativeTabBuilderJS> tabs() {
@@ -71,6 +78,34 @@ public final class RegistryManager {
         }
         for (CreativeTabBuilderJS tab : TABS.values()) {
             lang.addProperty("itemGroup." + NAMESPACE + "." + tab.id(), tab.displayName());
+        }
+        for (FluidBuilderJS fluid : FLUIDS.values()) {
+            lang.addProperty("block." + NAMESPACE + "." + fluid.id(), fluid.displayName());
+            lang.addProperty("fluid_type." + NAMESPACE + "." + fluid.id(), fluid.displayName());
+            JsonObject particle = new JsonObject();
+            JsonObject particleTextures = new JsonObject();
+            particleTextures.addProperty("particle", "minecraft:block/water_still");
+            particle.add("textures", particleTextures);
+            data.putJson(NAMESPACE, "models/block/" + fluid.id(), particle);
+            JsonObject variant = new JsonObject();
+            variant.addProperty("model", NAMESPACE + ":block/" + fluid.id());
+            JsonObject variants = new JsonObject();
+            variants.add("", variant);
+            JsonObject state = new JsonObject();
+            state.add("variants", variants);
+            data.putJson(NAMESPACE, "blockstates/" + fluid.id(), state);
+            if (!fluid.isNoBucket()) {
+                lang.addProperty("item." + NAMESPACE + "." + fluid.id() + "_bucket", fluid.displayName() + " Bucket");
+                if (VersionFormat.current().usesItemDefinitions()) {
+                    writeItemDefinition(data, fluid.id() + "_bucket", NAMESPACE + ":item/" + fluid.id() + "_bucket");
+                }
+                JsonObject bucket = new JsonObject();
+                bucket.addProperty("parent", "minecraft:item/generated");
+                JsonObject bucketTextures = new JsonObject();
+                bucketTextures.addProperty("layer0", "minecraft:item/water_bucket");
+                bucket.add("textures", bucketTextures);
+                data.putJson(NAMESPACE, "models/item/" + fluid.id() + "_bucket", bucket);
+            }
         }
         for (BlockBuilderJS block : BLOCKS.values()) {
             lang.addProperty("block." + NAMESPACE + "." + block.id(), block.displayName());

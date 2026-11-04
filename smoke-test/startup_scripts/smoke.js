@@ -23,3 +23,6 @@ StartupEvents.registry('item', event => {
   event.create('test_helmet').armor('helmet', 'iron');
   event.create('test_boots').armor('boots', 'diamond');
 });
+StartupEvents.registry('fluid', event => {
+  event.create('test_goo').color(0x44FF44).luminosity(6);
+});

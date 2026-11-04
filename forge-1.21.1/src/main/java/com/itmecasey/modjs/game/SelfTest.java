@@ -87,6 +87,13 @@ public final class SelfTest {
             check("registered tool " + tool, found);
         }
 
+        check("registered fluid test_goo", net.minecraft.core.registries.BuiltInRegistries.FLUID.stream()
+            .anyMatch(f -> net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(f).toString().equals("modjs:test_goo")));
+        check("registered fluid test_goo_flowing", net.minecraft.core.registries.BuiltInRegistries.FLUID.stream()
+            .anyMatch(f -> net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(f).toString().equals("modjs:test_goo_flowing")));
+        check("registered bucket test_goo_bucket", net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+            .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("modjs:test_goo_bucket")));
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }
