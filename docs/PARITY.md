@@ -27,7 +27,8 @@ textures and models have not been run on a real client.
 | | blockLootTables, entityLootTables, chestLootTables, genericLootTables | yes (ModJS names; KubeJS names may differ) |
 | | commandRegistry, loaded, unloaded, tick | yes |
 | | afterRecipes | compiled |
-| | basicCommand, command, compostableRecipes, recipeTypeRegistry, specialRecipeSerializers | no |
+| | command | compiled |
+| | basicCommand, compostableRecipes, recipeTypeRegistry, specialRecipeSerializers | no |
 | ClientEvents | lang, highPriorityAssets, tick | yes / compiled |
 | | loggedIn, loggedOut | compiled |
 | | init, leftDebugInfo, rightDebugInfo, painterUpdated, paintScreen | no |

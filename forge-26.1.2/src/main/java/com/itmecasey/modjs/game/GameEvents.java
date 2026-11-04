@@ -288,6 +288,20 @@ public final class GameEvents {
             return fire(EventGroups.LEVEL, "beforeExplosion", null, new GameEventJS().level(e.getLevel()));
         });
 
+        net.minecraftforge.event.CommandEvent.BUS.addListener((net.minecraftforge.event.CommandEvent e) -> {
+            if (!wants(EventGroups.SERVER, "command")) {
+                return false;
+            }
+            String line = e.getParseResults().getReader().getString();
+            GameEventJS js = new GameEventJS().message(line);
+            if (e.getParseResults().getContext().getSource().getEntity() instanceof Player p) {
+                js.player(p);
+            }
+            String name = line.startsWith("/") ? line.substring(1) : line;
+            int space = name.indexOf(' ');
+            return fire(EventGroups.SERVER, "command", space < 0 ? name : name.substring(0, space), js);
+        });
+
         ExplosionEvent.Detonate.BUS.addListener((ExplosionEvent.Detonate e) -> {
             if (!e.getLevel().isClientSide() && wants(EventGroups.LEVEL, "afterExplosion")) {
                 fire(EventGroups.LEVEL, "afterExplosion", null, new GameEventJS().level(e.getLevel()));

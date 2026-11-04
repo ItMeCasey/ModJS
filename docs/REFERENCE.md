@@ -76,6 +76,8 @@ Raw data: `ServerEvents.generateData(event => event.addJson('mymod:loot_table/x'
 
 Commands: `ServerEvents.commandRegistry(event => event.register(Java.loadClass('net.minecraft.commands.Commands').literal('hi').executes(ctx => 1)))`.
 
+`ServerEvents.command("gamemode", e => e.cancel())` runs for every command typed, filtered by command name (`e.message` is the full line).
+
 Gameplay events (`BlockEvents`, `ItemEvents`, `PlayerEvents`, `EntityEvents`, `LevelEvents`) hand you a `GameEvent` with
 `player`, `playerName`, `level`, `entity`, `entityId`, `item`, `itemId`, `blockId`, `x`, `y`, `z`, `message`, `amount`,
 `tell(text)` and `runCommand(command)`. Chat can be rewritten with `event.message = '...'`; hurt damage with

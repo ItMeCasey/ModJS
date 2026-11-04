@@ -294,6 +294,22 @@ public final class GameEvents {
     // -- more KubeJS events --------------------------------------------------------------------------------------
 
     private static void registerExtras() {
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.CommandEvent e) -> {
+            if (!wants(EventGroups.SERVER, "command")) {
+                return;
+            }
+            String line = e.getParseResults().getReader().getString();
+            GameEventJS js = new GameEventJS().message(line);
+            if (e.getParseResults().getContext().getSource().getEntity() instanceof Player p) {
+                js.player(p);
+            }
+            String name = line.startsWith("/") ? line.substring(1) : line;
+            int space = name.indexOf(' ');
+            if (fire(EventGroups.SERVER, "command", space < 0 ? name : name.substring(0, space), js)) {
+                e.setCanceled(true);
+            }
+        });
+
         MinecraftForge.EVENT_BUS.addListener((LevelEvent.Unload e) -> {
             if (e.getLevel() instanceof Level level && !level.isClientSide() && wants(EventGroups.LEVEL, "unloaded")) {
                 fire(EventGroups.LEVEL, "unloaded", level.dimension().location().toString(), new GameEventJS().level(level));
