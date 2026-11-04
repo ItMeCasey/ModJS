@@ -1,0 +1,99 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'net.neoforged.gradle.userdev' version '7.0.192'
+}
+
+version = mod_version
+group = mod_group
+
+base {
+    archivesName = "${mod_id}-neoforge-mc${minecraft_version}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+// The script engine, event system and data generators live in ../common and are compiled into this mod.
+sourceSets {
+    main {
+        java.srcDir '../common/src/main/java'
+        resources.srcDir '../common/src/main/resources'
+    }
+    test {
+        java.srcDir '../common/src/test/java'
+    }
+}
+
+configurations {
+    library
+    implementation.extendsFrom library
+}
+
+runs {
+    configureEach {
+        workingDirectory = project.file('run')
+        modSource sourceSets.main
+        // Libraries (Rhino) must be on the game's module path in dev runs.
+        dependencies {
+            runtime project.configurations.library
+        }
+    }
+
+    client {
+    }
+
+    server {
+        programArgument '--nogui'
+    }
+
+    gameTestServer {
+        systemProperty 'modjs.selftest', 'true'
+        systemProperty 'forge.enabledGameTestNamespaces', mod_id
+        programArgument '--nogui'
+    }
+}
+
+repositories {
+    maven { url 'https://maven.neoforged.net/releases' }
+    mavenCentral()
+    maven {
+        name = 'BlameJared (JEI)'
+        url = 'https://maven.blamejared.com'
+    }
+}
+
+dependencies {
+    implementation "net.neoforged:forge:${minecraft_version}-${neo_version}"
+    library "org.mozilla:rhino:${rhino_version}"
+    jarJar("org.mozilla:rhino:[${rhino_version},1.8)") {
+        version { prefer rhino_version }
+    }
+    compileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
+
+    testImplementation "com.google.code.gson:gson:2.11.0"
+    testImplementation "org.slf4j:slf4j-api:2.0.16"
+    testImplementation platform("org.junit:junit-bom:5.11.4")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    systemProperty 'modjs.pluralFolders', 'true'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('processResources', ProcessResources) {
+    var replaceProperties = [
+        mod_id: mod_id, mod_name: mod_name, mod_version: mod_version, mod_license: mod_license,
+        minecraft_version: minecraft_version,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
