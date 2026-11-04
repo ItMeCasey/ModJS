@@ -98,31 +98,32 @@ final class ArtStyle {
         return out;
     }
 
-    /** A flat sprite from a shape: highlight on the top left, shadow on the bottom right, a dark outline around it. */
+    /** A flat sprite from a shape: dark outline, light on the top-left edge, shadow on the bottom-right edge. */
     static BufferedImage shaped(boolean[][] mask, int rgb) {
         int[] ramp = ramp(rgb);
         int size = mask.length;
+        boolean[][] outline = new boolean[size][size];
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                outline[y][x] = mask[y][x] && (y == 0 || x == 0 || y == size - 1 || x == size - 1
+                    || !mask[y - 1][x] || !mask[y + 1][x] || !mask[y][x - 1] || !mask[y][x + 1]);
+            }
+        }
         BufferedImage out = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 if (!mask[y][x]) {
                     continue;
                 }
-                boolean edgeTop = y == 0 || !mask[y - 1][x];
-                boolean edgeLeft = x == 0 || !mask[y][x - 1];
-                boolean edgeBottom = y == size - 1 || !mask[y + 1][x];
-                boolean edgeRight = x == size - 1 || !mask[y][x + 1];
-                boolean outline = (y == 0 || x == 0 || y == size - 1 || x == size - 1)
-                    || !mask[y - 1][x] || !mask[y + 1][x] || !mask[y][x - 1] || !mask[y][x + 1];
                 int tone;
-                if (outline) {
+                if (outline[y][x]) {
                     tone = ramp[0];
-                } else if (!mask[y - 1][x - 1] || edgeTop || edgeLeft) {
+                } else if (outline[y - 1][x] || outline[y][x - 1]) {
                     tone = ramp[4];
-                } else if (edgeBottom || edgeRight || !mask[y + 1][x + 1]) {
+                } else if (outline[y + 1][x] || outline[y][x + 1]) {
                     tone = ramp[1];
                 } else {
-                    tone = ((x + y) % 5 == 0) ? ramp[3] : ramp[2];
+                    tone = ((x + y) % 4 == 0) ? ramp[3] : ramp[2];
                 }
                 out.setRGB(x, y, 0xFF000000 | tone);
             }
@@ -155,15 +156,21 @@ final class ArtStyle {
         return mask;
     }
 
+    /** An eight-tooth cog with a round hole. */
     static boolean[][] gear() {
         boolean[][] mask = new boolean[16][16];
+        double teeth = 8;
         for (int y = 0; y < 16; y++) {
             for (int x = 0; x < 16; x++) {
-                double d = Math.hypot(x - 7.5, y - 7.5);
-                double angle = Math.atan2(y - 7.5, x - 7.5);
-                boolean tooth = d <= 7.4 && Math.sin(angle * 4) > 0.15;
-                boolean body = d <= 5.6 && d >= 2.4;
-                mask[y][x] = body || (tooth && d >= 2.4);
+                double dx = x - 7.5;
+                double dy = y - 7.5;
+                double d = Math.hypot(dx, dy);
+                double phase = (Math.atan2(dy, dx) / (2 * Math.PI) * teeth) % 1.0;
+                if (phase < 0) {
+                    phase += 1;
+                }
+                boolean tooth = d <= 7.6 && Math.abs(phase - 0.5) <= 0.3;
+                mask[y][x] = d >= 2.0 && (d <= 5.8 || tooth);
             }
         }
         return mask;
