@@ -102,7 +102,7 @@ public final class WorldgenEventJS extends EventJS {
         placed.add("placement", placement);
         data.putJson(NAMESPACE, "worldgen/placed_feature/" + id, placed);
 
-        writeModifier(id, "forge:add_features", biomes(options, "biomes", "#minecraft:is_overworld"),
+        writeModifier(id, com.itmecasey.modjs.format.LoaderNames.id("add_features"), biomes(options, "biomes", "#minecraft:is_overworld"),
             "features", new JsonPrimitive(NAMESPACE + ":" + id), stringOption(options, "step", "underground_ores"));
     }
 
@@ -134,7 +134,7 @@ public final class WorldgenEventJS extends EventJS {
     public void addFeature(Object options) {
         String id = requireId(options);
         JsonElement features = RecipeJson.selector(JsonUtil.property(options, "features"));
-        writeModifier(id, "forge:add_features", biomes(options, "biomes", "#minecraft:is_overworld"),
+        writeModifier(id, com.itmecasey.modjs.format.LoaderNames.id("add_features"), biomes(options, "biomes", "#minecraft:is_overworld"),
             "features", features, stringOption(options, "step", "underground_ores"));
     }
 
@@ -142,10 +142,10 @@ public final class WorldgenEventJS extends EventJS {
     public void removeFeature(Object options) {
         String id = requireId(options);
         JsonObject json = new JsonObject();
-        json.addProperty("type", "forge:remove_features");
+        json.addProperty("type", com.itmecasey.modjs.format.LoaderNames.id("remove_features"));
         json.add("biomes", biomes(options, "biomes", "#minecraft:is_overworld"));
         json.add("features", RecipeJson.selector(JsonUtil.property(options, "features")));
-        data.putJson(NAMESPACE, "forge/biome_modifier/" + id, json);
+        data.putJson(NAMESPACE, com.itmecasey.modjs.format.LoaderNames.biomeModifierFolder() + id, json);
     }
 
     /** Adds a mob spawn: options {@code id}, {@code entity}, {@code weight}, {@code minCount}, {@code maxCount}, {@code biomes}. */
@@ -161,22 +161,22 @@ public final class WorldgenEventJS extends EventJS {
         spawner.addProperty("minCount", intOption(options, "minCount", 1));
         spawner.addProperty("maxCount", intOption(options, "maxCount", 3));
         JsonObject json = new JsonObject();
-        json.addProperty("type", "forge:add_spawns");
+        json.addProperty("type", com.itmecasey.modjs.format.LoaderNames.id("add_spawns"));
         json.add("biomes", biomes(options, "biomes", "#minecraft:is_overworld"));
         JsonArray spawners = new JsonArray();
         spawners.add(spawner);
         json.add("spawners", spawners);
-        data.putJson(NAMESPACE, "forge/biome_modifier/" + id, json);
+        data.putJson(NAMESPACE, com.itmecasey.modjs.format.LoaderNames.biomeModifierFolder() + id, json);
     }
 
     /** Removes mob spawns: options {@code id}, {@code entities} (ids or a #tag), {@code biomes}. */
     public void removeSpawn(Object options) {
         String id = requireId(options);
         JsonObject json = new JsonObject();
-        json.addProperty("type", "forge:remove_spawns");
+        json.addProperty("type", com.itmecasey.modjs.format.LoaderNames.id("remove_spawns"));
         json.add("biomes", biomes(options, "biomes", "#minecraft:is_overworld"));
         json.add("entity_types", RecipeJson.selector(JsonUtil.property(options, "entities")));
-        data.putJson(NAMESPACE, "forge/biome_modifier/" + id, json);
+        data.putJson(NAMESPACE, com.itmecasey.modjs.format.LoaderNames.biomeModifierFolder() + id, json);
     }
 
     private void writeModifier(String id, String type, JsonElement biomes, String featureKey, JsonElement features, String step) {
@@ -185,7 +185,7 @@ public final class WorldgenEventJS extends EventJS {
         json.add("biomes", biomes);
         json.add(featureKey, features);
         json.addProperty("step", step);
-        data.putJson(NAMESPACE, "forge/biome_modifier/" + id, json);
+        data.putJson(NAMESPACE, com.itmecasey.modjs.format.LoaderNames.biomeModifierFolder() + id, json);
     }
 
     public List<String> steps() {

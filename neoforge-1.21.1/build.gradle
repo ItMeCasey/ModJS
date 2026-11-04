@@ -1,0 +1,104 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = mod_group
+
+base {
+    archivesName = "${mod_id}-neoforge-mc${minecraft_version}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// The script engine, event system and data generators live in ../common and are compiled into this mod.
+sourceSets {
+    main {
+        java.srcDir '../common/src/main/java'
+        resources.srcDir '../common/src/main/resources'
+    }
+    test {
+        java.srcDir '../common/src/test/java'
+    }
+}
+
+neoForge {
+    version = neo_version
+
+    runs {
+        configureEach {
+            gameDirectory = layout.projectDirectory.dir('run')
+        }
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'modjs.selftest', 'true'
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'BlameJared (JEI)'
+        url = 'https://maven.blamejared.com'
+    }
+}
+
+dependencies {
+    implementation "org.mozilla:rhino:${rhino_version}"
+    additionalRuntimeClasspath "org.mozilla:rhino:${rhino_version}"
+    jarJar("org.mozilla:rhino:[${rhino_version},1.8)") {
+        version { prefer rhino_version }
+    }
+    compileOnly "mezz.jei:jei-1.21.1-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
+
+    testImplementation "com.google.code.gson:gson:2.11.0"
+    testImplementation "org.slf4j:slf4j-api:2.0.16"
+    testImplementation platform("org.junit:junit-bom:5.11.4")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    // Some unit tests read the game's own data (loot tables, tags); it ships in the minecraft-resources artifact.
+    var gameData = layout.buildDirectory.file("moddev/artifacts/neoforge-${neo_version}-client-extra-aka-minecraft-resources.jar")
+    classpath += files(gameData)
+    dependsOn tasks.matching { it.name == 'createMinecraftArtifacts' }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// neoforge.mods.toml is a template: this fills in its ${} values from gradle.properties.
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+        neo_version_range: neo_version_range, loader_version_range: loader_version_range,
+        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+        mod_authors: mod_authors, mod_description: mod_description,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata

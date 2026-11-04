@@ -1,0 +1,161 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/C:/Users/casey/.gradle/wrapper/dists/gradle-9.3.1-bin/23ovyewtku6u96viwx3xl3oks/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :compileJava
+> Task :generateModMetadata UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes
+> Task :downloadAssets UP-TO-DATE
+> Task :writeGameTestServerLegacyClasspath UP-TO-DATE
+> Task :prepareGameTestServerRun UP-TO-DATE
+
+> Task :runGameTestServer
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[11:49:41] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeserverdev, --gameDir, ., --fml.fmlVersion, 4.0.45, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.265, --fml.neoFormVersion, 20240808.144430]
+[11:49:41] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.13+9-LTS
+[11:49:41] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.13 by Eclipse Adoptium; OS Windows 10 arch amd64 version 10.0
+[11:49:41] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgeserverdev
+[11:49:41] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/C:/Users/casey/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.16.4+mixin.0.8.7/26d01f0567ab46e9ca0d2ed89d0ecc11aadbd433/sponge-mixin-0.16.4+mixin.0.8.7.jar%2395!/ Service=ModLauncher Env=SERVER
+[11:49:41] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[11:49:41] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		Minecraft 1.21.1 (minecraft)
+		ModJS 2026.11.23 (modjs)
+		NeoForge 21.1.265 (neoforge)
+[11:49:42] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeserverdev' with arguments [--gameDir, .]
+[11:49:43] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+[11:49:49] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[11:49:49] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[11:49:49] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[11:49:49] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[11:49:49] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[11:49:49] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.265, for MC 1.21.1
+[11:49:49] [modloading-worker-0/INFO] [co.it.mo.ModJS/]: ModJS loading scripts from C:\Users\casey\Desktop\ModJS\neoforge-1.21.1\run\modjs
+[11:49:49] [modloading-worker-0/INFO] [modjs/]: [STARTUP] smoke test: startup script ran, Java sandbox check next
+[11:49:49] [modloading-worker-0/INFO] [modjs/]: [STARTUP] loaded 1 script(s), 0 error(s)
+[11:49:49] [main/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[11:49:49] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/casey/Desktop/ModJS/neoforge-1.21.1/build/moddev/artifacts/neoforge-21.1.265.jar%23127!/assets/.mcassetsroot' uses unexpected schema
+[11:49:49] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/casey/Desktop/ModJS/neoforge-1.21.1/build/moddev/artifacts/neoforge-21.1.265.jar%23127!/data/.mcassetsroot' uses unexpected schema
+[11:49:49] [main/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: [modjs]
+[11:49:49] [main/INFO] [modjs/]: [SERVER] SELFTEST script: globals 1 5 36 up
+[11:49:49] [main/INFO] [modjs/]: [SERVER] server script loaded
+[11:49:49] [main/INFO] [modjs/]: [SERVER] loaded 2 script(s), 0 error(s)
+[11:49:49] [main/INFO] [modjs/]: ModJS generated 52 data file(s)
+[11:49:49] [main/INFO] [modjs/]: [SERVER] SELFTEST script: globals 1 5 36 up
+[11:49:49] [main/INFO] [modjs/]: [SERVER] server script loaded
+[11:49:49] [main/INFO] [modjs/]: [SERVER] loaded 2 script(s), 0 error(s)
+[11:49:49] [main/INFO] [modjs/]: ModJS generated 52 data file(s)
+[11:49:50] [main/INFO] [minecraft/RecipeManager]: Loaded 1293 recipes
+[11:49:51] [main/INFO] [minecraft/AdvancementTree]: Loaded 1400 advancements
+[11:49:51] [main/INFO] [modjs/]: ModJS unified 2 item group(s) and 1 fluid group(s)
+[11:49:51] [main/INFO] [co.it.mo.re.RecipeReloadHook/]: ModJS recipes: 1293 loaded, 1 removed, 1 rewritten, 0 without a source file; unify rewrote 8 outputs and 6 inputs, added 3 conversions
+[11:49:52] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[11:49:52] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 2%
+[11:49:52] [Server thread/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 193 ms
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: Started game test server
+[11:49:52] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: gamerule false -> true of 51
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] server loaded; recipes = 1295
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] oak in planks tag: false, birch in planks tag: true
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] ender pearl max stack: 64
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: 1 tests are now running at position 14054981, -59, -7716694!
+[11:49:52] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'defaultBatch:0' (1 tests)...
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] scheduled task ran
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [minecraft/GameTestServer]: [ ]
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: loggedIn ModJSTester
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS trace reports events with details
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: broken minecraft:stone by ModJSTester
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.broken cancel
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.broken id filter leaves other blocks alone
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: chat "hello there?"
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS PlayerEvents.chat rewrites the message
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: loggedIn ModJSTester
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: crafted minecraft:stick
+[11:49:52] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: hurt amount 3
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS EntityEvents.hurt changes the amount
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_slab
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_stairs
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_wall
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_fence
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_pickaxe
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_sword
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_helmet
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_boots
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered fluid test_goo
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered fluid test_goo_flowing
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS registered bucket test_goo_bucket
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS block entity found at a chest
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS block entity inventory round trip
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS block entity nbt readable
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS no block entity on plain blocks
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS generated dimension void_test parses as a level stem
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS generated dimension flat_test parses as a level stem
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS generated dimension nether_copy parses as a level stem
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS DimensionEvents.drop removes a dimension
+[11:49:52] [Server thread/INFO] [modjs/]: ModJS created dimension modjs:selftest_world
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.create builds a dimension at run time
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.create refuses a duplicate id
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS run-time dimension is a real level
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS run-time dimension keeps blocks
+[11:49:52] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.teleport rejects an unknown dimension
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.delete removes it
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST unify groups [Group[tag=c:ingots/tin, canonical=modjs:tin_ingot, inputs=CANONICAL, members=[minecraft:iron_ingot]], Group[tag=c:ores/zinc, canonical=modjs:zinc_ore, inputs=CANONICAL, members=[minecraft:coal_ore, minecraft:deepslate_coal_ore]]]
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify picks our item as canonical
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify rewrote recipe outputs and inputs
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify added a conversion recipe
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify replaces non-canonical drops
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify swaps inventory stacks
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify fluid group picks our fluid
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify block zinc_ore
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item crushed_zinc
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item zinc_clump
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item zinc_shard
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item zinc_dirty_dust
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item raw_zinc
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify maps foreign ores to the canonical ore
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify swaps ore features in biomes
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify converts ore blocks in a chunk
+[11:49:53] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: inventoryChanged slot 7 minecraft:apple
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS ServerEvents.compostableRecipes sets a chance
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.modification changes hardness, resistance and light
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS custom tool tier sets durability
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS custom armor material sets durability
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS container block has a block entity with its rows
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS container block keeps items in its data
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST sampled copper color b05434
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify samples a material color from the game's textures
+[11:49:53] [Server thread/INFO] [modjs/]: SELFTEST DONE failures=0
+[11:49:53] [Server thread/INFO] [minecraft/GameTestServer]: [+]
+[11:49:53] [Server thread/INFO] [minecraft/GameTestServer]: ========= 1 GAME TESTS COMPLETE IN 655.2 ms ======================
+[11:49:53] [Server thread/INFO] [minecraft/GameTestServer]: All 1 required tests passed :)
+[11:49:53] [Server thread/INFO] [minecraft/GameTestServer]: ====================================================
+[11:49:53] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[11:49:53] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[11:49:53] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[11:49:53] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:overworld
+[11:49:54] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_end
+[11:49:54] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_nether
+[11:49:54] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[11:49:54] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[11:49:54] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[11:49:54] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[11:49:54] [Server thread/INFO] [minecraft/GameTestServer]: Game test server shutting down
+
+BUILD SUCCESSFUL in 25s
+8 actionable tasks: 2 executed, 6 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html

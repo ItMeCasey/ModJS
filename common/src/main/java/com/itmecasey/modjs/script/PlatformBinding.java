@@ -23,7 +23,7 @@ public final class PlatformBinding {
     }
 
     public String getLoader() {
-        return "forge";
+        return com.itmecasey.modjs.format.LoaderNames.loader();
     }
 
     public boolean isClient() {

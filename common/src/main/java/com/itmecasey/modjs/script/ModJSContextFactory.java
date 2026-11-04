@@ -19,7 +19,7 @@ public final class ModJSContextFactory extends ContextFactory {
         "java.io.", "java.nio.", "java.net.", "java.lang.reflect.", "java.lang.invoke.", "java.lang.foreign.",
         "java.lang.management.", "java.lang.instrument.", "java.sql.", "java.rmi.", "javax.script.",
         "sun.", "jdk.", "org.mozilla.javascript.", "java.util.concurrent.ThreadPool",
-        "net.minecraftforge.fml.loading.", "cpw.mods."
+        "net.minecraftforge.fml.loading.", "net.neoforged.fml.loading.", "cpw.mods."
     );
 
     private static final Set<String> DENIED_CLASSES = Set.of(

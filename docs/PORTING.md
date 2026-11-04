@@ -3,6 +3,19 @@
 ModJS ships Forge 26.1.2 and Forge 1.21.1 today. More Minecraft versions and loaders are planned, so this file lists
 what a new port has to provide and every gap that exists because a version could not do something yet.
 
+## Ports so far
+
+| Module | Minecraft | Loader | Status |
+|---|---|---|---|
+| `forge-26.1.2` | 26.1.2 | Forge 64.1.6 | full; self test passes |
+| `forge-1.21.1` | 1.21.1 | Forge 52.1.21 | full; self test passes |
+| `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 52 self-test checks and 59 unit tests pass |
+
+The NeoForge module copies the Forge 1.21.1 one and changes only loader API names: events on `NeoForge.EVENT_BUS` with `net.neoforged` packages, `PlayerTickEvent.Post` and friends for ticks, `LivingIncomingDamageEvent` for hurt,
+`ItemEntityPickupEvent.Pre`, `ModifyDefaultComponentsEvent` for item changes, payload handlers instead of a channel for networking, `DeferredHolder` instead of `RegistryObject`, `BaseFlowingFluid`,
+and `neoforge:` ids and data folders (`LoaderNames`). Build files use ModDevGradle with Gradle 9.3.1, Rhino on `additionalRuntimeClasspath` and as Jar-in-Jar.
+Fluid client art still uses the deprecated `FluidType.initializeClient`; move it to `RegisterClientExtensionsEvent` when a later NeoForge removes it.
+
 ## What a port provides
 
 `common/` holds everything free of Minecraft classes (scripting, events, recipes, tags, loot, data and asset

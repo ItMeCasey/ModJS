@@ -15,6 +15,8 @@ jobs:
             java: 25
           - module: forge-1.21.1
             java: 21
+          - module: neoforge-1.21.1
+            java: 21
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,7 +30,12 @@ jobs:
       - run: chmod +x gradlew
       - run: ./gradlew build --no-daemon
       - name: Game test server (self test)
-        run: ./gradlew runGameTestServer --no-daemon
+        run: |
+          mkdir -p run/modjs
+          cp -r ../smoke-test/startup_scripts ../smoke-test/server_scripts ../smoke-test/client_scripts run/modjs/
+          ./gradlew runGameTestServer --no-daemon 2>&1 | tee selftest.log
+          grep -q "SELFTEST DONE failures=0" selftest.log
+          ! grep -q "SELFTEST FAIL" selftest.log
       - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.module }}
