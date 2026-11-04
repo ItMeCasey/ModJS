@@ -8,6 +8,8 @@ How things were checked: server-side data (recipes, tags, loot, worldgen files, 
 the self test ran in a real Forge game-test server on both 26.1.2 and 1.21.1. Client events, networking and generated
 textures and models have not been run on a real client.
 
+See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to provide.
+
 ## Script folders
 
 | KubeJS | ModJS |
