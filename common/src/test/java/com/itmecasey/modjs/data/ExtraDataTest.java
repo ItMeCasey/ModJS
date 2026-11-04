@@ -26,6 +26,17 @@ class ExtraDataTest {
 
     private final GeneratedData data = new GeneratedData();
 
+    @org.junit.jupiter.api.BeforeAll
+    static void folderStyle() {
+        // The 1.20.x modules run these tests against a game that still uses plural data folders.
+        com.itmecasey.modjs.format.DataFolders.usePlural(Boolean.getBoolean("modjs.pluralFolders"));
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    static void resetFolderStyle() {
+        com.itmecasey.modjs.format.DataFolders.usePlural(false);
+    }
+
     @BeforeEach
     void setUp() {
         ScriptManager.setRoot(root);
@@ -61,7 +72,7 @@ class ExtraDataTest {
         DataBuilder.buildServerData(data);
         assertEquals(0, ScriptManager.of(ScriptType.SERVER).errors().size(), ScriptManager.of(ScriptType.SERVER).errors().toString());
 
-        JsonObject dirt = json("minecraft", "loot_table/blocks/dirt.json");
+        JsonObject dirt = json("minecraft", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/dirt.json");
         assertEquals("minecraft:block", dirt.get("type").getAsString());
         JsonObject pool = dirt.getAsJsonArray("pools").get(0).getAsJsonObject();
         JsonObject entry = pool.getAsJsonArray("entries").get(0).getAsJsonObject();
@@ -69,16 +80,16 @@ class ExtraDataTest {
         assertEquals(2, entry.getAsJsonArray("functions").get(0).getAsJsonObject().get("count").getAsInt());
         assertEquals("minecraft:survives_explosion", pool.getAsJsonArray("conditions").get(0).getAsJsonObject().get("condition").getAsString());
 
-        JsonObject ore = json("mymod", "loot_table/blocks/ore.json");
+        JsonObject ore = json("mymod", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/ore.json");
         JsonObject orePool = ore.getAsJsonArray("pools").get(0).getAsJsonObject();
         assertEquals("minecraft:uniform", orePool.getAsJsonObject("rolls").get("type").getAsString());
         assertEquals(2, orePool.getAsJsonArray("entries").size());
         assertEquals(5, orePool.getAsJsonArray("entries").get(1).getAsJsonObject().get("weight").getAsInt());
         assertEquals(0.5, orePool.getAsJsonArray("conditions").get(0).getAsJsonObject().get("chance").getAsDouble());
 
-        assertEquals(0, json("minecraft", "loot_table/blocks/stone.json").getAsJsonArray("pools").size());
-        assertEquals("minecraft:entity", json("minecraft", "loot_table/entities/cow.json").get("type").getAsString());
-        assertNotNull(data.get("mymod", "loot_table/gameplay/fishing.json"));
+        assertEquals(0, json("minecraft", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/stone.json").getAsJsonArray("pools").size());
+        assertEquals("minecraft:entity", json("minecraft", com.itmecasey.modjs.format.DataFolders.lootTable() + "/entities/cow.json").get("type").getAsString());
+        assertNotNull(data.get("mymod", com.itmecasey.modjs.format.DataFolders.lootTable() + "/gameplay/fishing.json"));
     }
 
     @Test
@@ -181,7 +192,7 @@ class ExtraDataTest {
         DataBuilder.buildServerData(data);
         assertEquals(0, ScriptManager.of(ScriptType.SERVER).errors().size(), ScriptManager.of(ScriptType.SERVER).errors().toString());
 
-        JsonObject planks = json("minecraft", "tags/item/planks.json");
+        JsonObject planks = json("minecraft", com.itmecasey.modjs.format.DataFolders.tags("item") + "/planks.json");
         assertTrue(planks.get("replace").getAsBoolean());
         String values = planks.getAsJsonArray("values").toString();
         assertTrue(!values.contains("minecraft:oak_planks"), values);
@@ -200,10 +211,10 @@ class ExtraDataTest {
             """);
         DataBuilder.buildServerData(data);
 
-        String diamond = json("minecraft", "loot_table/blocks/diamond_ore.json").toString();
+        String diamond = json("minecraft", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/diamond_ore.json").toString();
         assertTrue(diamond.contains("minecraft:emerald"), diamond);
         assertTrue(!diamond.contains("\"minecraft:diamond\""), diamond);
-        String coal = json("minecraft", "loot_table/blocks/coal_ore.json").toString();
+        String coal = json("minecraft", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/coal_ore.json").toString();
         assertTrue(!coal.contains("\"minecraft:coal\""), coal);
         assertTrue(coal.contains("minecraft:stick"), coal);
         assertEquals(1, ScriptManager.of(ScriptType.SERVER).errors().size(), "only the missing table should error");

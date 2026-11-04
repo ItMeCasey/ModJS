@@ -1,0 +1,132 @@
+plugins {
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.47,6.2)'
+}
+
+base.archivesName = "${mod_id}-mc${minecraft_version}"
+version = mod_version
+group = mod_group
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    withSourcesJar()
+}
+
+// The script engine, event system and data generators live in ../common and are compiled into this mod.
+sourceSets {
+    main {
+        java.srcDir '../common/src/main/java'
+        resources.srcDir '../common/src/main/resources'
+        resources.srcDir 'src/generated/resources'
+    }
+    test {
+        java.srcDir '../common/src/test/java'
+    }
+}
+
+// Dev runs find the mod in one directory, so keep resources next to the compiled classes.
+sourceSets.main.output.resourcesDir = sourceSets.main.java.destinationDirectory.get().asFile
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+    reobf = false
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'eventbus.api.strictRuntimeChecks', 'true'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+        }
+
+        server {
+            args '--nogui'
+        }
+
+        gameTestServer {
+            // Enables the in-game event self test; see SelfTest.java and run/modjs/server_scripts/selftest.js.
+            property 'modjs.selftest', 'true'
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+// Ships Rhino inside the mod jar so players do not need to install it.
+jarJar.enable()
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Forge'
+        url = 'https://maven.minecraftforge.net'
+    }
+    maven {
+        name = 'BlameJared (JEI)'
+        url = 'https://maven.blamejared.com'
+    }
+    maven {
+        name = 'Minecraft libraries'
+        url = 'https://libraries.minecraft.net'
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    minecraftLibrary "org.mozilla:rhino:${rhino_version}"
+    compileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
+    jarJar("org.mozilla:rhino:${rhino_version}") {
+        jarJar.ranged(it, "[${rhino_version},1.8)")
+    }
+
+
+    testImplementation platform("org.junit:junit-bom:5.11.4")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    systemProperty 'modjs.pluralFolders', 'true'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('processResources', ProcessResources) {
+    var replaceProperties = [
+        mod_id: mod_id, mod_name: mod_name, mod_version: mod_version, mod_license: mod_license,
+        minecraft_version: minecraft_version,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+tasks.named('jar', Jar) {
+    archiveClassifier = 'slim'
+}
+
+tasks.named('jarJar') {
+    archiveClassifier = ''
+}
+
+tasks.named('build') {
+    dependsOn 'jarJar'
+}

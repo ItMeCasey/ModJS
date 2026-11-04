@@ -9,8 +9,11 @@ what a new port has to provide and every gap that exists because a version could
 |---|---|---|---|
 | `forge-26.1.2` | 26.1.2 | Forge 64.1.6 | full; self test passes |
 | `forge-1.21.1` | 1.21.1 | Forge 52.1.21 | full; self test passes |
+| `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | full except rarity changes in `ItemEvents.modification` (no components in that version); the same 52 self-test checks and 59 unit tests pass |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 52 self-test checks and 59 unit tests pass |
 | `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full except F3 debug lines and the fluid art; the same 52 self-test checks and 59 unit tests pass |
+
+The 1.20.1 module copies the Forge 1.21.1 one and adapts to the older game: plural data folders and `item`/string recipe results (`DataFolders`, `Legacy120Format`), `FriendlyByteBuf` messages on a `SimpleChannel`, the old `Tier` and `ArmorMaterial` interfaces, `RecipeManager.fromJson`, reflection for item stack size and durability, `Codec` instead of `MapCodec`, and Rhino through `minecraftLibrary`. Its self test needs a connected test player (an `EmbeddedChannel`) because Forge reacts to logins.
 
 The NeoForge module copies the Forge 1.21.1 one and changes only loader API names: events on `NeoForge.EVENT_BUS` with `net.neoforged` packages, `PlayerTickEvent.Post` and friends for ticks, `LivingIncomingDamageEvent` for hurt,
 `ItemEntityPickupEvent.Pre`, `ModifyDefaultComponentsEvent` for item changes, payload handlers instead of a channel for networking, `DeferredHolder` instead of `RegistryObject`, `BaseFlowingFluid`,
