@@ -1,6 +1,12 @@
 package com.itmecasey.modjs.registry;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -21,6 +27,8 @@ import java.util.List;
 public final class ContentRegistry {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, RegistryManager.NAMESPACE);
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, RegistryManager.NAMESPACE);
+
+    private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
 
     private record TabEntry(String tab, RegistryObject<Item> item) {
     }
@@ -68,9 +76,30 @@ public final class ContentRegistry {
             });
             TAB_ENTRIES.add(new TabEntry(b.tab(), item));
         }
+        for (CreativeTabBuilderJS builder : RegistryManager.tabs()) {
+            CreativeTabBuilderJS t = builder;
+            TABS.register(t.id(), () -> CreativeModeTab.builder()
+                .title(Component.translatable("itemGroup." + RegistryManager.NAMESPACE + "." + t.id()))
+                .icon(() -> iconFor(t.icon()))
+                .displayItems((parameters, output) -> {
+                    for (TabEntry entry : TAB_ENTRIES) {
+                        if (entry.tab().equals(t.tabId())) {
+                            output.accept(entry.item().get());
+                        }
+                    }
+                })
+                .build());
+        }
+        TABS.register(modBus);
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
         modBus.addListener(ContentRegistry::fillTabs);
+    }
+
+    private static ItemStack iconFor(String itemId) {
+        ResourceLocation id = ResourceLocation.tryParse(itemId);
+        Item item = id == null ? Items.STONE : BuiltInRegistries.ITEM.get(id);
+        return new ItemStack(item);
     }
 
     private static Rarity rarity(String name) {

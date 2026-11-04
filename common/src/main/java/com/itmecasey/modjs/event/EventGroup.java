@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * {@code ServerEvents.tags('item', event => ...)}.
  */
 public final class EventGroup extends ScriptableObject {
-    private record Handler(ScriptType owner, Function function, Scriptable scope) {
+    private record Handler(ScriptType owner, Function function, Scriptable scope, int priority, boolean once) {
     }
 
     private final String name;
@@ -65,12 +65,13 @@ public final class EventGroup extends ScriptableObject {
         }
     }
 
-    private synchronized void register(ScriptType owner, String event, String extraId, Function function, Scriptable scope) {
+    private synchronized void register(ScriptType owner, String event, String extraId, Function function, Scriptable scope,
+                                       int priority, boolean once) {
         if (allowedType != null && allowedType != owner) {
             ScriptManager.of(owner).addError(name + "." + event + " can only be used in " + allowedType.directory);
             return;
         }
-        handlers.computeIfAbsent(key(event, extraId), k -> new CopyOnWriteArrayList<>()).add(new Handler(owner, function, scope));
+        handlers.computeIfAbsent(key(event, extraId), k -> new CopyOnWriteArrayList<>()).add(new Handler(owner, function, scope, priority, once));
     }
 
     public synchronized boolean hasHandlers(String event) {
@@ -105,6 +106,22 @@ public final class EventGroup extends ScriptableObject {
         return eventObject.isCancelled();
     }
 
+    /** Removes every registration of {@code function} for {@code event}, with or without an id filter. */
+    private synchronized void unregister(String event, Function function) {
+        for (Map.Entry<String, List<Handler>> entry : handlers.entrySet()) {
+            String key = entry.getKey();
+            if (key.equals(event) || key.startsWith(event + ":")) {
+                entry.getValue().removeIf(handler -> handler.function == function);
+            }
+        }
+    }
+
+    private synchronized void unregisterHandler(Handler handler) {
+        for (List<Handler> list : handlers.values()) {
+            list.remove(handler);
+        }
+    }
+
     /** Posts an event with no id filter. Returns true if a handler cancelled it. */
     public boolean post(String event, EventJS eventObject) {
         return post(event, null, eventObject);
@@ -133,7 +150,12 @@ public final class EventGroup extends ScriptableObject {
     }
 
     private void run(String event, List<Handler> toRun, EventJS eventObject) {
-        for (Handler handler : toRun) {
+        List<Handler> ordered = new ArrayList<>(toRun);
+        ordered.sort((a, b) -> Integer.compare(b.priority, a.priority));
+        for (Handler handler : ordered) {
+            if (handler.once) {
+                unregisterHandler(handler);
+            }
             try {
                 ModJSContextFactory.INSTANCE.call(cx -> {
                     Object wrapped = Context.javaToJS(eventObject, handler.scope);
@@ -145,27 +167,88 @@ public final class EventGroup extends ScriptableObject {
         }
     }
 
+    /**
+     * The function behind {@code ServerEvents.recipes}. Calling it registers a handler; its properties offer
+     * {@code once(handler)}, {@code priority(n, handler)} (higher runs first) and {@code off(handler)}.
+     */
     private final class Registrar extends BaseFunction {
         private final String event;
+        private final Map<String, BaseFunction> helpers = new HashMap<>();
 
         Registrar(String event) {
             this.event = event;
         }
 
         @Override
-        public Object call(Context cx, Scriptable callScope, Scriptable thisObj, Object[] args) {
+        public boolean has(String property, Scriptable start) {
+            return property.equals("once") || property.equals("priority") || property.equals("off") || super.has(property, start);
+        }
+
+        @Override
+        public Object get(String property, Scriptable start) {
+            return switch (property) {
+                case "once", "priority", "off" -> helpers.computeIfAbsent(property, Helper::new);
+                default -> super.get(property, start);
+            };
+        }
+
+        private Scriptable scopeFor(ScriptType owner) {
+            return ScriptManager.of(owner).scope();
+        }
+
+        private ScriptType requireOwner() {
             ScriptType owner = ScriptManager.currentType();
             if (owner == null) {
                 throw Context.reportRuntimeError("Events can only be registered while scripts load");
             }
-            if (args.length == 1 && args[0] instanceof Function function) {
-                register(owner, event, null, function, ScriptManager.of(owner).scope());
-            } else if (args.length == 2 && args[1] instanceof Function function) {
-                register(owner, event, Context.toString(args[0]), function, ScriptManager.of(owner).scope());
+            return owner;
+        }
+
+        /** Handles (handler) and (id, handler) argument shapes starting at {@code from}. */
+        private void registerArgs(Object[] args, int from, int priority, boolean once) {
+            ScriptType owner = requireOwner();
+            int count = args.length - from;
+            if (count == 1 && args[from] instanceof Function function) {
+                register(owner, event, null, function, scopeFor(owner), priority, once);
+            } else if (count == 2 && args[from + 1] instanceof Function function) {
+                register(owner, event, Context.toString(args[from]), function, scopeFor(owner), priority, once);
             } else {
                 throw Context.reportRuntimeError(name + "." + event + " expects (handler) or (id, handler)");
             }
+        }
+
+        @Override
+        public Object call(Context cx, Scriptable callScope, Scriptable thisObj, Object[] args) {
+            registerArgs(args, 0, 0, false);
             return Context.getUndefinedValue();
+        }
+
+        private final class Helper extends BaseFunction {
+            private final String kind;
+
+            Helper(String kind) {
+                this.kind = kind;
+            }
+
+            @Override
+            public Object call(Context cx, Scriptable callScope, Scriptable thisObj, Object[] args) {
+                switch (kind) {
+                    case "once" -> registerArgs(args, 0, 0, true);
+                    case "priority" -> {
+                        if (args.length < 2 || !(args[0] instanceof Number number)) {
+                            throw Context.reportRuntimeError(name + "." + event + ".priority expects (number, handler)");
+                        }
+                        registerArgs(args, 1, number.intValue(), false);
+                    }
+                    default -> {
+                        if (args.length != 1 || !(args[0] instanceof Function function)) {
+                            throw Context.reportRuntimeError(name + "." + event + ".off expects (handler)");
+                        }
+                        unregister(event, function);
+                    }
+                }
+                return Context.getUndefinedValue();
+            }
         }
     }
 }

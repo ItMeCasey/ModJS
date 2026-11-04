@@ -20,6 +20,7 @@ public final class RegistryManager {
 
     private static final Map<String, ItemBuilderJS> ITEMS = new LinkedHashMap<>();
     private static final Map<String, BlockBuilderJS> BLOCKS = new LinkedHashMap<>();
+    private static final Map<String, CreativeTabBuilderJS> TABS = new LinkedHashMap<>();
     private static boolean contributorsInstalled;
 
     private RegistryManager() {
@@ -29,6 +30,8 @@ public final class RegistryManager {
     public static synchronized void collect() {
         ITEMS.clear();
         BLOCKS.clear();
+        TABS.clear();
+        EventGroups.STARTUP.postExact("registry", "creative_tab", new RegistryEventJS<>("creative tab", TABS, CreativeTabBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
         if (!contributorsInstalled) {
@@ -46,6 +49,10 @@ public final class RegistryManager {
         return BLOCKS.values();
     }
 
+    public static Collection<CreativeTabBuilderJS> tabs() {
+        return TABS.values();
+    }
+
     static void writeAssets(GeneratedData data) {
         JsonObject lang = new JsonObject();
         for (ItemBuilderJS item : ITEMS.values()) {
@@ -59,6 +66,9 @@ public final class RegistryManager {
             textures.addProperty("layer0", item.texture());
             model.add("textures", textures);
             data.putJson(NAMESPACE, "models/item/" + item.id(), model);
+        }
+        for (CreativeTabBuilderJS tab : TABS.values()) {
+            lang.addProperty("itemGroup." + NAMESPACE + "." + tab.id(), tab.displayName());
         }
         for (BlockBuilderJS block : BLOCKS.values()) {
             lang.addProperty("block." + NAMESPACE + "." + block.id(), block.displayName());

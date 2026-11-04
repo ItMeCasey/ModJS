@@ -14,12 +14,69 @@ import java.util.function.Consumer;
 
 /** A loot table under construction: {@code table.addPool(pool => pool.addItem('minecraft:diamond'))}. */
 public final class LootTableJS {
-    private final String type;
+    private String type;
     private final List<PoolJS> pools = new ArrayList<>();
+    private JsonArray existingPools = new JsonArray();
     private final JsonArray functions = new JsonArray();
 
     LootTableJS(String type) {
         this.type = type;
+    }
+
+    /** Starts from an existing table so scripts can edit it instead of replacing it. */
+    LootTableJS(JsonObject existing) {
+        this.type = existing.has("type") ? existing.get("type").getAsString() : "minecraft:generic";
+        if (existing.has("pools")) {
+            this.existingPools = existing.getAsJsonArray("pools").deepCopy();
+        }
+        if (existing.has("functions")) {
+            existing.getAsJsonArray("functions").forEach(functions::add);
+        }
+    }
+
+    /** Drops every pool the table already had. */
+    public LootTableJS clearPools() {
+        existingPools = new JsonArray();
+        return this;
+    }
+
+    /** Removes every entry that drops {@code item}, from all pools of the existing table. */
+    public LootTableJS removeItem(Object item) {
+        String id = ItemRef.parse(item).id();
+        for (JsonElement pool : existingPools) {
+            filterEntries(pool.getAsJsonObject(), "entries", id, null);
+        }
+        return this;
+    }
+
+    /** Makes every entry that drops {@code from} drop {@code to} instead. */
+    public LootTableJS replaceItem(Object from, Object to) {
+        String fromId = ItemRef.parse(from).id();
+        String toId = ItemRef.parse(to).id();
+        for (JsonElement pool : existingPools) {
+            filterEntries(pool.getAsJsonObject(), "entries", fromId, toId);
+        }
+        return this;
+    }
+
+    /** Removes (replacement null) or renames item entries, recursing into composite entries. */
+    private static void filterEntries(JsonObject holder, String key, String id, String replacement) {
+        if (!holder.has(key)) {
+            return;
+        }
+        JsonArray entries = holder.getAsJsonArray(key);
+        for (int i = entries.size() - 1; i >= 0; i--) {
+            JsonObject entry = entries.get(i).getAsJsonObject();
+            if (entry.has("name") && entry.get("name").getAsString().equals(id)) {
+                if (replacement == null) {
+                    entries.remove(i);
+                } else {
+                    entry.addProperty("name", replacement);
+                }
+            } else {
+                filterEntries(entry, "children", id, replacement);
+            }
+        }
     }
 
     public LootTableJS addPool(Consumer<PoolJS> configure) {
@@ -38,7 +95,7 @@ public final class LootTableJS {
     JsonObject toJson() {
         JsonObject out = new JsonObject();
         out.addProperty("type", type);
-        JsonArray poolArray = new JsonArray();
+        JsonArray poolArray = existingPools.deepCopy();
         pools.forEach(pool -> poolArray.add(pool.toJson()));
         out.add("pools", poolArray);
         if (!functions.isEmpty()) {

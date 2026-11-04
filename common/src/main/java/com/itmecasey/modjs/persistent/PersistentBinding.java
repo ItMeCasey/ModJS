@@ -17,6 +17,16 @@ public final class PersistentBinding {
         return STORES.computeIfAbsent(name, PersistentStore::new);
     }
 
+    /** A store for one player, keyed by UUID: {@code Persistent.player(event.player.getStringUUID()).set('kills', 3)}. */
+    public PersistentStore player(String uuid) {
+        return store("player_" + uuid);
+    }
+
+    /** A store for one entity, keyed by UUID. */
+    public PersistentStore entity(String uuid) {
+        return store("entity_" + uuid);
+    }
+
     private PersistentStore main() {
         return store("main");
     }

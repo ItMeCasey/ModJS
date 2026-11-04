@@ -188,7 +188,13 @@ interface ScheduledTask {
   isCancelled(): boolean;
 }
 
+interface CreativeTabBuilder {
+  displayName(name: string): CreativeTabBuilder;
+  icon(itemId: string): CreativeTabBuilder;
+}
+
 declare const StartupEvents: {
+  registry(type: 'creative_tab', handler: Handler<RegistryEvent<CreativeTabBuilder>>): void;
   registry(type: 'item', handler: Handler<RegistryEvent<ItemBuilder>>): void;
   registry(type: 'block', handler: Handler<RegistryEvent<BlockBuilder>>): void;
 };
@@ -341,6 +347,8 @@ declare const Persistent: {
   has(key: string): boolean;
   remove(key: string): void;
   store(name: string): PersistentStore;
+  player(uuid: string): PersistentStore;
+  entity(uuid: string): PersistentStore;
 };
 
 interface NetworkEvent extends EventBase {

@@ -54,6 +54,41 @@ public final class LootEventJS extends EventJS {
         addSimple(block, drop);
     }
 
+    /**
+     * Edits a table that ships in the game or a mod jar (for example {@code 'minecraft:dirt'}):
+     * {@code event.modify('minecraft:diamond_ore', t => t.replaceItem('minecraft:diamond', 'minecraft:emerald'))}.
+     * Tables that only exist in a world data pack cannot be edited this way.
+     */
+    public void modify(String id, Consumer<LootTableJS> configure) {
+        int colon = id.indexOf(':');
+        String namespace = colon < 0 ? "minecraft" : id.substring(0, colon);
+        String path = colon < 0 ? id : id.substring(colon + 1);
+        String resource = "data/" + namespace + "/loot_table/" + (folder.isEmpty() ? "" : folder + "/") + path + ".json";
+        JsonObject existing = readFromClassPath(resource);
+        if (existing == null) {
+            throw Context.reportRuntimeError("No loot table '" + id + "' found in the game or mod jars to modify");
+        }
+        LootTableJS table = new LootTableJS(existing);
+        configure.accept(table);
+        data.putJson(namespace, "loot_table/" + (folder.isEmpty() ? "" : folder + "/") + path, table.toJson());
+    }
+
+    private static JsonObject readFromClassPath(String resource) {
+        for (ClassLoader loader : new ClassLoader[] {Thread.currentThread().getContextClassLoader(), LootEventJS.class.getClassLoader()}) {
+            if (loader == null) {
+                continue;
+            }
+            try (java.io.InputStream in = loader.getResourceAsStream(resource)) {
+                if (in != null) {
+                    return com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+                }
+            } catch (java.io.IOException | RuntimeException e) {
+                // try the next loader
+            }
+        }
+        return null;
+    }
+
     /** Makes a block drop nothing. */
     public void clear(String id) {
         add(id, table -> { });

@@ -169,4 +169,43 @@ class ExtraDataTest {
         assertEquals(1, ScriptManager.of(ScriptType.CLIENT).errors().size());
         assertTrue(!Files.exists(root.resolveSibling("escape.json")));
     }
+
+    @Test
+    void tagRemovalRewritesTheMergedTagFromGameJars() throws IOException {
+        script(ScriptType.SERVER, "t.js", """
+            ServerEvents.tags('item', event => {
+              event.remove('minecraft:planks', ['minecraft:oak_planks']);
+              event.add('minecraft:planks', 'mymod:plank');
+            });
+            """);
+        DataBuilder.buildServerData(data);
+        assertEquals(0, ScriptManager.of(ScriptType.SERVER).errors().size(), ScriptManager.of(ScriptType.SERVER).errors().toString());
+
+        JsonObject planks = json("minecraft", "tags/item/planks.json");
+        assertTrue(planks.get("replace").getAsBoolean());
+        String values = planks.getAsJsonArray("values").toString();
+        assertTrue(!values.contains("minecraft:oak_planks"), values);
+        assertTrue(values.contains("minecraft:birch_planks"), values);
+        assertTrue(values.contains("mymod:plank"), values);
+    }
+
+    @Test
+    void lootTablesShippedInJarsCanBeModified() throws IOException {
+        script(ScriptType.SERVER, "l.js", """
+            ServerEvents.blockLootTables(e => {
+              e.modify('minecraft:diamond_ore', t => t.replaceItem('minecraft:diamond', 'minecraft:emerald'));
+              e.modify('minecraft:coal_ore', t => t.removeItem('minecraft:coal').addPool(p => p.addItem('minecraft:stick')));
+            });
+            ServerEvents.genericLootTables(e => e.modify('minecraft:missing/nothing_here', t => t.clearPools()));
+            """);
+        DataBuilder.buildServerData(data);
+
+        String diamond = json("minecraft", "loot_table/blocks/diamond_ore.json").toString();
+        assertTrue(diamond.contains("minecraft:emerald"), diamond);
+        assertTrue(!diamond.contains("\"minecraft:diamond\""), diamond);
+        String coal = json("minecraft", "loot_table/blocks/coal_ore.json").toString();
+        assertTrue(!coal.contains("\"minecraft:coal\""), coal);
+        assertTrue(coal.contains("minecraft:stick"), coal);
+        assertEquals(1, ScriptManager.of(ScriptType.SERVER).errors().size(), "only the missing table should error");
+    }
 }

@@ -1,6 +1,7 @@
 package com.itmecasey.modjs.tags;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itmecasey.modjs.event.EventJS;
 import com.itmecasey.modjs.json.JsonUtil;
@@ -18,6 +19,7 @@ public final class TagsEventJS extends EventJS {
     private final String registry;
     private final Map<String, Set<String>> additions = new LinkedHashMap<>();
     private final Set<String> replaced = new LinkedHashSet<>();
+    private final Map<String, Set<String>> removals = new LinkedHashMap<>();
 
     public TagsEventJS(String registry) {
         this.registry = normalizeRegistry(registry);
@@ -70,8 +72,9 @@ public final class TagsEventJS extends EventJS {
     }
 
     /**
-     * Requests removal of entries from a tag. Data packs cannot remove entries, so this is recorded in
-     * {@link TagChanges} and applied after tags load.
+     * Removes entries from a tag. Data packs cannot subtract, so ModJS merges every copy of the tag found in the
+     * game and mod jars, drops the removed entries and writes the result as a replacement. Tags that only exist in
+     * a world data pack are not seen.
      */
     public TagsEventJS remove(Object tag, Object entries) {
         String id = tagId(tag);
@@ -80,6 +83,7 @@ public final class TagsEventJS extends EventJS {
             if (text == null) {
                 throw Context.reportRuntimeError("Tag entries must be strings, got " + entry);
             }
+            removals.computeIfAbsent(id, k -> new LinkedHashSet<>()).add(text);
             TagChanges.current().remove(registry, id, text);
         }
         return this;
@@ -88,15 +92,28 @@ public final class TagsEventJS extends EventJS {
     public void writeTo(GeneratedData data) {
         Set<String> all = new LinkedHashSet<>(additions.keySet());
         all.addAll(replaced);
+        all.addAll(removals.keySet());
         for (String tag : all) {
             int colon = tag.indexOf(':');
             String namespace = tag.substring(0, colon);
             String path = tag.substring(colon + 1);
             JsonObject json = new JsonObject();
-            json.addProperty("replace", replaced.contains(tag));
             JsonArray values = new JsonArray();
+            boolean replace = replaced.contains(tag);
+            Set<String> removed = removals.getOrDefault(tag, Set.of());
+            if (!removed.isEmpty() && !replace) {
+                replace = true;
+                for (JsonElement existing : TagSources.mergedValues(registry, namespace, path)) {
+                    if (!removed.contains(TagSources.entryId(existing))) {
+                        values.add(existing);
+                    }
+                }
+            }
+            json.addProperty("replace", replace);
             for (String value : additions.getOrDefault(tag, Set.of())) {
-                values.add(value);
+                if (!removed.contains(value)) {
+                    values.add(value);
+                }
             }
             json.add("values", values);
             data.putJson(namespace, "tags/" + registry + "/" + path, json);
