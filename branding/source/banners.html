@@ -1,0 +1,247 @@
+<!doctype html>
+<!--
+  Renders the ModJS banners. Each asset is picked by the URL hash, e.g. banners.html#banner.
+  branding/source/render_banners.py screenshots every asset with headless Chrome.
+  The pixel font and sprites below are original to this project.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg0: #0f0e1a; --bg1: #1a1830; --edge: #2e2a46;
+    --gold: #f2b33d; --gold-hi: #ffe28c; --gold-lo: #b27420;
+    --text: #f4f2ff; --muted: #a9a4c8; --mod: #7aa8ff; --green: #7ed957;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg0); overflow: hidden; }
+  body { font-family: "Bahnschrift", "Segoe UI", sans-serif; color: var(--text); }
+  .stage { position: relative; overflow: hidden;
+    background:
+      radial-gradient(ellipse at 18% 40%, rgba(242,179,61,.16), transparent 55%),
+      radial-gradient(ellipse at 85% 70%, rgba(122,168,255,.12), transparent 50%),
+      linear-gradient(160deg, var(--bg1), var(--bg0)); }
+  .stage::before { content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 32px 32px; }
+  .stage > * { position: relative; }
+  canvas { image-rendering: pixelated; display: block; }
+  .icon { image-rendering: pixelated; display: block; filter: drop-shadow(0 10px 24px rgba(0,0,0,.5)); }
+  .tag { font-size: 30px; color: var(--muted); letter-spacing: .5px; }
+  .tag b { color: var(--text); font-weight: 600; }
+  .meta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .pill { font-size: 20px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--edge);
+    background: rgba(255,255,255,.04); color: var(--muted); }
+  .pill.on { color: var(--bg0); background: var(--gold); border-color: var(--gold); font-weight: 600; }
+
+  /* Code window mock. */
+  .win { display: flex; flex-direction: column; min-width: 420px; border-radius: 8px; overflow: hidden;
+    background: #14121f; border: 2px solid #3a3360; box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+  .win .bar0 { display: flex; align-items: center; gap: 7px; padding: 8px 12px; background: #221f38; border-bottom: 1px solid #000; }
+  .win .dot { width: 11px; height: 11px; border-radius: 50%; background: #3a3660; }
+  .win .dot:nth-child(1) { background: #e5594a; } .win .dot:nth-child(2) { background: var(--gold); } .win .dot:nth-child(3) { background: #7ed957; }
+  .win .file { margin-left: 8px; font-size: 15px; color: var(--muted); }
+  .win pre { font: 18px/1.5 "Cascadia Mono", Consolas, monospace; padding: 14px 18px 16px; color: #e8e5fb; white-space: pre; }
+  .k { color: #7aa8ff; } .s { color: #7ed957; } .f { color: #f2b33d; } .c { color: #6f6a94; font-style: italic; } .n { color: #ff9f6b; }
+  .cap { font-size: 22px; color: var(--muted); margin-top: 14px; }
+  .cap b { display: block; font-size: 26px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ---------- pixel font (5x7, original) ----------
+const FONT = {
+  A:[".###.","#...#","#...#","#####","#...#","#...#","#...#"],
+  B:["####.","#...#","#...#","####.","#...#","#...#","####."],
+  C:[".###.","#...#","#....","#....","#....","#...#",".###."],
+  D:["####.","#...#","#...#","#...#","#...#","#...#","####."],
+  E:["#####","#....","#....","####.","#....","#....","#####"],
+  F:["#####","#....","#....","####.","#....","#....","#...."],
+  G:[".###.","#...#","#....","#.###","#...#","#...#",".###."],
+  H:["#...#","#...#","#...#","#####","#...#","#...#","#...#"],
+  I:["###",".#.",".#.",".#.",".#.",".#.","###"],
+  J:["..###","...#.","...#.","...#.","#..#.","#..#.",".##.."],
+  K:["#...#","#..#.","#.#..","##...","#.#..","#..#.","#...#"],
+  L:["#....","#....","#....","#....","#....","#....","#####"],
+  M:["#...#","##.##","#.#.#","#.#.#","#...#","#...#","#...#"],
+  N:["#...#","##..#","#.#.#","#..##","#...#","#...#","#...#"],
+  O:[".###.","#...#","#...#","#...#","#...#","#...#",".###."],
+  P:["####.","#...#","#...#","####.","#....","#....","#...."],
+  Q:[".###.","#...#","#...#","#...#","#.#.#","#..#.",".##.#"],
+  R:["####.","#...#","#...#","####.","#.#..","#..#.","#...#"],
+  S:[".####","#....","#....",".###.","....#","....#","####."],
+  T:["#####","..#..","..#..","..#..","..#..","..#..","..#.."],
+  U:["#...#","#...#","#...#","#...#","#...#","#...#",".###."],
+  V:["#...#","#...#","#...#","#...#","#...#",".#.#.","..#.."],
+  W:["#...#","#...#","#...#","#.#.#","#.#.#","##.##","#...#"],
+  X:["#...#","#...#",".#.#.","..#..",".#.#.","#...#","#...#"],
+  Y:["#...#","#...#",".#.#.","..#..","..#..","..#..","..#.."],
+  Z:["#####","....#","...#.","..#..",".#...","#....","#####"],
+  "?":[".###.","#...#","....#","..##.","..#..",".....","..#.."],
+  "!":["#","#","#","#","#",".","#"],
+  ".":[".",".",".",".",".",".","#"],
+  "-":["....","....","....","####","....","....","...."],
+  ",":["..","..","..","..",".#",".#","#."],
+  "+":[".....","..#..","..#..","#####","..#..","..#..","....."],
+  "0":[".###.","#...#","#..##","#.#.#","##..#","#...#",".###."],
+  "1":["..#..",".##..","..#..","..#..","..#..","..#..",".###."],
+  "2":[".###.","#...#","....#","...#.","..#..",".#...","#####"],
+  "6":[".###.","#....","#....","####.","#...#","#...#",".###."],
+  " ":["...","...","...","...","...","...","..."],
+};
+const BEVEL = ["#ffe28c","#ffe28c","#f7c95a","#f2b33d","#f2b33d","#d8952e","#b27420"];
+const WHITE = ["#ffffff","#ffffff","#f1efff","#e4e1f7","#e4e1f7","#cfcbe6","#b3aed0"];
+
+function pixelText(str, s, colors = BEVEL) {
+  const cols = [];
+  for (const ch of str.toUpperCase()) { const g = FONT[ch] || FONT["?"]; cols.push(g, null); }
+  const w = cols.reduce((n, g) => n + (g ? g[0].length : 1), 0);
+  const c = document.createElement("canvas");
+  c.width = (w + 1) * s; c.height = 8 * s;
+  const x2 = c.getContext("2d");
+  for (const pass of ["shadow", "face"]) {
+    let x = 0;
+    for (const g of cols) {
+      if (!g) { x += 1; continue; }
+      g.forEach((row, y) => [...row].forEach((p, i) => {
+        if (p !== "#") return;
+        if (pass === "shadow") { x2.fillStyle = "rgba(0,0,0,.55)"; x2.fillRect((x + i) * s + s * .6, y * s + s * .6, s, s); }
+        else { x2.fillStyle = colors[y]; x2.fillRect((x + i) * s, y * s, s, s); }
+      }));
+      x += g[0].length;
+    }
+  }
+  return c;
+}
+
+
+// ---------- helpers ----------
+function half(c) { c.style.width = c.width / 2 + "px"; c.style.height = c.height / 2 + "px"; return c; }
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "style" ? (e.style.cssText = v) : e.setAttribute(k, v);
+  for (const k of kids) e.append(k);
+  return e;
+}
+function iconImg(px) { return el("img", {class: "icon", src: "../icon/icon_512.png", width: px, height: px}); }
+// Code window. Lines use <span class="k|s|f|c|n"> for colors.
+function win(file, html) {
+  const pre = el("pre"); pre.innerHTML = html;
+  return el("div", {class: "win"}, el("div", {class: "bar0"}, el("i", {class: "dot"}), el("i", {class: "dot"}), el("i", {class: "dot"}), el("span", {class: "file"}, file)), pre);
+}
+const k = (t) => `<span class="k">${t}</span>`, s = (t) => `<span class="s">${t}</span>`, f = (t) => `<span class="f">${t}</span>`,
+  c = (t) => `<span class="c">${t}</span>`, n = (t) => `<span class="n">${t}</span>`;
+
+const CODE = {
+  items: () => win("startup_scripts/ruby.js",
+`${f("StartupEvents")}.registry(${s("'item'")}, event ${k("=>")} {
+  event.create(${s("'ruby'")})
+    .displayName(${s("'Ruby'")})
+    .tooltip(${s("'Shiny'")});
+});`),
+  recipes: () => win("server_scripts/recipes.js",
+`${f("ServerEvents")}.recipes(event ${k("=>")} {
+  event.shaped(${s("'modjs:ruby'")}, [${s("'DD'")}, ${s("'DD'")}],
+    { D: ${s("'minecraft:diamond'")} });
+  event.remove({ output: ${s("'minecraft:tnt'")} });
+});`),
+  dims: () => win("server_scripts/hub.js",
+`${f("PlayerEvents")}.loggedIn(event ${k("=>")} {
+  ${k("const")} id = ${s("'mymod:player_'")} + event.playerName;
+  ${f("Dimensions")}.create(id, { generator: ${s("'void'")} });
+  ${f("Dimensions")}.teleport(event.player, id, ${n("0.5")}, ${n("64")}, ${n("0.5")});
+});`),
+  unify: () => win("server_scripts/unify.js",
+`${c("// one tin for the whole pack")}
+${f("Unify")}.auto(${s("'all'")});
+${f("Unify")}.prefer([${s("'modjs'")}, ${s("'create'")}]);
+${f("Unify")}.ores();`),
+  events: () => win("server_scripts/events.js",
+`${f("BlockEvents")}.broken(${s("'minecraft:diamond_ore'")}, event ${k("=>")} {
+  event.tell(event.playerName + ${s("' found diamonds!'")});
+});
+${f("PlayerEvents")}.chat(event ${k("=>")} {
+  event.message = ${s("'[Pack] '")} + event.message;
+});`),
+  title: () => win("client_scripts/title.js",
+`${f("ClientEvents")}.titleScreen(event ${k("=>")} {
+  event.background(${s("'panorama'")});
+  event.button(${s("'Play'")}, ${s("'connect:play.example.com'")});
+  event.button(${s("'Quit'")}, ${s("'quit'")});
+});`),
+};
+
+// ---------- assets ----------
+const ASSETS = {
+  banner: [800, 150, (r) => {
+    r.style.cssText += "display:flex;align-items:center;gap:24px;padding:0 28px";
+    r.append(iconImg(104));
+    r.append(el("div", {style: "display:flex;flex-direction:column;align-items:flex-start;gap:11px;flex:1"},
+      half(pixelText("ModJS", 9)),
+      el("div", {class: "tag", style: "font-size:16px"}, "Script Minecraft in JavaScript. ", el("b", {}, "No Java needed.")),
+      el("div", {class: "meta", style: "gap:6px"},
+        el("span", {class: "pill on", style: "font-size:11px;padding:3px 9px"}, "Forge + NeoForge"),
+        el("span", {class: "pill", style: "font-size:11px;padding:3px 9px"}, "1.20.1, 1.21.1, 26.1.2"),
+        el("span", {class: "pill", style: "font-size:11px;padding:3px 9px"}, "KubeJS style"))));
+    const p = CODE.recipes(); p.style.cssText += ";zoom:.46;transform:rotate(-2deg);min-width:430px"; r.append(p);
+  }],
+  social: [1280, 640, (r) => {
+    r.style.cssText += "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center";
+    r.append(iconImg(220));
+    r.append(pixelText("ModJS", 10));
+    r.append(el("div", {class: "tag"}, "Script Minecraft in JavaScript. Items, recipes, dimensions, menus."));
+  }],
+  features: [1920, 1080, (r) => {
+    r.style.cssText += "display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 90px;gap:60px";
+    r.append(el("div", {style: "display:flex;align-items:center;gap:36px"}, iconImg(140),
+      el("div", {style: "display:flex;flex-direction:column;gap:16px"}, pixelText("ModJS", 7),
+        el("div", {class: "tag"}, "Plain JavaScript files change the game: no Java, no build, no mod project"))));
+    const items = [
+      ["items", "Items and blocks", "Register content, textures and models are generated"],
+      ["recipes", "Recipes and loot", "Add, change and remove, with filters"],
+      ["events", "Gameplay events", "Blocks, items, players, chat, damage"],
+      ["dims", "Dimensions", "Even one per player, while the server runs"],
+      ["unify", "Unify", "One canonical item per material across mods"],
+      ["title", "Menus", "Rebuild the title screen and your own screens"],
+    ];
+    const grid = el("div", {style: "zoom:.8;display:grid;grid-template-columns:repeat(3,auto);gap:46px 56px;justify-content:center;align-items:start"});
+    for (const [id, t, d] of items) grid.append(el("div", {}, CODE[id](), el("div", {class: "cap"}, el("b", {}, t), d)));
+    r.append(grid);
+  }],
+  scripts: [1920, 1080, (r) => {
+    r.style.cssText += "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:50px";
+    r.append(el("div", {style: "display:flex;align-items:center;gap:36px"}, iconImg(130),
+      el("div", {style: "display:flex;flex-direction:column;gap:16px"}, pixelText("Three script folders", 7),
+        el("div", {class: "tag"}, "Each one runs at the right time, and most reload without a restart"))));
+    const cols = [
+      ["startup_scripts", "Runs once at load", "Items, blocks, fluids, tools, tabs", "items"],
+      ["server_scripts", "Runs when a world loads", "Recipes, loot, events, dimensions", "recipes"],
+      ["client_scripts", "Runs on the client", "Names, tooltips, menus, screens", "title"],
+    ];
+    const row = el("div", {style: "display:flex;gap:40px;align-items:flex-start;zoom:1.0"});
+    for (const [fold, a, b, id] of cols) row.append(el("div", {}, CODE[id](),
+      el("div", {class: "cap"}, el("b", {}, "modjs/" + fold), a + ". " + b)));
+    r.append(row);
+  }],
+};
+for (const [key, label] of Object.entries({features: "Features", scripts: "How it works", unify: "Unify", dimensions: "Dimensions", client: "Client scripts", install: "Install", faq: "FAQ"})) {
+  ASSETS["h_" + key] = [800, 46, (r) => {
+    r.style.cssText += "display:flex;align-items:center;gap:14px;padding:0 16px;border-top:2px solid var(--gold)";
+    r.append(iconImg(30));
+    r.append(half(pixelText(label, 5)));
+  }];
+}
+
+const name = location.hash.slice(1) || "banner";
+const [w, h, build] = ASSETS[name];
+const root = document.getElementById("root");
+root.className = "stage";
+root.style.cssText = `width:${w}px;height:${h}px`;
+build(root);
+window.ASSET_NAMES = Object.keys(ASSETS);
+</script>
+</body>
+</html>

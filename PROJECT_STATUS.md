@@ -59,3 +59,7 @@ Spend: none
 - [x] Automated tests: shared unit tests plus a game-test self test in both modules (w:3)
 - [x] Example scripts are written on first run; docs/REFERENCE.md covers every event family (w:2)
 - [x] Parity checklist against the KubeJS event list in docs/PARITY.md (w:1)
+- [x] Wiki at itmecasey.com/wiki/modjs: 38 pages with examples, written and checked locally in the site folder (w:3)
+- [x] Deploy the ModJS wiki to the droplet and check it live (w:1)
+- [x] Logo, banners, section headers and CurseForge description in branding/ and curseforge/ (not yet pushed or uploaded) (w:2)
+- [ ] Create the CurseForge and Modrinth projects and upload the jars (w:3)
