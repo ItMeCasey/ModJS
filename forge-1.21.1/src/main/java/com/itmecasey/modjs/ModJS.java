@@ -68,11 +68,14 @@ public class ModJS {
         context.getModEventBus().addListener((FMLLoadCompleteEvent e) -> EventGroups.STARTUP.post("postInit", new EventJS()));
         ModJSNetwork.init();
         GameEvents.register();
+        com.itmecasey.modjs.game.ExtraGameEvents.register();
         SelfTest.register();
         if (Boolean.getBoolean("modjs.selftest")) {
             context.getModEventBus().addListener((RegisterGameTestsEvent e) -> e.register(SelfTestCases.class));
         }
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            context.getModEventBus().addListener((net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent e) ->
+                EventGroups.CLIENT.post("init", new EventJS()));
             ClientBridge.register();
         }
         context.getModEventBus().addListener(ModJSPacks::onAddPackFinders);

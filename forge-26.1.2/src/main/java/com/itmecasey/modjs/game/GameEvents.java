@@ -214,10 +214,13 @@ public final class GameEvents {
         });
 
         ServerChatEvent.BUS.addListener((ServerChatEvent e) -> {
-            if (!wants(EventGroups.PLAYER, "chat")) {
+            if (!wants(EventGroups.PLAYER, "chat") && !wants(EventGroups.PLAYER, "decorateChat")) {
                 return false;
             }
             GameEventJS js = new GameEventJS().player(e.getPlayer()).message(e.getRawText());
+            if (wants(EventGroups.PLAYER, "decorateChat")) {
+                fire(EventGroups.PLAYER, "decorateChat", null, js);
+            }
             boolean cancelled = fire(EventGroups.PLAYER, "chat", null, js);
             if (!cancelled && !js.getMessage().equals(e.getRawText())) {
                 e.setMessage(Component.literal(js.getMessage()));
@@ -300,6 +303,10 @@ public final class GameEvents {
         });
 
         net.minecraftforge.event.CommandEvent.BUS.addListener((net.minecraftforge.event.CommandEvent e) -> {
+            if (wants(EventGroups.SERVER, "basicCommand")
+                && fire(EventGroups.SERVER, "basicCommand", null, new GameEventJS().message(e.getParseResults().getReader().getString()))) {
+                return true;
+            }
             if (!wants(EventGroups.SERVER, "command")) {
                 return false;
             }
@@ -311,6 +318,16 @@ public final class GameEvents {
             String name = line.startsWith("/") ? line.substring(1) : line;
             int space = name.indexOf(' ');
             return fire(EventGroups.SERVER, "command", space < 0 ? name : name.substring(0, space), js);
+        });
+
+        net.minecraftforge.event.entity.living.MobSpawnEvent.PositionCheck.BUS.addListener((net.minecraftforge.event.entity.living.MobSpawnEvent.PositionCheck e) -> {
+            if (e.getLevel().isClientSide() || !wants(EventGroups.ENTITY, "checkSpawn")) {
+                return;
+            }
+            GameEventJS js = new GameEventJS().entity(e.getEntity()).level(e.getLevel().getLevel());
+            if (fire(EventGroups.ENTITY, "checkSpawn", entityId(e.getEntity()), js)) {
+                e.setResult(net.minecraftforge.common.util.Result.DENY);
+            }
         });
 
         ExplosionEvent.Detonate.BUS.addListener((ExplosionEvent.Detonate e) -> {

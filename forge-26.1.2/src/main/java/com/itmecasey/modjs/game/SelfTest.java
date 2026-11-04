@@ -62,7 +62,7 @@ public final class SelfTest {
 
         ServerChatEvent chat = new ServerChatEvent(player, "hello there", Component.literal("hello there"));
         ServerChatEvent.BUS.post(chat);
-        check("PlayerEvents.chat rewrites the message", chat.getMessage().getString().equals("HELLO THERE"));
+        check("PlayerEvents.chat rewrites the message", chat.getMessage().getString().equals("HELLO THERE?"));
 
         java.util.List<String> traced = new java.util.ArrayList<>();
         com.itmecasey.modjs.event.EventTrace.start(traced::add, false);
@@ -198,6 +198,13 @@ public final class SelfTest {
         int converted = com.itmecasey.modjs.unify.OreUnifier.convertChunk(level.getChunkAt(orePos), oreBlocks);
         check("Unify converts ore blocks in a chunk", converted >= 1 && net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(level.getBlockState(orePos).getBlock()).toString().equals("modjs:zinc_ore"));
         level.setBlockAndUpdate(orePos, Blocks.AIR.defaultBlockState());
+
+        player.getInventory().setItem(7, ItemStack.EMPTY);
+        net.minecraftforge.event.TickEvent.PlayerTickEvent.Post.BUS.post(new net.minecraftforge.event.TickEvent.PlayerTickEvent.Post(player));
+        player.getInventory().setItem(7, new ItemStack(Items.APPLE, 3));
+        net.minecraftforge.event.TickEvent.PlayerTickEvent.Post.BUS.post(new net.minecraftforge.event.TickEvent.PlayerTickEvent.Post(player));
+        check("ServerEvents.compostableRecipes sets a chance", net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.getFloat(Items.STONE) == 0.85f);
+        player.getInventory().setItem(7, ItemStack.EMPTY);
 
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }

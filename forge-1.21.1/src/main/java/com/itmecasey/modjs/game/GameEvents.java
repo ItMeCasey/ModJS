@@ -227,10 +227,13 @@ public final class GameEvents {
         });
 
         MinecraftForge.EVENT_BUS.addListener((ServerChatEvent e) -> {
-            if (!wants(EventGroups.PLAYER, "chat")) {
+            if (!wants(EventGroups.PLAYER, "chat") && !wants(EventGroups.PLAYER, "decorateChat")) {
                 return;
             }
             GameEventJS js = new GameEventJS().player(e.getPlayer()).message(e.getRawText());
+            if (wants(EventGroups.PLAYER, "decorateChat")) {
+                fire(EventGroups.PLAYER, "decorateChat", null, js);
+            }
             boolean cancelled = fire(EventGroups.PLAYER, "chat", null, js);
             if (cancelled) {
                 e.setCanceled(true);
@@ -298,6 +301,12 @@ public final class GameEvents {
 
     private static void registerExtras() {
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.CommandEvent e) -> {
+            if (wants(EventGroups.SERVER, "basicCommand")) {
+                if (fire(EventGroups.SERVER, "basicCommand", null, new GameEventJS().message(e.getParseResults().getReader().getString()))) {
+                    e.setCanceled(true);
+                    return;
+                }
+            }
             if (!wants(EventGroups.SERVER, "command")) {
                 return;
             }

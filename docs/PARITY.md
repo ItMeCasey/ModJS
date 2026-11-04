@@ -30,26 +30,30 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | | commandRegistry, loaded, unloaded, tick | yes |
 | | afterRecipes | compiled |
 | | command | compiled |
-| | basicCommand, compostableRecipes, recipeTypeRegistry, specialRecipeSerializers | no |
+| | basicCommand | compiled |
+| | compostableRecipes | yes (checked) |
+| | recipeTypeRegistry, specialRecipeSerializers | no |
 | ClientEvents | lang, highPriorityAssets, tick | yes / compiled |
 | | loggedIn, loggedOut | compiled |
 | | splashes, titleScreen (ModJS only) | compiled; splash and screen unchecked on a client |
-| | init, leftDebugInfo, rightDebugInfo, painterUpdated, paintScreen | no |
+| | init, leftDebugInfo, rightDebugInfo | compiled |
+| | painterUpdated, paintScreen | no |
 | BlockEvents | broken, placed, rightClicked, leftClicked | yes (broken checked in game test) |
 | | farmlandTrampled | compiled |
 | | detectorChanged, detectorPowered, detectorUnpowered, modification | no |
 | ItemEvents | rightClicked, entityInteracted, crafted, smelted, foodEaten, dropped, pickedUp | crafted checked; others compiled |
 | | tooltip (KubeJS: modifyTooltips) | compiled |
 | | modification (max stack size, max damage, rarity) | yes, checked on both versions |
-| | firstLeftClicked, firstRightClicked, canPickUp, dynamicTooltips, modelProperties, armorTierRegistry, toolTierRegistry | no |
+| | firstLeftClicked, firstRightClicked, canPickUp | compiled |
+| | dynamicTooltips, modelProperties, armorTierRegistry, toolTierRegistry | no |
 | EntityEvents | hurt | yes (checked) |
 | | death, spawned | compiled |
-| | checkSpawn | compiled on 1.21.1 only; no on 26.1.2 |
+| | checkSpawn | compiled on both versions |
 | LevelEvents | tick, loaded, unloaded, beforeExplosion, afterExplosion | compiled |
 | PlayerEvents | chat, loggedIn | yes (checked) |
 | | loggedOut, respawned, tick, advancement, inventoryOpened, inventoryClosed | compiled |
 | | chestOpened, chestClosed | compiled |
-| | decorateChat, inventoryChanged | no |
+| | decorateChat, inventoryChanged | yes (checked in the self test) |
 | Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in headless self test; teleport with a real player and restart persistence unchecked |
 | DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
 | NetworkEvents | dataReceived | compiled |
@@ -93,5 +97,5 @@ Mod-specific recipe schemas (for example Create): no.
 - Tag removal and loot-table editing read the original files from the game and mod jars, not from world data packs.
 - Gameplay events pass real Minecraft objects (`player`, `level`, `item`) instead of KubeJS wrapper classes.
 - Recipe, tag, loot and worldgen changes are written as a generated data pack, so they work with any other data pack.
-- On 26.1.2, a script that holds a Minecraft `Block` object (for example `Blocks.STONE`) crashes a dedicated server, because the script engine inspects client-only classes. Use id strings there.
+- On 26.1.2 a script cannot hold a raw Minecraft `Block` or block state (the engine would inspect client-only classes and crash a dedicated server), so those are swapped for stand-ins with `id`, `defaultState`, `blockId` and `properties`. Fixed and checked in the self test.
 - `Unify` (ModJS only, an Ore Dictionary replacement): recipe, loot and inventory unification and generated materials were checked in the headless self test on both versions with a fake second mod (vanilla iron ingots as tin). Not checked with real mods that use custom recipe types.

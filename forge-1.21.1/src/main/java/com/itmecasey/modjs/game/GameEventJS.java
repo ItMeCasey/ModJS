@@ -30,6 +30,7 @@ public final class GameEventJS extends EventJS {
     private String hand;
     private String face;
     private String damageType;
+    private int slot = -1;
 
     // -- builders used by the Forge bridge -----------------------------------------------------------------------
 
@@ -47,6 +48,16 @@ public final class GameEventJS extends EventJS {
         this.pos = blockPos;
         this.state = blockState;
         return this;
+    }
+
+    GameEventJS slot(int value) {
+        this.slot = value;
+        return this;
+    }
+
+    /** The inventory slot for inventory events, or -1. */
+    public int getSlot() {
+        return slot;
     }
 
     GameEventJS item(ItemStack stack) {

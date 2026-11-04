@@ -69,7 +69,7 @@ public final class SelfTest {
 
         ServerChatEvent chat = new ServerChatEvent(player, "hello there", Component.literal("hello there"));
         MinecraftForge.EVENT_BUS.post(chat);
-        check("PlayerEvents.chat rewrites the message", chat.getMessage().getString().equals("HELLO THERE"));
+        check("PlayerEvents.chat rewrites the message", chat.getMessage().getString().equals("HELLO THERE?"));
 
         MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
         MinecraftForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player, new ItemStack(Items.STICK, 4), new SimpleContainer(1)));
@@ -199,6 +199,13 @@ public final class SelfTest {
         int converted = com.itmecasey.modjs.unify.OreUnifier.convertChunk(level.getChunkAt(orePos), oreBlocks);
         check("Unify converts ore blocks in a chunk", converted >= 1 && net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(level.getBlockState(orePos).getBlock()).toString().equals("modjs:zinc_ore"));
         level.setBlockAndUpdate(orePos, Blocks.AIR.defaultBlockState());
+
+        player.getInventory().setItem(7, ItemStack.EMPTY);
+        MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.TickEvent.PlayerTickEvent(player, net.minecraftforge.event.TickEvent.Phase.END) { });
+        player.getInventory().setItem(7, new ItemStack(Items.APPLE, 3));
+        MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.TickEvent.PlayerTickEvent(player, net.minecraftforge.event.TickEvent.Phase.END) { });
+        check("ServerEvents.compostableRecipes sets a chance", net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.getFloat(Items.STONE) == 0.85f);
+        player.getInventory().setItem(7, ItemStack.EMPTY);
 
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }

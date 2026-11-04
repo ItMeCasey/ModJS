@@ -123,10 +123,16 @@ A block entity gives `id`, `blockId`, `x/y/z`, `hasInventory`, `size`, `getItemI
 `setItem(slot, id, count)`, `clearSlot(slot)` and `nbt` (SNBT text). Example:
 `BlockEvents.rightClicked('minecraft:chest', e => { const be = e.blockEntity; if (be) e.tell(be.items.length + ' stacks'); })`.
 
+More events: `ItemEvents.firstRightClicked` / `firstLeftClicked` / `canPickUp` (cancellable), `PlayerEvents.inventoryChanged` (`event.slot`, `event.item`),
+`PlayerEvents.decorateChat` (runs before `chat`; set `event.message`), `ServerEvents.basicCommand` (every command; `event.message`; cancellable),
+`ServerEvents.compostableRecipes(event => event.add(0.3, 'minecraft:stone'))` (0 removes), `EntityEvents.checkSpawn` (cancel to deny a spawn).
+Script errors are also shown in chat to operators when they join (server and startup scripts) and to every player for their own client scripts.
+On 26.1.2 blocks and block states reach scripts as stand-ins: `Blocks.STONE.id`, `.defaultState.properties`.
+
 ## Client scripts
 
 `ClientEvents.lang('en_us', event => event.add('key', 'Value'))`; rename existing things with `event.renameItem('minecraft:diamond', 'Shiny Rock')`, `renameBlock`, `renameEntity` (display names only; F3+T to apply), `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
-`ClientEvents.keyPressed(event => ...)`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
+`ClientEvents.keyPressed(event => ...)`, `ClientEvents.leftDebugInfo` / `rightDebugInfo` (`event.add('text')` adds lines to F3), `ClientEvents.init`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
 
 ### Unifying items (Ore Dictionary style)
 

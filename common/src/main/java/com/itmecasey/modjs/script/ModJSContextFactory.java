@@ -29,13 +29,37 @@ public final class ModJSContextFactory extends ContextFactory {
         "com.itmecasey.modjs.script.ScriptManager", "com.itmecasey.modjs.script.ModJSContextFactory"
     );
 
+    private static final java.util.List<java.util.function.UnaryOperator<Object>> WRAP_ADAPTERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
     private static final WrapFactory WRAP_FACTORY = new WrapFactory() {
         {
             setJavaPrimitiveWrap(false);
         }
+
+        @Override
+        public Object wrap(Context cx, org.mozilla.javascript.Scriptable scope, Object obj, Class<?> staticType) {
+            Object adapted = obj;
+            if (adapted != null) {
+                for (java.util.function.UnaryOperator<Object> adapter : WRAP_ADAPTERS) {
+                    Object replacement = adapter.apply(adapted);
+                    if (replacement != null) {
+                        adapted = replacement;
+                    }
+                }
+            }
+            return super.wrap(cx, scope, adapted, adapted == obj ? staticType : null);
+        }
     };
 
     private ModJSContextFactory() {
+    }
+
+    /**
+     * Lets a platform swap Java objects for script-friendly stand-ins before scripts see them. The adapter returns null
+     * to leave an object alone. Used where the engine's own classes cannot be inspected safely.
+     */
+    public static void addWrapAdapter(java.util.function.UnaryOperator<Object> adapter) {
+        WRAP_ADAPTERS.add(adapter);
     }
 
     public static boolean isVisible(String className) {

@@ -1,4 +1,5 @@
 BlockEvents.broken('minecraft:stone', e => { console.log('SELFTEST script: broken ' + e.blockId + ' by ' + e.playerName); e.cancel(); });
+PlayerEvents.decorateChat(e => { e.message = e.message + '?'; });
 PlayerEvents.chat(e => { console.log('SELFTEST script: chat "' + e.message + '"'); e.message = e.message.toUpperCase(); });
 PlayerEvents.loggedIn(e => console.log('SELFTEST script: loggedIn ' + e.playerName));
 ItemEvents.crafted(e => console.log('SELFTEST script: crafted ' + e.itemId));
@@ -26,3 +27,6 @@ ServerEvents.tags('item', event => {
 });
 ServerEvents.tags('fluid', event => event.add('c:goo', 'minecraft:lava'));
 Unify.ores();
+ServerEvents.compostableRecipes(event => event.add(0.85, 'minecraft:stone'));
+PlayerEvents.inventoryChanged(e => console.log('SELFTEST script: inventoryChanged slot ' + e.slot + ' ' + e.itemId));
+ServerEvents.loaded(() => { if (Platform.mcVersion.startsWith('26')) { console.log('SELFTEST script: facade ' + Blocks.STONE.id); } });

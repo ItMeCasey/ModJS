@@ -40,6 +40,21 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.CustomizeGuiOverlayEvent.DebugText e) -> {
+            String name = e.getSide() == net.minecraftforge.client.event.CustomizeGuiOverlayEvent.DebugText.Side.Left ? "leftDebugInfo" : "rightDebugInfo";
+            if (EventGroups.CLIENT.hasHandlers(name)) {
+                com.itmecasey.modjs.client.DebugInfoEventJS js = new com.itmecasey.modjs.client.DebugInfoEventJS();
+                EventGroups.CLIENT.post(name, js);
+                e.getText().addAll(js.lines());
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingIn e) -> {
+            for (String line : com.itmecasey.modjs.script.ErrorNotice.lines(com.itmecasey.modjs.script.ScriptType.CLIENT)) {
+                e.getPlayer().sendSystemMessage(Component.literal(line).withStyle(net.minecraft.ChatFormatting.RED));
+            }
+        });
+
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ScreenEvent.Opening e) -> {
             com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.TitleScreenConfig.current();
             if (config != null && e.getNewScreen() != null && e.getNewScreen().getClass() == net.minecraft.client.gui.screens.TitleScreen.class) {
