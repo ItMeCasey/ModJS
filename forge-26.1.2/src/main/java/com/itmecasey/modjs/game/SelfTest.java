@@ -142,6 +142,13 @@ public final class SelfTest {
         }
         check("Dimensions.delete removes it", dimensions.delete("modjs:selftest_world") && !dimensions.exists("modjs:selftest_world"));
 
+        com.itmecasey.modjs.unify.Unifier unifier = com.itmecasey.modjs.unify.Unifier.current();
+        LOGGER.info("SELFTEST unify groups {}", unifier.groups());
+        check("Unify picks our item as canonical", "modjs:tin_ingot".equals(unifier.canonicalFor("minecraft:iron_ingot")));
+        check("Unify rewrote recipe outputs and inputs", unifier.outputsRewritten() > 0 && unifier.inputsRewritten() > 0);
+        check("Unify added a conversion recipe", unifier.conversionRecipes().containsKey("modjs:unify/modjs_tin_ingot_from_minecraft_iron_ingot")
+            && server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().identifier().toString().equals("modjs:unify/modjs_tin_ingot_from_minecraft_iron_ingot")));
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

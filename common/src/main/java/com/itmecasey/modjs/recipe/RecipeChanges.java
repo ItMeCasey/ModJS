@@ -8,6 +8,7 @@ import com.itmecasey.modjs.format.VersionFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 /**
  * Removals and replacements requested by scripts for recipes that already exist. They are applied to the loaded
@@ -82,22 +83,38 @@ public final class RecipeChanges {
     }
 
     private static boolean replaceResult(JsonObject json, String from, String to) {
+        return mapResult(json, id -> id.equals(from) ? to : null);
+    }
+
+    private static boolean replaceIngredients(JsonObject json, String from, String to) {
+        return mapIngredients(json, token -> token.equals(from) ? to : null);
+    }
+
+    /** Rewrites the result item through {@code mapper} (null keeps it); returns whether anything changed. */
+    public static boolean mapResult(JsonObject json, UnaryOperator<String> mapper) {
         JsonElement result = json.get("result");
         if (result != null && result.isJsonObject()) {
             JsonObject object = result.getAsJsonObject();
             JsonElement id = object.get("id");
-            if (id != null && id.isJsonPrimitive() && id.getAsString().equals(from)) {
-                object.addProperty("id", to);
+            if (id != null && id.isJsonPrimitive()) {
+                String mapped = mapper.apply(id.getAsString());
+                if (mapped != null) {
+                    object.addProperty("id", mapped);
+                    return true;
+                }
+            }
+        } else if (result != null && result.isJsonPrimitive()) {
+            String mapped = mapper.apply(result.getAsString());
+            if (mapped != null) {
+                json.addProperty("result", mapped);
                 return true;
             }
-        } else if (result != null && result.isJsonPrimitive() && result.getAsString().equals(from)) {
-            json.addProperty("result", to);
-            return true;
         }
         return false;
     }
 
-    private static boolean replaceIngredients(JsonObject json, String from, String to) {
+    /** Rewrites every ingredient token ({@code id} or {@code #tag}) through {@code mapper} (null keeps it). */
+    public static boolean mapIngredients(JsonObject json, UnaryOperator<String> mapper) {
         boolean changed = false;
         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
             String key = entry.getKey();
@@ -105,42 +122,45 @@ public final class RecipeChanges {
                 continue;
             }
             JsonElement value = entry.getValue();
-            if (isToken(value, from)) {
-                entry.setValue(VersionFormat.current().ingredient(to));
+            String mapped = tokenOf(value, mapper);
+            if (mapped != null) {
+                entry.setValue(VersionFormat.current().ingredient(mapped));
                 changed = true;
             } else {
-                changed |= replaceInContainer(value, from, to);
+                changed |= mapInContainer(value, mapper);
             }
         }
         return changed;
     }
 
-    private static boolean isToken(JsonElement element, String token) {
-        return token.equals(VersionFormat.current().ingredientToken(element));
+    private static String tokenOf(JsonElement element, UnaryOperator<String> mapper) {
+        String token = VersionFormat.current().ingredientToken(element);
+        return token == null ? null : mapper.apply(token);
     }
 
-    /** Rewrites matching ingredients inside an array or object in place; returns whether anything changed. */
-    private static boolean replaceInContainer(JsonElement container, String from, String to) {
+    private static boolean mapInContainer(JsonElement container, UnaryOperator<String> mapper) {
         boolean changed = false;
         if (container.isJsonArray()) {
             JsonArray array = container.getAsJsonArray();
             for (int i = 0; i < array.size(); i++) {
                 JsonElement child = array.get(i);
-                if (isToken(child, from)) {
-                    array.set(i, VersionFormat.current().ingredient(to));
+                String mapped = tokenOf(child, mapper);
+                if (mapped != null) {
+                    array.set(i, VersionFormat.current().ingredient(mapped));
                     changed = true;
                 } else {
-                    changed |= replaceInContainer(child, from, to);
+                    changed |= mapInContainer(child, mapper);
                 }
             }
         } else if (container.isJsonObject()) {
             for (Map.Entry<String, JsonElement> entry : container.getAsJsonObject().entrySet()) {
                 JsonElement child = entry.getValue();
-                if (isToken(child, from)) {
-                    entry.setValue(VersionFormat.current().ingredient(to));
+                String mapped = tokenOf(child, mapper);
+                if (mapped != null) {
+                    entry.setValue(VersionFormat.current().ingredient(mapped));
                     changed = true;
                 } else {
-                    changed |= replaceInContainer(child, from, to);
+                    changed |= mapInContainer(child, mapper);
                 }
             }
         }

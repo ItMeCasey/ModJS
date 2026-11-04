@@ -17,6 +17,7 @@ public final class ItemBuilderJS {
     private float saturation;
     private boolean alwaysEdible;
     private String toolType;
+    private String unifyTag;
     private String toolTier = "iron";
     private String armorSlot;
     private String armorTier = "iron";
@@ -43,6 +44,21 @@ public final class ItemBuilderJS {
     }
 
     /** Tool kind: pickaxe, axe, shovel, hoe or sword; null for a plain item. */
+    /** The tag this item is the canonical (unified) version of, or null. */
+    public String unifyTag() {
+        return unifyTag;
+    }
+
+    /**
+     * Makes this the canonical item for a tag such as {@code "c:ingots/tin"}: it joins the tag and, once data loads,
+     * replaces every other item in the tag in recipes, drops and inventories (see {@code Unify}).
+     */
+    public ItemBuilderJS unify(String tag) {
+        String id = tag.startsWith("#") ? tag.substring(1) : tag;
+        this.unifyTag = id.contains(":") ? id : "c:" + id;
+        return this;
+    }
+
     public String toolType() {
         return toolType;
     }

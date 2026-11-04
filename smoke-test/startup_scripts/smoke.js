@@ -26,3 +26,7 @@ StartupEvents.registry('item', event => {
 StartupEvents.registry('fluid', event => {
   event.create('test_goo').color(0x44FF44).luminosity(6);
 });
+Unify.materials({ materials: ['tin', 'ruby'] });
+StartupEvents.registry('item', event => {
+  event.create('test_unified_rod').unify('c:rods/test_unified');
+});

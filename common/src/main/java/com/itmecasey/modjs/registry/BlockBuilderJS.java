@@ -13,6 +13,7 @@ public final class BlockBuilderJS {
     private boolean noItem;
     private boolean dropsNothing;
     private String type = "basic";
+    private String unifyTag;
 
     BlockBuilderJS(String id) {
         this.id = id;
@@ -56,6 +57,21 @@ public final class BlockBuilderJS {
 
     public boolean isDropsNothing() {
         return dropsNothing;
+    }
+
+    /** The tag this item is the canonical (unified) version of, or null. */
+    public String unifyTag() {
+        return unifyTag;
+    }
+
+    /**
+     * Makes this the canonical item for a tag such as {@code "c:ingots/tin"}: it joins the tag and, once data loads,
+     * replaces every other item in the tag in recipes, drops and inventories (see {@code Unify}).
+     */
+    public BlockBuilderJS unify(String tag) {
+        String id = tag.startsWith("#") ? tag.substring(1) : tag;
+        this.unifyTag = id.contains(":") ? id : "c:" + id;
+        return this;
     }
 
     /** One of basic, slab, stairs, wall, fence. */

@@ -78,7 +78,8 @@ public final class RecipeReloadHook {
         @Override
         protected void apply(Void prepared, ResourceManager resources, ProfilerFiller profiler) {
             RecipeChanges changes = RecipeChanges.current();
-            if (changes.isEmpty()) {
+            com.itmecasey.modjs.unify.Unifier unifier = com.itmecasey.modjs.unify.UnifyReload.prepare(resources);
+            if (changes.isEmpty() && !unifier.active()) {
                 EventGroups.SERVER.post("afterRecipes", new EventJS());
                 return;
             }
@@ -101,6 +102,7 @@ public final class RecipeReloadHook {
                 if (changed == null) {
                     continue;
                 }
+                changed = unifier.apply(id.toString(), changed);
                 if (changed == source) {
                     result.add(holder);
                     continue;
@@ -114,10 +116,19 @@ public final class RecipeReloadHook {
                     result.add(new RecipeHolder<>(id, recipe));
                 }
             }
+            for (Map.Entry<String, JsonObject> conversion : unifier.conversionRecipes().entrySet()) {
+                Recipe<?> recipe = Recipe.CODEC.parse(ops, conversion.getValue()).result().orElse(null);
+                if (recipe != null) {
+                    result.add(new RecipeHolder<>(ResourceLocation.parse(conversion.getKey()), recipe));
+                } else {
+                    LOGGER.error("ModJS could not build conversion recipe {}", conversion.getKey());
+                }
+            }
             manager.replaceRecipes(result);
             EventGroups.SERVER.post("afterRecipes", new EventJS());
-            LOGGER.info("ModJS recipes: {} loaded, {} removed, {} rewritten, {} without a source file",
-                before, changes.removedCount(), changes.replacedCount(), withoutSource);
+            LOGGER.info("ModJS recipes: {} loaded, {} removed, {} rewritten, {} without a source file; unify rewrote {} outputs and {} inputs, added {} conversions",
+                before, changes.removedCount(), changes.replacedCount(), withoutSource, unifier.outputsRewritten(), unifier.inputsRewritten(),
+                unifier.conversionRecipes().size());
         }
     }
 }

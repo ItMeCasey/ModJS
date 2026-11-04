@@ -19,3 +19,7 @@ DimensionEvents.add(event => {
   event.add('modjs:dropped', { generator: 'void' });
   event.drop('modjs:dropped');
 });
+ServerEvents.tags('item', event => {
+  // pretend vanilla iron ingots are a second mod's tin ingots, so vanilla recipes exercise the unifier
+  event.add('c:ingots/tin', 'minecraft:iron_ingot');
+});

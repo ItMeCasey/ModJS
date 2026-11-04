@@ -22,6 +22,7 @@ public final class RegistryManager {
     private static final Map<String, BlockBuilderJS> BLOCKS = new LinkedHashMap<>();
     private static final Map<String, FluidBuilderJS> FLUIDS = new LinkedHashMap<>();
     private static final Map<String, CreativeTabBuilderJS> TABS = new LinkedHashMap<>();
+    private static final Map<String, com.itmecasey.modjs.unify.UnifyMaterials.Entry> UNIFY_ENTRIES = new LinkedHashMap<>();
     private static boolean contributorsInstalled;
 
     private RegistryManager() {
@@ -33,16 +34,49 @@ public final class RegistryManager {
         BLOCKS.clear();
         TABS.clear();
         FLUIDS.clear();
+        UNIFY_ENTRIES.clear();
         com.itmecasey.modjs.item.ItemModifications.clear();
         EventGroups.ITEM.post("modification", new com.itmecasey.modjs.item.ItemModifications.ModificationEventJS());
         EventGroups.STARTUP.postExact("registry", "creative_tab", new RegistryEventJS<>("creative tab", TABS, CreativeTabBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "fluid", new RegistryEventJS<>("fluid", FLUIDS, FluidBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
+        addUnifiedMaterials();
+        for (ItemBuilderJS item : ITEMS.values()) {
+            if (item.unifyTag() != null) {
+                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(item.unifyTag(), NAMESPACE + ":" + item.id());
+            }
+        }
+        for (BlockBuilderJS block : BLOCKS.values()) {
+            if (block.unifyTag() != null) {
+                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(block.unifyTag(), NAMESPACE + ":" + block.id());
+            }
+        }
         if (!contributorsInstalled) {
             contributorsInstalled = true;
             DataBuilder.addClientContributor(RegistryManager::writeAssets);
             DataBuilder.addServerContributor(RegistryManager::writeData);
+        }
+    }
+
+    /** Registers the canonical items {@code Unify.materials} asked for, unless a script already made the same id. */
+    private static void addUnifiedMaterials() {
+        for (com.itmecasey.modjs.unify.UnifyMaterials.Spec spec : com.itmecasey.modjs.unify.UnifyConfig.materialSpecs()) {
+            for (com.itmecasey.modjs.unify.UnifyMaterials.Entry entry : com.itmecasey.modjs.unify.UnifyMaterials.expand(spec)) {
+                if (ITEMS.containsKey(entry.id()) || BLOCKS.containsKey(entry.id())) {
+                    continue;
+                }
+                if (entry.block()) {
+                    BLOCKS.put(entry.id(), new BlockBuilderJS(entry.id()).displayName(entry.displayName()).hardness(3).resistance(6).unify(entry.tag()));
+                } else {
+                    ItemBuilderJS item = new ItemBuilderJS(entry.id()).displayName(entry.displayName()).unify(entry.tag());
+                    if (entry.kind().equals("rod")) {
+                        item.parentModel("minecraft:item/handheld");
+                    }
+                    ITEMS.put(entry.id(), item);
+                }
+                UNIFY_ENTRIES.put(entry.id(), entry);
+            }
         }
     }
 
@@ -138,6 +172,12 @@ public final class RegistryManager {
             model.add("textures", textures);
             data.putJson(NAMESPACE, "models/block/" + block.id(), model);
         }
+        for (com.itmecasey.modjs.unify.UnifyMaterials.Entry entry : UNIFY_ENTRIES.values()) {
+            String path = "textures/" + (entry.block() ? "block/" : "item/") + entry.id() + ".png";
+            if (!data.has(NAMESPACE, path)) {
+                data.putBytes(NAMESPACE, path, com.itmecasey.modjs.unify.UnifyMaterials.texture(entry.kind(), entry.color()));
+            }
+        }
         if (lang.size() > 0) {
             data.putJson(NAMESPACE, "lang/en_us", lang);
         }
@@ -153,6 +193,21 @@ public final class RegistryManager {
     }
 
     static void writeData(GeneratedData data) {
+        Map<String, java.util.List<String>> itemTags = new LinkedHashMap<>();
+        Map<String, java.util.List<String>> blockTags = new LinkedHashMap<>();
+        for (ItemBuilderJS item : ITEMS.values()) {
+            if (item.unifyTag() != null) {
+                itemTags.computeIfAbsent(item.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + item.id());
+            }
+        }
+        for (BlockBuilderJS block : BLOCKS.values()) {
+            if (block.unifyTag() != null) {
+                itemTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+                blockTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+            }
+        }
+        writeTags(data, "item", itemTags);
+        writeTags(data, "block", blockTags);
         for (BlockBuilderJS block : BLOCKS.values()) {
             JsonObject table = new JsonObject();
             table.addProperty("type", "minecraft:block");
@@ -192,6 +247,19 @@ public final class RegistryManager {
             }
             table.add("pools", pools);
             data.putJson(NAMESPACE, "loot_table/blocks/" + block.id(), table);
+        }
+    }
+
+    private static void writeTags(GeneratedData data, String registry, Map<String, java.util.List<String>> tags) {
+        for (Map.Entry<String, java.util.List<String>> entry : tags.entrySet()) {
+            String tag = entry.getKey();
+            int colon = tag.indexOf(':');
+            JsonObject json = new JsonObject();
+            json.addProperty("replace", false);
+            JsonArray values = new JsonArray();
+            entry.getValue().forEach(values::add);
+            json.add("values", values);
+            data.putJson(tag.substring(0, colon), "tags/" + registry + "/" + tag.substring(colon + 1), json);
         }
     }
 }
