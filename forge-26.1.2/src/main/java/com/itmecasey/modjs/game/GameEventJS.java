@@ -127,6 +127,25 @@ public final class GameEventJS extends EventJS {
         return item;
     }
 
+    @Override
+    public String describe() {
+        StringBuilder out = new StringBuilder();
+        if (player != null) {
+            out.append("player=").append(getPlayerName()).append(' ');
+        }
+        if (entity != null) {
+            out.append("entity=").append(getEntityId()).append(' ');
+        }
+        if (pos != null) {
+            out.append("block=").append(getBlockId()).append(" at ").append(getX()).append(',').append(getY()).append(',').append(getZ()).append(' ');
+        }
+        String item = getItemId();
+        if (item != null && !item.equals("minecraft:air")) {
+            out.append("item=").append(item).append(' ');
+        }
+        return out.toString().trim();
+    }
+
     public String getItemId() {
         return item.isEmpty() ? "minecraft:air" : BuiltInRegistries.ITEM.getKey(item.getItem()).toString();
     }

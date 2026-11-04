@@ -48,6 +48,15 @@ public final class ModJSCommands {
             return total;
         }));
 
+        root.then(Commands.literal("trace").requires(admin)
+            .then(Commands.literal("on").executes(context -> startTrace(context.getSource(), false))
+                .then(Commands.literal("ticks").executes(context -> startTrace(context.getSource(), true))))
+            .then(Commands.literal("off").executes(context -> {
+                com.itmecasey.modjs.event.EventTrace.stop();
+                context.getSource().sendSuccess(() -> Component.literal("Event trace off."), false);
+                return 1;
+            })));
+
         root.then(Commands.literal("status").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();
             for (ScriptType type : ScriptType.values()) {
@@ -63,5 +72,17 @@ public final class ModJSCommands {
 
         dispatcher.register(root);
         EventGroups.SERVER.post("commandRegistry", new CommandRegistryEventJS(dispatcher));
+    }
+
+    private static int startTrace(CommandSourceStack source, boolean ticks) {
+        net.minecraft.server.level.ServerPlayer target = source.getEntity() instanceof net.minecraft.server.level.ServerPlayer p ? p : null;
+        com.itmecasey.modjs.event.EventTrace.start(line -> {
+            org.slf4j.LoggerFactory.getLogger("modjs").info("TRACE {}", line);
+            if (target != null && !target.hasDisconnected()) {
+                target.sendSystemMessage(Component.literal(line).withStyle(net.minecraft.ChatFormatting.GRAY));
+            }
+        }, ticks);
+        source.sendSuccess(() -> Component.literal("Event trace on" + (ticks ? " (with ticks)" : "") + ". Use /modjs trace off to stop."), false);
+        return 1;
     }
 }

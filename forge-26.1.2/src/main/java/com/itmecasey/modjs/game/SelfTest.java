@@ -64,6 +64,12 @@ public final class SelfTest {
         ServerChatEvent.BUS.post(chat);
         check("PlayerEvents.chat rewrites the message", chat.getMessage().getString().equals("HELLO THERE"));
 
+        java.util.List<String> traced = new java.util.ArrayList<>();
+        com.itmecasey.modjs.event.EventTrace.start(traced::add, false);
+        PlayerEvent.PlayerLoggedInEvent.BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
+        com.itmecasey.modjs.event.EventTrace.stop();
+        check("trace reports events with details", traced.stream().anyMatch(l -> l.startsWith("PlayerEvents.loggedIn") && l.contains("player=ModJSTester")));
+
         PlayerEvent.PlayerLoggedInEvent.BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
         PlayerEvent.ItemCraftedEvent.BUS.post(new PlayerEvent.ItemCraftedEvent(player, new ItemStack(Items.STICK, 4), new SimpleContainer(1)));
 

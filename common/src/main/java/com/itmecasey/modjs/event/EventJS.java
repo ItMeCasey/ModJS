@@ -9,6 +9,11 @@ public class EventJS {
         cancelled = true;
     }
 
+    /** A short summary shown by {@code /modjs trace}; subclasses add the player, block, item or entity involved. */
+    public String describe() {
+        return "";
+    }
+
     public boolean isCancelled() {
         return cancelled;
     }

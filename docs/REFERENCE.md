@@ -26,6 +26,7 @@ and never stops other scripts.
 | `/modjs reload` | operators | reload data packs and server scripts |
 | `/modjs errors` | operators | list script errors |
 | `/modjs status` | operators | script counts and recipe change counts |
+| `/modjs trace on` / `off` | operators | prints every script event (name, player, block, item, entity) to your chat and the log as it fires; `trace on ticks` includes tick events |
 
 ## Startup scripts
 

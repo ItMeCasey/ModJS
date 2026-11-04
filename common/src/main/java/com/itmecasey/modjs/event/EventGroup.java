@@ -75,6 +75,9 @@ public final class EventGroup extends ScriptableObject {
     }
 
     public synchronized boolean hasHandlers(String event) {
+        if (EventTrace.enabled()) {
+            return true;
+        }
         for (Map.Entry<String, List<Handler>> entry : handlers.entrySet()) {
             String key = entry.getKey();
             if ((key.equals(event) || key.startsWith(event + ":")) && !entry.getValue().isEmpty()) {
@@ -132,6 +135,7 @@ public final class EventGroup extends ScriptableObject {
      * Returns true if the event was cancelled.
      */
     public boolean post(String event, String extraId, EventJS eventObject) {
+        EventTrace.log(name, event, extraId, eventObject);
         List<Handler> toRun = new ArrayList<>();
         synchronized (this) {
             List<Handler> general = handlers.get(event);

@@ -53,6 +53,12 @@ public final class SelfTest {
         ServerPlayer player = new ServerPlayer(server, level, new GameProfile(UUID.nameUUIDFromBytes("modjs-selftest".getBytes()), "ModJSTester"), ClientInformation.createDefault());
         BlockPos pos = new BlockPos(0, 100, 0);
 
+        java.util.List<String> traced = new java.util.ArrayList<>();
+        com.itmecasey.modjs.event.EventTrace.start(traced::add, false);
+        MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
+        com.itmecasey.modjs.event.EventTrace.stop();
+        check("trace reports events with details", traced.stream().anyMatch(l -> l.startsWith("PlayerEvents.loggedIn") && l.contains("player=ModJSTester")));
+
         BlockEvent.BreakEvent brokenStone = new BlockEvent.BreakEvent(level, pos, Blocks.STONE.defaultBlockState(), player);
         MinecraftForge.EVENT_BUS.post(brokenStone);
         check("BlockEvents.broken cancel", brokenStone.isCanceled());
