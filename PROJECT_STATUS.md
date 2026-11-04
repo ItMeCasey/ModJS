@@ -48,7 +48,7 @@ Spend: none
 - [~] Client screens: scripted title screen and splash text (compiled, not seen on a client); other screens and widgets not started (w:2)
 
 ## Compatibility and tooling
-- [ ] Integrations with JEI or EMI and with popular mod recipe types such as Create (w:3)
+- [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); EMI, REI and 26.1.2 blocked by missing Forge builds; Create recipe types not started (w:3)
 - [x] Type definitions: a hand-written modjs.d.ts and jsconfig.json are written to modjs/ on launch (w:3)
 - [ ] In-game error overlay at startup and on script error (w:2)
 

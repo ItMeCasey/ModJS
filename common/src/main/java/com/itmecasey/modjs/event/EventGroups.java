@@ -14,6 +14,7 @@ public final class EventGroups {
     public static final EventGroup PLAYER = new EventGroup("PlayerEvents", ScriptType.SERVER);
     public static final EventGroup ENTITY = new EventGroup("EntityEvents", ScriptType.SERVER);
     public static final EventGroup LEVEL = new EventGroup("LevelEvents", ScriptType.SERVER);
+    public static final EventGroup RECIPE_VIEWER = new EventGroup("RecipeViewerEvents", ScriptType.CLIENT);
     public static final EventGroup DIMENSION = new EventGroup("DimensionEvents", ScriptType.SERVER);
     public static final EventGroup WORLDGEN = new EventGroup("WorldgenEvents", ScriptType.SERVER);
     public static final EventGroup NETWORK = new EventGroup("NetworkEvents", null);
@@ -22,7 +23,7 @@ public final class EventGroups {
     private static final Map<String, EventGroup> ALL = new LinkedHashMap<>();
 
     static {
-        for (EventGroup group : new EventGroup[] {STARTUP, SERVER, BLOCK, ITEM, PLAYER, ENTITY, LEVEL, WORLDGEN, DIMENSION, NETWORK, CLIENT}) {
+        for (EventGroup group : new EventGroup[] {STARTUP, SERVER, BLOCK, ITEM, PLAYER, ENTITY, LEVEL, WORLDGEN, DIMENSION, RECIPE_VIEWER, NETWORK, CLIENT}) {
             ALL.put(group.groupName(), group);
         }
     }

@@ -154,6 +154,16 @@ Button actions: `singleplayer`, `multiplayer`, `options`, `mods`, `languages`, `
 Buttons without `x`/`y` stack down the middle. If no `titleScreen` handler exists the vanilla menu stays. F3+T applies changes.
 The `panorama` background draws the vanilla one on 1.21.1; on 26.1.2 it uses the game's default menu background.
 
+### Recipe viewers (JEI)
+
+```js
+// client_scripts/viewer.js
+RecipeViewerEvents.hideItems(event => event.hide('minecraft:dirt', '#minecraft:wool', '@create'));   // id, #tag or @mod
+RecipeViewerEvents.addInformation(event => event.add('minecraft:diamond', 'Found deep underground.', 'Needs an iron pickaxe.'));
+RecipeViewerEvents.hideCategories(event => event.hide('minecraft:campfire_cooking'));
+```
+Works with JEI on Minecraft 1.21.1 only. See `docs/PARITY.md` for why EMI, REI and 26.1.2 are not covered. These hide entries in the viewer; they do not remove items or recipes from the game (use `ServerEvents.recipes` for that).
+
 ## Helpers
 
 `Item.of`, `Ingredient.of`, `Text.of/red/green/...`, `Utils.runAfter(ticks, fn)`, `Utils.runEvery(ticks, fn)`,

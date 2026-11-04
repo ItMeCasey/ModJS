@@ -51,7 +51,10 @@ textures and models have not been run on a real client.
 | Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in headless self test; teleport with a real player and restart persistence unchecked |
 | DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
 | NetworkEvents | dataReceived | compiled |
-| RecipeViewerEvents | all eight | no |
+| RecipeViewerEvents | hideItems, addInformation, hideCategories | JEI on 1.21.1: compiles against JEI 19.70.0.469, not run with JEI |
+| | the other five (custom categories, recipe hiding, and so on) | no |
+| | EMI, REI | blocked: no Forge build to compile against. EMI's published Forge builds stop at 1.20.x and its 1.21.1 build is NeoForge only; REI's Forge artifacts stop at 12.x (1.20.x) and REI 16 for Forge 1.21.1 is not on a Maven. |
+| | JEI on 26.1.2 | blocked: JEI lists 26.1.2 for NeoForge and Fabric, no Forge artifact on its Maven |
 
 ## Registry builders
 
