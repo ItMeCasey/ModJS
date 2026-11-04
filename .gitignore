@@ -8,3 +8,4 @@ out/
 .vscode/
 logs/
 crash-reports/
+st*.log
