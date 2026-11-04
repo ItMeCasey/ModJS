@@ -61,6 +61,7 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | Commands (ModJS only) | `commandRegistry` add, remove, edit, alias, rename (usage strings with typed arguments) | checked in the self test on all six builds |
 | Scoreboard global (ModJS only) | objectives, scores, display slots, teams | checked in the self test on all six builds |
 | Toasts (ModJS only) | `Client.hideToasts`, `ClientEvents.toast`, `Client.showToast`, `Client.disableTutorial`, `Client.skipExperimentalWarning` | compiled; not seen on a client |
+| World types (ModJS only) | `StartupEvents.worldTypes` add, edit, duplicate, hide, rename, drop | JSON parsed by the game's world preset codec in the self test on all six builds; the button not seen on a client |
 | Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in headless self test; teleport with a real player and restart persistence unchecked |
 | DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
 | NetworkEvents | dataReceived | compiled |

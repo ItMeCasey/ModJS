@@ -279,6 +279,34 @@ public final class SelfTest {
         board.removeTeam("st_team");
         check("Scoreboard removeTeam deletes it", board.teams().stream().noneMatch("st_team"::equals));
 
+
+        com.itmecasey.modjs.pack.GeneratedData serverData = com.itmecasey.modjs.pack.GeneratedData.SERVER;
+        for (String name : new String[] {"modjs:selftest_void", "modjs:selftest_amp", "minecraft:large_biomes"}) {
+            String ns = name.substring(0, name.indexOf(':'));
+            byte[] bytes = serverData.get(ns, "worldgen/world_preset/" + name.substring(name.indexOf(':') + 1) + ".json");
+            boolean ok = false;
+            if (bytes != null) {
+                var json = com.google.gson.JsonParser.parseString(new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+                var result = net.minecraft.world.level.levelgen.presets.WorldPreset.DIRECT_CODEC.parse(ops, json);
+                result.error().ifPresent(e -> LOGGER.info("SELFTEST world preset {} error: {}", name, e.message()));
+                ok = result.result().isPresent();
+            }
+            check("generated world type " + name + " parses as a world preset", ok);
+        }
+        String normalTag = new String(serverData.get("minecraft", "tags/worldgen/world_preset/normal.json"), java.nio.charset.StandardCharsets.UTF_8);
+        check("world types: new ones join the list and vanilla ones stay", normalTag.contains("modjs:selftest_void") && normalTag.contains("modjs:selftest_amp") && normalTag.contains("minecraft:flat"));
+        check("world types: hide removes a vanilla one, visible false keeps one out", !normalTag.contains("single_biome_surface") && !normalTag.contains("selftest_hidden"));
+        check("world types: a hidden one still exists", serverData.has("modjs", "worldgen/world_preset/selftest_hidden.json"));
+        check("world types: drop removes a script-made one", !serverData.has("modjs", "worldgen/world_preset/selftest_gone.json"));
+        com.google.gson.JsonObject largeBiomes = com.google.gson.JsonParser.parseString(new String(serverData.get("minecraft", "worldgen/world_preset/large_biomes.json"), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+        check("world types: edit keeps the other dimensions and swaps the one given", largeBiomes.getAsJsonObject("dimensions").size() == 3
+            && largeBiomes.getAsJsonObject("dimensions").getAsJsonObject("minecraft:the_nether").getAsJsonObject("generator").get("type").getAsString().equals("minecraft:flat")
+            && largeBiomes.getAsJsonObject("dimensions").getAsJsonObject("minecraft:overworld").getAsJsonObject("generator").get("type").getAsString().equals("minecraft:noise"));
+        com.google.gson.JsonObject worldTypeLang = new com.google.gson.JsonObject();
+        com.itmecasey.modjs.worldgen.WorldTypes.addNames(worldTypeLang);
+        check("world types: labels become language entries", "Self Test Void".equals(worldTypeLang.get("generator.modjs.selftest_void").getAsString())
+            && "Self Test Amplified".equals(worldTypeLang.get("generator.modjs.selftest_amp").getAsString()));
+
         LOGGER.info("SELFTEST DONE failures={}", failures);
     }
 }

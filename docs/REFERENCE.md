@@ -120,6 +120,18 @@ PlayerEvents.loggedIn(event => {
 `Dimensions.create(id, options)` (false if it exists), `exists(id)`, `list()`, `created()`, `teleport(player, id, x, y, z)` and `delete(id)`.
 `delete` sends players inside to the overworld spawn, unloads the level and deletes its folder; it only works on dimensions made with `create`.
 
+World types (the Create World screen's World Type button; a startup script, restart to change):
+```js
+StartupEvents.worldTypes(event => {
+  event.add('mypack:skyblock', { name: 'Skyblock', overworld: 'void' });                   // nether and end stay vanilla; base defaults to minecraft:normal
+  event.add('mypack:hollow', { overworld: 'void', nether: 'void', dimensions: { 'mypack:sky': { generator: 'void' } }, visible: false });
+  event.edit('minecraft:large_biomes', { nether: 'void' });                                // keeps the dimensions you do not mention
+  event.duplicate('minecraft:amplified', 'mypack:tall', { name: 'Tall' });
+  event.hide('minecraft:single_biome_surface');  event.rename('minecraft:flat', 'Flatland');  event.drop('mypack:old');
+});
+```
+Dimension options are those of `DimensionEvents.add`. Presets are written to `worldgen/world_preset/<id>.json`, the list is the tag `minecraft:normal`, labels are language keys `generator.<ns>.<id>`. A dedicated server picks one with `level-type=mypack:skyblock`.
+
 Raw data: `ServerEvents.generateData(event => event.addJson('mymod:loot_table/x', {...}))`.
 
 Commands: `ServerEvents.commandRegistry` runs each time the command tree is built (world load and `/reload`), after every other mod has registered.

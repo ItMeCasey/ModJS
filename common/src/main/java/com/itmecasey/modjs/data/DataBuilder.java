@@ -69,6 +69,7 @@ public final class DataBuilder {
         EventGroups.SERVER.post("genericLootTables", new LootEventJS("", "minecraft:generic", data));
         EventGroups.WORLDGEN.post("add", new WorldgenEventJS(data));
         EventGroups.DIMENSION.post("add", new com.itmecasey.modjs.worldgen.DimensionEventJS(data));
+        com.itmecasey.modjs.worldgen.WorldTypes.writeTo(data);
 
         EventGroups.SERVER.post("generateData", new DataEventJS(data));
         writePackMetadata(data);
@@ -89,6 +90,12 @@ public final class DataBuilder {
             JsonObject json = existingLang(data, language);
             lang.entries().forEach(json::addProperty);
             data.putJson("modjs", "lang/" + language, json);
+        }
+
+        if (com.itmecasey.modjs.worldgen.WorldTypes.any()) {
+            JsonObject json = existingLang(data, "en_us");
+            com.itmecasey.modjs.worldgen.WorldTypes.addNames(json);
+            data.putJson("modjs", "lang/en_us", json);
         }
 
         if (EventGroups.CLIENT.hasHandlers("splashes")) {

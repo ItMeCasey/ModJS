@@ -39,3 +39,12 @@ StartupEvents.registry('item', event => {
   event.create('ruby_helmet').armor('helmet', 'ruby');
 });
 StartupEvents.registry('block', event => event.create('test_crate').container(2).hardness(2));
+StartupEvents.worldTypes(event => {
+  event.add('modjs:selftest_void', { name: 'Self Test Void', overworld: { generator: 'void' } });
+  event.add('modjs:selftest_hidden', { visible: false, overworld: 'void' });
+  event.edit('minecraft:large_biomes', { nether: { generator: 'void' } });
+  event.duplicate('minecraft:amplified', 'modjs:selftest_amp', { name: 'Self Test Amplified' });
+  event.hide('minecraft:single_biome_surface');
+  event.add('modjs:selftest_gone', {});
+  event.drop('modjs:selftest_gone');
+});

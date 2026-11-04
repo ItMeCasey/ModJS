@@ -27,11 +27,11 @@ public final class DimensionEventJS extends EventJS {
 
     // -- ids ---------------------------------------------------------------------------------------------------
 
-    private static String namespace(String id) {
+    static String namespace(String id) {
         return id.contains(":") ? id.substring(0, id.indexOf(':')) : "modjs";
     }
 
-    private static String path(String id) {
+    static String path(String id) {
         String p = id.contains(":") ? id.substring(id.indexOf(':') + 1) : id;
         if (!p.matches("[a-z0-9_./-]+") || !namespace(id).matches("[a-z0-9_.-]+")) {
             throw Context.reportRuntimeError("Invalid dimension id '" + id + "': use lowercase letters, digits and _ . / -");
@@ -39,7 +39,7 @@ public final class DimensionEventJS extends EventJS {
         return p;
     }
 
-    private static String full(String id) {
+    static String full(String id) {
         return namespace(id) + ":" + path(id);
     }
 
@@ -249,7 +249,7 @@ public final class DimensionEventJS extends EventJS {
     }
 
     /** Reads {@code data/<ns>/<folder>/<path>.json} from the game and mod jars, or null. */
-    private static JsonObject tryLoadJson(String id, String folder) {
+    static JsonObject tryLoadJson(String id, String folder) {
         String resource = "data/" + namespace(id) + "/" + folder + "/" + path(id) + ".json";
         for (ClassLoader loader : new ClassLoader[] {Thread.currentThread().getContextClassLoader(), DimensionEventJS.class.getClassLoader()}) {
             if (loader == null) {
