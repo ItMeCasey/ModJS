@@ -1,6 +1,6 @@
 name: release
 
-# Push a tag such as v2026.11.25 to build every module and self-test it, then publish a GitHub release and upload to CurseForge
+# Push a tag such as v2026.11.26 to build every module and self-test it, then publish a GitHub release and upload to CurseForge
 # only the builds whose own mod_version equals the tag version. The other builds are skipped (never re-uploaded), and the run
 # fails only when no build matches the tag.
 # Needs the repository secret CURSEFORGE_TOKEN (a CurseForge upload API token).

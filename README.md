@@ -15,6 +15,12 @@ KubeJS-style scripting for Forge and NeoForge, powered by Rhino. Supports Minecr
 
 Each module is its own Gradle build. Run `./gradlew build` inside a module folder.
 
+## Block and entity info
+
+`InfoEvents` lets scripts add lines, bars and icons to the Show Me What This Is and Jade overlays (`common/info`, `compat/smwti`, `compat/jade`).
+Show Me What This Is works on every build; Jade on NeoForge 26.3, 26.2, 26.1.2 and 1.21.1 (Jade 1.20.1 is compile-checked only; Forge 26.x and 1.21.1 have no Jade build).
+Example: `examples/block-info`; screenshots from real clients: `docs/frames` (made by `scripts/info_tour.py`).
+
 ## Scripts
 
 On first launch ModJS creates a `modjs/` folder in the game directory with `startup_scripts`, `server_scripts`,

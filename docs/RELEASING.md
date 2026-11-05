@@ -20,8 +20,8 @@ Windows user environment (it is read from there and never printed):
 3. Tag and push:
 
    ```
-   git tag v2026.11.25
-   git push origin v2026.11.25
+   git tag v2026.11.26
+   git push origin v2026.11.26
    ```
 
 The `release` workflow uploads a build only when its own `mod_version` equals the tag version, logs `skipping <module>` for the rest,

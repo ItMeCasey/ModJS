@@ -19,6 +19,7 @@ ServerEvents.recipes(event => event.shaped('modjs:ruby', ['DD', 'DD'], { D: 'min
 - **Gameplay events:** block broken, player joined, chat sent, item used, entity hurt, and many more. Cancel an action or rewrite it.
 - **Dimensions:** add, edit, duplicate and drop dimensions, or create them while the server runs. Give every player who joins their own.
 - **Game state:** read and edit chests, furnaces and signs, change game rules, and save values between restarts.
+- **Look-at info:** `InfoEvents` adds your own lines, bars and item icons to what Show Me What This Is and Jade show for a block or entity, yours or another mod's. [Block and entity info](https://itmecasey.com/wiki/modjs/?p=block-info)
 - **Client side:** rename things, add tooltips, change the splash text, rebuild the title screen and make your own screens with buttons and text boxes.
 
 ![How it works](https://raw.githubusercontent.com/ItMeCasey/ModJS/main/branding/banners/h_scripts.png)

@@ -59,6 +59,7 @@ Spend: none
 - [~] Info bridges: SMWTI on all ten builds and Jade on the six that have one compile; seen on a real client (frames in docs/frames) on NeoForge 26.3, 26.2, 26.1.2 and 1.21.1 with both overlays and on NeoForge and Forge 1.20.1 with SMWTI; all four Forge 26.x and 1.21.1 builds seen too (SMWTI only, no Jade build) (w:4)
 - [x] Forge 26.x and 1.21.1 clients could not open a world (the jar-shipped ore biome modifier flagged it experimental, a confirmation screen waited): modifier now generated only when Unify.ores() is on, seen on a real client on all four builds (w:4)
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
+- [x] Release 2026.11.26 prepared locally for all ten builds: versions bumped, changelog, README and CurseForge text, wiki pages written (not tagged or uploaded) (w:2)
 - [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines and fluid art on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
 
 ## Testing and release
