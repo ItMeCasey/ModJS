@@ -128,7 +128,7 @@ def prepare(module):
         old.unlink()
     for old in mods.glob("jade-*.jar"):
         old.unlink()
-    if module not in FROM_GRADLE:
+    if module not in FROM_GRADLE and not os.environ.get("INFO_TOUR_NO_SMWTI"):  # the variable runs ModJS alone, to isolate a stall
         shutil.copy2(smwti_jar(module), mods)
     jade = None if module in FROM_GRADLE else jade_jar(module)
     if jade:

@@ -21,6 +21,7 @@ OPTIONS = (
 )
 CRASH = re.compile(r"Crash report saved|ModLoadingException|Game crashed|Exception in thread \"main\"")
 READY = re.compile(r"Sound engine started")
+WORLD_READY = re.compile(r"Starting integrated minecraft server|Preparing spawn")
 TIMEOUT = 300
 
 
@@ -68,14 +69,24 @@ def main():
     if "--root" in args:
         root = Path(args[args.index("--root") + 1])
         args = [a for a in args if a not in ("--root", str(root))]
+    world = None
+    if "--world" in args:
+        world = Path(args[args.index("--world") + 1])
+        args = [a for a in args if a not in ("--world", str(world))]
     module = args[0]
     folder = root / module
     run = folder / "run"
     run.mkdir(exist_ok=True)
     (run / "options.txt").write_text(OPTIONS)
+    if world:
+        import shutil
+        target = run / "saves" / "modjs_info"
+        if target.exists():
+            shutil.rmtree(target)
+        shutil.copytree(world, target)
     x, y, w, h = display6()
     log = []
-    proc = subprocess.Popen(["cmd", "/c", str(folder / "gradlew.bat"), "runClient", "--no-daemon", "-q"], cwd=folder,
+    proc = subprocess.Popen(["cmd", "/c", str(folder / "gradlew.bat"), "runClient", "--no-daemon", "-q"] + (["-PquickWorld=modjs_info"] if world else []), cwd=folder,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
     state = {"result": None}
 
@@ -85,8 +96,8 @@ def main():
             log.append(line)
             if state["result"] is None and CRASH.search(line):
                 state["result"] = "CRASH"
-            elif state["result"] is None and READY.search(line):
-                state["result"] = "MENU"
+            elif state["result"] is None and (WORLD_READY if world else READY).search(line):
+                state["result"] = "WORLD" if world else "MENU"
 
     threading.Thread(target=pump, daemon=True).start()
     start = time.time()
@@ -102,7 +113,7 @@ def main():
     subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
     (run / "boot_check.log").write_text("\n".join(log), encoding="utf-8")
     cause = ""
-    if result != "MENU":
+    if result not in ("MENU", "WORLD"):
         for i, line in enumerate(log):
             if re.search(r"ModLoadingException|Exception in thread|Caused by|NullPointerException|IllegalState", line) and "oshi" not in line:
                 cause = " | ".join(s.strip() for s in log[i:i + 3])[:400]
