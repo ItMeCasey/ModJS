@@ -38,8 +38,11 @@ public final class ModJSNetwork {
     }
 
     public static void init(IEventBus modBus) {
+        // 26.3 splits the handlers: the one given here runs on the server, the client one is registered on its own event.
         modBus.addListener((RegisterPayloadHandlersEvent event) ->
             event.registrar("1").optional().playBidirectional(DataMessage.TYPE, DataMessage.CODEC, ModJSNetwork::handle));
+        modBus.addListener((net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent event) ->
+            event.register(DataMessage.TYPE, ModJSNetwork::handle));
     }
 
     private static void handle(DataMessage message, IPayloadContext context) {

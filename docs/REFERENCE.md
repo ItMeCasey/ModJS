@@ -272,6 +272,17 @@ Client.skipExperimentalWarning();                        // answers "proceed" on
 ```
 All of this reaches the game by reflection and class names, so a version that renamed something logs a warning and does nothing. Not checked on a real client.
 
+### Block and entity info (Show Me What This Is and Jade)
+`InfoEvents` decides what the look-at overlays say. Handlers go in startup scripts (they run on both sides) or client scripts.
+```js
+InfoEvents.block('mymod:lamp', e => { e.add('Lit', { color: '#ffd24a' }); e.bar('Power', 0.4, '#ffd24a'); e.item('minecraft:coal', 'Fuel', 8); });
+InfoEvents.entity('minecraft:cow', e => e.bar('Health', e.entity.getHealth() / e.entity.getMaxHealth(), '#ff5555'));
+InfoEvents.block(e => e.hideTag('jade:energy_storage'));   // no id: every block; hideTag is Jade only
+```
+Event fields: `id`, `kind`, `side`, `detailed`, `x`, `y`, `z`, `state`, `blockEntity`, `entity`, `nbt`. Calls: `add(text, {color, position, item, count})`, `bar(text, fraction, color)`, `item(id, text, count)`, `hideTag(tag)`.
+Handlers in startup and server scripts run on the server for blocks with a block entity and for entities, and on the client for plain blocks; client script handlers always run on the client.
+Works with SMWTI on every build and Jade on NeoForge 26.x, NeoForge 1.21.1 and 1.20.1 (Jade has no Forge 26.x or Forge 1.21.1 build). Example: `examples/block-info`.
+
 ### Recipe viewers (JEI)
 
 ```js

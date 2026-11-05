@@ -19,11 +19,12 @@ public final class EventGroups {
     public static final EventGroup WORLDGEN = new EventGroup("WorldgenEvents", ScriptType.SERVER);
     public static final EventGroup NETWORK = new EventGroup("NetworkEvents", null);
     public static final EventGroup CLIENT = new EventGroup("ClientEvents", ScriptType.CLIENT);
+    public static final EventGroup INFO = new EventGroup("InfoEvents", null);
 
     private static final Map<String, EventGroup> ALL = new LinkedHashMap<>();
 
     static {
-        for (EventGroup group : new EventGroup[] {STARTUP, SERVER, BLOCK, ITEM, PLAYER, ENTITY, LEVEL, WORLDGEN, DIMENSION, RECIPE_VIEWER, NETWORK, CLIENT}) {
+        for (EventGroup group : new EventGroup[] {STARTUP, SERVER, BLOCK, ITEM, PLAYER, ENTITY, LEVEL, WORLDGEN, DIMENSION, RECIPE_VIEWER, NETWORK, CLIENT, INFO}) {
             ALL.put(group.groupName(), group);
         }
     }

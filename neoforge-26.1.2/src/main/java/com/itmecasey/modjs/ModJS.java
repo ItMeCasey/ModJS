@@ -84,7 +84,10 @@ public class ModJS {
         SelfTest.register();
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             modBus.addListener(
-                (net.neoforged.fml.event.lifecycle.FMLClientSetupEvent e) -> EventGroups.CLIENT.post("init", new EventJS()));
+                (net.neoforged.fml.event.lifecycle.FMLClientSetupEvent e) -> {
+                    ClientBridge.installToasts();
+                    EventGroups.CLIENT.post("init", new EventJS());
+                });
             ClientBridge.register();
         }
         modBus.addListener(ModJSPacks::onAddPackFinders);

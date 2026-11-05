@@ -46,6 +46,8 @@ minecraft {
         }
 
         client {
+            // `-PquickWorld=<folder>` opens that saved world on launch, for the screenshot tour in docs/frames.
+            if (project.hasProperty('quickWorld')) { args '--quickPlaySingleplayer', project.property('quickWorld') }
         }
 
         server {
@@ -69,6 +71,11 @@ minecraft {
 jarJar.enable()
 
 repositories {
+    maven {
+        name = 'Cursemaven (Jade API, compile only)'
+        url = 'https://cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
     mavenCentral()
     maven {
         name = 'Forge'
@@ -85,6 +92,9 @@ repositories {
 }
 
 dependencies {
+    // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
+    compileOnly files('../libs/smwti-api-1.20.1.jar')
+    compileOnly fg.deobf('curse.maven:jade-324717:8479276')
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     minecraftLibrary "org.mozilla:rhino:${rhino_version}"
     compileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"

@@ -38,10 +38,13 @@ public final class ClientBridge {
         }
     }
 
-    public static void register() {
+    /** Swaps in the scripted toast manager. Called from client setup: the game instance does not exist yet while mods construct. */
+    public static void installToasts() {
         net.minecraft.client.Minecraft toastHost = net.minecraft.client.Minecraft.getInstance();
         toastHost.execute(() -> ClientTweaks.installToastComponent(new ScriptedToasts(toastHost)));
+    }
 
+    public static void register() {
         com.itmecasey.modjs.client.ScriptedScreens.setHooks(name -> {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
             com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.ScriptedScreens.get(name);

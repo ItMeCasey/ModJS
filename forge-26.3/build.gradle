@@ -37,7 +37,10 @@ minecraft {
             systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
         }
 
-        register('client')
+        register('client') {
+            // `-PquickWorld=<folder>` opens that saved world on launch, for the screenshot tour in docs/frames.
+            if (project.hasProperty('quickWorld')) { args '--quickPlaySingleplayer', project.property('quickWorld') }
+        }
 
         register('server') {
             args '--nogui'
@@ -72,6 +75,8 @@ repositories {
 }
 
 dependencies {
+    // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
+    compileOnly files('../libs/smwti-api-26.3.jar')
     implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
     implementation "org.mozilla:rhino:${rhino_version}"
     jarJar("org.mozilla:rhino:${rhino_version}")

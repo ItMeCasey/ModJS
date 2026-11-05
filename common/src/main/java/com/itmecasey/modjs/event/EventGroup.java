@@ -153,6 +153,27 @@ public final class EventGroup extends ScriptableObject {
         return eventObject.isCancelled();
     }
 
+    /**
+     * Like {@link #post(String, String, EventJS)} but runs only the handlers whose script type {@code owners} accepts.
+     * Info handlers use it so the server runs the ones that can see real state and the client the ones written for it.
+     */
+    public void postFor(String event, String extraId, EventJS eventObject, java.util.function.Predicate<ScriptType> owners) {
+        List<Handler> toRun = new ArrayList<>();
+        synchronized (this) {
+            List<Handler> general = handlers.get(event);
+            if (general != null) {
+                general.stream().filter(handler -> owners.test(handler.owner)).forEach(toRun::add);
+            }
+            if (extraId != null) {
+                List<Handler> specific = handlers.get(key(event, extraId));
+                if (specific != null) {
+                    specific.stream().filter(handler -> owners.test(handler.owner)).forEach(toRun::add);
+                }
+            }
+        }
+        run(event, toRun, eventObject);
+    }
+
     private void run(String event, List<Handler> toRun, EventJS eventObject) {
         List<Handler> ordered = new ArrayList<>(toRun);
         ordered.sort((a, b) -> Integer.compare(b.priority, a.priority));

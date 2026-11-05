@@ -28,7 +28,7 @@ public final class BlockEntityJS {
     }
 
     /** The block entity at a position, or null if the block has none. */
-    static BlockEntityJS at(Level level, BlockPos pos) {
+    public static BlockEntityJS at(Level level, BlockPos pos) {
         if (level == null || pos == null) {
             return null;
         }

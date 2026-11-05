@@ -81,7 +81,10 @@ public class ModJS {
         SelfTest.register();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent.getBus(context.getModBusGroup()).addListener(
-                (net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent e) -> EventGroups.CLIENT.post("init", new EventJS()));
+                (net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent e) -> {
+                    ClientBridge.installToasts();
+                    EventGroups.CLIENT.post("init", new EventJS());
+                });
             ClientBridge.register();
         }
         AddPackFindersEvent.BUS.addListener(ModJSPacks::onAddPackFinders);

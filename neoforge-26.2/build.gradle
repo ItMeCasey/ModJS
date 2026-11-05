@@ -33,6 +33,11 @@ neoForge {
         }
         client {
             client()
+            // `-PquickWorld=<folder>` opens that saved world on launch, for the screenshot tour in docs/frames.
+            if (project.hasProperty('quickWorld')) {
+                programArgument '--quickPlaySingleplayer'
+                programArgument project.property('quickWorld')
+            }
         }
         server {
             server()
@@ -53,6 +58,11 @@ neoForge {
 }
 
 repositories {
+    maven {
+        name = 'Cursemaven (Jade API, compile only)'
+        url = 'https://cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
     mavenCentral()
     maven {
         name = 'BlameJared (JEI)'
@@ -65,6 +75,9 @@ repositories {
 }
 
 dependencies {
+    // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
+    compileOnly files('../libs/smwti-api-26.2.jar')
+    compileOnly 'curse.maven:jade-324717:8755115'
     implementation "org.mozilla:rhino:${rhino_version}"
     jarJar("org.mozilla:rhino:[${rhino_version},1.8)") {
         version { prefer rhino_version }

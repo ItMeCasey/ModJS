@@ -47,6 +47,12 @@ Look at `forge-1.21.1/` for the older API shape and `forge-26.1.2/` for the newe
 (`ResourceLocation` to `Identifier`), event buses (`MinecraftForge.EVENT_BUS` to per-event `BUS`), and rendering
 (`GuiGraphics` to `GuiGraphicsExtractor`).
 
+## Block and entity info
+
+`InfoEvents` (shared in `common/info`) feeds two optional overlays. `compat/smwti/ModJSSmwtiPlugin` and `compat/jade/ModJSJadePlugin` are found by their annotations,
+so they load only when SMWTI or Jade is installed; the SMWTI API jars are compile-only in `libs/` and Jade is compile-only from CurseForge. `info/InfoBridge` builds the
+events and moves lines from server to client for Jade. The per-version files are generated from one template, so change all ten together.
+
 ## Known gaps to close when porting
 
 | Area | Gap | Why |
@@ -56,6 +62,10 @@ Look at `forge-1.21.1/` for the older API shape and `forge-26.1.2/` for the newe
 | Recipe viewers | KubeJS events beyond hide items, add information, hide categories | Not built (custom categories, hiding single recipes, and so on). |
 | Scripts | On 26.1.2 `Block` and `BlockState` are replaced by stand-ins (`BlockFacades`) | The script engine would inspect client-only classes and crash a dedicated server. Check whether each new version needs the same. |
 | Title screen | Vanilla panorama background only on 1.21.1 | `PanoramaRenderer` was removed in 26.1.2. |
+| Block info | Jade plugin missing on Forge 26.1.2, 26.2, 26.3 and Forge 1.21.1 | Jade publishes no Forge build for those versions (checked 2026-11-05 on CurseForge). `compat/jade/` is copied from the NeoForge module when one appears. |
+| Block info | `hideTag` only works in Jade | SMWTI's API only lets a mod add lines, not remove another mod's. |
+| Block info | Jade shows a bar as a row of blocks | Jade's bar element differs between its 1.20.1, 1.21.1 and 26.x versions. |
+| Block info | Entity `nbt` is empty | Saving an entity changed on 26.x (value output), so scripts read `event.entity` instead. |
 | Item modification | Applies on the server and single player, not to a remote client | Components are not synced. |
 
 Unification needs from a port: the item tag folder name (`tags/item`), an item-exists check, the recipe reload hook calling
