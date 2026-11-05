@@ -50,6 +50,10 @@ def smwti_jar(module):
 
 def smwti_world(module):
     loader, mc = module.split("-", 1)
+    if loader == "forge" and mc != "1.20.1":
+        # Forge stops on a confirmation screen when it loads SMWTI's saved world, so these builds use a flat world the BEI project
+        # generated with that version's own Forge server (copying a world accepts nothing).
+        return DESKTOP / "BEI" / "versions" / f"mc{mc}" / "forge" / "run" / "saves" / "tipworld"
     return DESKTOP / "SMWTI" / "versions" / f"mc{mc}" / loader / "run" / "saves" / "smwti_shots"
 
 
