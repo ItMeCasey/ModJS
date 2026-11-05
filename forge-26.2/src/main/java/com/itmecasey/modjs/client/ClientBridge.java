@@ -45,6 +45,12 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        com.itmecasey.modjs.client.ScriptedScreens.setScreenshotHook(name -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            mc.execute(() -> net.minecraft.client.Screenshot.grab(mc.gameDirectory, name, mc.gameRenderer.mainRenderTarget(), 1, message -> {
+            }));
+        });
+
         com.itmecasey.modjs.client.ScriptedScreens.setHooks(name -> {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
             com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.ScriptedScreens.get(name);

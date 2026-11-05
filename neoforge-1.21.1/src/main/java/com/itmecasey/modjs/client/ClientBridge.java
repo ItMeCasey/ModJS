@@ -43,6 +43,12 @@ public final class ClientBridge {
         net.minecraft.client.Minecraft toastHost = net.minecraft.client.Minecraft.getInstance();
         toastHost.execute(() -> ClientTweaks.installToastComponent(new ScriptedToasts(toastHost)));
 
+        com.itmecasey.modjs.client.ScriptedScreens.setScreenshotHook(name -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            mc.execute(() -> net.minecraft.client.Screenshot.grab(mc.gameDirectory, name, mc.getMainRenderTarget(), message -> {
+            }));
+        });
+
         com.itmecasey.modjs.client.ScriptedScreens.setHooks(name -> {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
             com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.ScriptedScreens.get(name);

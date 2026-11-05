@@ -5,7 +5,7 @@ PlayerEvents.loggedIn(event => {
   const run = command => event.runCommand(command);
   const me = event.player.getName().getString();
   const bx = Math.floor(event.player.getX());
-  const by = Math.floor(event.player.getY());
+  const by = Math.round(event.player.getY());
   const bz = Math.floor(event.player.getZ()) + 3;
   const at = bx + ' ' + by + ' ' + bz;
   const scenes = [
@@ -20,6 +20,9 @@ PlayerEvents.loggedIn(event => {
       run('summon minecraft:cow ' + (bx + 0.5) + ' ' + by + ' ' + (bz + 0.5) + ' {NoAI:1b,PersistenceRequired:1b}');
     } },
   ];
+  // The reused test world has an item frame and a dropped sword near the spawn; they would be what the crosshair hits.
+  run('kill @e[type=minecraft:item_frame]');
+  run('kill @e[type=minecraft:item]');
   run('time set noon');
   run('weather clear');
   scenes.forEach((scene, index) => {
@@ -30,6 +33,9 @@ PlayerEvents.loggedIn(event => {
       const look = (bx + 0.5) + ' ' + (by + 0.5) + ' ' + (bz + 0.5);
       run('execute as ' + me + ' at ' + me + ' run tp @s ~ ~ ~ facing ' + look);
       run('rotate ' + me + ' facing ' + look);
+      // Plain angles as well: 0 faces south, 20 looks down a little. Old versions take them on tp, new ones on rotate.
+      run('execute as ' + me + ' at ' + me + ' run tp @s ~ ~ ~ 0 20');
+      run('rotate ' + me + ' 0 20');
     });
     Utils.runAfter(start + 120, () => console.log('INFO-TOUR READY ' + scene.name));
   });

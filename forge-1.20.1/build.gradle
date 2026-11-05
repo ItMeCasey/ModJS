@@ -95,6 +95,9 @@ dependencies {
     // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
     compileOnly files('../libs/smwti-api-1.20.1.jar')
     compileOnly fg.deobf('curse.maven:jade-324717:8479276')
+    // The screenshot tour (-PquickWorld) runs Show Me What This Is. Its 1.20.1 jar uses SRG names, so ForgeGradle remaps it.
+    // Jade's 1.20.1 jar cannot run in this dev game: its mixins look for SRG names the remap does not give them.
+    if (project.hasProperty('quickWorld')) { runtimeOnly fg.deobf('curse.maven:smwti-1781438:9450288') }
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     minecraftLibrary "org.mozilla:rhino:${rhino_version}"
     compileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"

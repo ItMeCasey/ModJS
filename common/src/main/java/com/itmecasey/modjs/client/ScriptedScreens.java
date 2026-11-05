@@ -45,6 +45,14 @@ public final class ScriptedScreens {
         closer = close;
     }
 
+    private static Consumer<String> screenshotter = name -> {
+    };
+
+    /** Set by the loader module: saves the current frame, with the screen overlays, as {@code screenshots/<name>} in the game folder. */
+    public static void setScreenshotHook(Consumer<String> hook) {
+        screenshotter = hook;
+    }
+
     /** The event passed to {@code ClientEvents.screens(event => event.create('name', screen => {...}))}. */
     public static final class ScreensEventJS extends EventJS {
         private final Map<String, TitleScreenConfig> created = new LinkedHashMap<>();
@@ -96,6 +104,18 @@ public final class ScriptedScreens {
 
         public void showToast(String title) {
             ClientTweaks.showToast(title, null);
+        }
+
+        /**
+         * Saves the current frame, with the in-world overlays drawn on it, to {@code screenshots/<name>.png} in the game folder.
+         * The name may use letters, digits, {@code _}, {@code -} and {@code .}. Used by the screenshot tours that document the mod.
+         */
+        public void screenshot(String name) {
+            String clean = name == null ? "" : name.replaceAll("[^A-Za-z0-9_.-]", "_");
+            if (clean.isEmpty()) {
+                throw org.mozilla.javascript.Context.reportRuntimeError("Client.screenshot needs a name");
+            }
+            screenshotter.accept(clean.endsWith(".png") ? clean : clean + ".png");
         }
 
         /** Removes every toast on screen or waiting. */

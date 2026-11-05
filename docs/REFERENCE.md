@@ -281,6 +281,7 @@ InfoEvents.block(e => e.hideTag('jade:energy_storage'));   // no id: every block
 ```
 Event fields: `id`, `kind`, `side`, `detailed`, `x`, `y`, `z`, `state`, `blockEntity`, `entity`, `nbt`. Calls: `add(text, {color, position, item, count})`, `bar(text, fraction, color)`, `item(id, text, count)`, `hideTag(tag)`.
 Handlers in startup and server scripts run on the server for blocks with a block entity and for entities, and on the client for plain blocks; client script handlers always run on the client.
+`Client.screenshot(name)` (client scripts) saves the current frame, overlays included, to `screenshots/<name>.png` in the game folder; `scripts/info_tour.py` uses it for docs/frames.
 Works with SMWTI on every build and Jade on NeoForge 26.x, NeoForge 1.21.1 and 1.20.1 (Jade has no Forge 26.x or Forge 1.21.1 build). Example: `examples/block-info`.
 
 ### Recipe viewers (JEI)

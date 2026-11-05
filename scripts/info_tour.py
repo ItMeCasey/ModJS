@@ -20,7 +20,6 @@ import threading
 import time
 from pathlib import Path
 
-from PIL import ImageGrab
 
 ROOT = Path(__file__).resolve().parent.parent
 DESKTOP = ROOT.parent
@@ -29,15 +28,17 @@ GRADLE_CACHE = Path.home() / ".gradle" / "caches" / "modules-2" / "files-2.1" / 
 FRAMES = ROOT / "docs" / "frames"
 TIMEOUT = 420
 WORLD = "modjs_info"
+JSTACK = "C:/Program Files/Microsoft/jdk-25.0.4.7-hotspot/bin/jstack.exe"
 OPTIONS = (
-    "soundCategory_master:0.0\nmusic:0.0\npauseOnLostFocus:false\nonboardAccessibility:false\n"
-    "skipMultiplayerWarning:true\ntutorialStep:none\nfullscreen:false\nguiScale:3\nlang:en_us\n"
+    "soundCategory_master:0.0\nmusic:0.0\npauseOnLostFocus:false\nonboardAccessibility:false\nskipMultiplayerWarning:true\ntutorialStep:none\njoinedFirstServer:true\nchatVisibility:2\nfullscreen:false\nguiScale:3\nlang:en_us\n"
 )
 # SMWTI full jar per build and Jade file id (None: Jade has no build for that loader and version).
 JADE = {
     "neoforge-26.3": "9042207", "neoforge-26.2": "8755115", "neoforge-26.1.2": "9156414", "neoforge-1.21.1": "8591319",
-    "forge-1.20.1": "8479276", "neoforge-1.20.1": "8479276",
 }
+# Jade's 1.20.1 jar uses SRG names. ForgeGradle remaps it when it is a gradle dependency (see build.gradle, -PquickWorld);
+# NeoGradle 7 (neoforge-1.20.1) has no such step here, so that build is run with SMWTI only.
+FROM_GRADLE = {"forge-1.20.1", "forge-1.21.1"}  # SMWTI comes from gradle there too; Jade has no usable 1.20.1 dev runtime on either loader
 
 
 def smwti_jar(module):
@@ -108,14 +109,6 @@ def place(hwnd, bounds, topmost):
     ctypes.windll.user32.SetWindowPos(hwnd, -1 if topmost else -2, left, top, right - left, bottom - top, flags)
 
 
-def grab(hwnd, bounds):
-    place(hwnd, bounds, True)
-    time.sleep(0.6)
-    image = ImageGrab.grab(bbox=bounds, all_screens=True)
-    place(hwnd, bounds, False)
-    return image
-
-
 def prepare(module):
     folder = ROOT / module
     run = folder / "run"
@@ -131,28 +124,51 @@ def prepare(module):
         old.unlink()
     for old in mods.glob("jade-*.jar"):
         old.unlink()
-    shutil.copy2(smwti_jar(module), mods)
-    jade = jade_jar(module)
+    if module not in FROM_GRADLE:
+        shutil.copy2(smwti_jar(module), mods)
+    jade = None if module in FROM_GRADLE else jade_jar(module)
     if jade:
         shutil.copy2(jade, mods / jade.name)
     # Other scripts in the dev run folder (the CI smoke scripts) are set aside for the tour and put back by cleanup().
+    cleanup(run)  # leftovers of an interrupted tour: this tour's own scripts go, the set-aside ones come back first
     for folder in ("startup_scripts", "server_scripts", "client_scripts"):
         for script in (run / "modjs" / folder).glob("*.js"):
-            script.rename(script.with_suffix(".js.tourbak"))
+            script.replace(script.with_suffix(".js.tourbak"))
     startup = run / "modjs" / "startup_scripts"
     server = run / "modjs" / "server_scripts"
     startup.mkdir(parents=True, exist_ok=True)
     server.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / "examples" / "block-info" / "startup_scripts" / "block_info.js", startup)
+    shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "tab_check.js", startup)
+    shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour_client.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour.js", server)
     return run, jade is not None
 
 
 def cleanup(run):
-    for path in (run / "modjs" / "startup_scripts" / "block_info.js", run / "modjs" / "server_scripts" / "info_tour.js"):
+    for path in (run / "modjs" / "startup_scripts" / "block_info.js", run / "modjs" / "startup_scripts" / "tab_check.js", run / "modjs" / "server_scripts" / "info_tour.js",
+                 run / "modjs" / "client_scripts" / "info_tour_client.js"):
         path.unlink(missing_ok=True)
     for saved in (run / "modjs").glob("*/*.js.tourbak"):
-        saved.rename(saved.with_name(saved.name[:-len(".tourbak")]))
+        saved.replace(saved.with_name(saved.name[:-len(".tourbak")]))
+
+
+def dump_threads(folder, target):
+    """Writes a jstack of the game started from this folder (the biggest java process there) to the target file."""
+    import psutil
+    best = None
+    for proc in psutil.process_iter(["pid", "name", "cmdline", "cwd", "memory_info"]):
+        try:
+            if (proc.info["name"] or "").lower().startswith("java") and str(proc.info["cwd"] or "").lower().startswith(str(folder).lower()):
+                if best is None or proc.info["memory_info"].rss > best.info["memory_info"].rss:
+                    best = proc
+        except (psutil.Error, OSError):
+            continue
+    if best is None:
+        target.write_text("no java process found", encoding="utf-8")
+        return
+    out = subprocess.run([JSTACK, str(best.info["pid"])], capture_output=True, text=True)
+    target.write_text(out.stdout + out.stderr, encoding="utf-8")
 
 
 def tour(module):
@@ -162,6 +178,10 @@ def tour(module):
     log = []
     saved = []
     done = threading.Event()
+    shots = run / "screenshots"
+    if shots.exists():
+        for old in shots.glob("info_*.png"):
+            old.unlink()
     proc = subprocess.Popen(["cmd", "/c", str(ROOT / module / "gradlew.bat"), "runClient", "--no-daemon", "-q", f"-PquickWorld={WORLD}"],
                             cwd=ROOT / module, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
 
@@ -169,15 +189,6 @@ def tour(module):
         for line in proc.stdout:
             line = line.rstrip()
             log.append(line)
-            match = re.search(r"INFO-TOUR READY (\w+)", line)
-            if match:
-                time.sleep(1.0)
-                hwnd = my_window(module)
-                if hwnd is None:
-                    continue
-                name = f"info-{module}-{match.group(1)}.png"
-                grab(hwnd, bounds).save(FRAMES / name)
-                saved.append(name)
             if "INFO-TOUR DONE" in line:
                 done.set()
 
@@ -196,10 +207,24 @@ def tour(module):
 
     threading.Thread(target=keep_placed, daemon=True).start()
     start = time.time()
+    quiet_since = time.time()
+    seen = 0
     while proc.poll() is None and not done.is_set() and time.time() - start < TIMEOUT:
         time.sleep(2)
+        if len(log) != seen:
+            seen = len(log)
+            quiet_since = time.time()
+        elif time.time() - quiet_since > 100:
+            # The game wrote nothing for 100 seconds: record where every thread is, then stop waiting.
+            dump_threads(ROOT / module, run / "stall_jstack.txt")
+            break
     timed_out = proc.poll() is None and not done.is_set()
+    time.sleep(4.0)
     subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
+    for shot in sorted((run / "screenshots").glob("info_*.png")):
+        name = f"info-{module}-{shot.stem[len('info_'):]}.png"
+        shutil.copy2(shot, FRAMES / name)
+        saved.append(name)
     (run / "info_tour.log").write_text("\n".join(log), encoding="utf-8")
     cleanup(run)
     errors = [line for line in log if " 0 error(s)" not in line and re.search(r"modjs/]: .*(Exception|Error)|ModLoadingException|Crash report saved|Exception in thread", line, re.I)]

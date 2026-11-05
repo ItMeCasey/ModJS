@@ -141,13 +141,8 @@ public final class ContentRegistry {
             TABS.register(t.id(), () -> CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup." + RegistryManager.NAMESPACE + "." + t.id()))
                 .icon(() -> iconFor(t.icon()))
-                .displayItems((parameters, output) -> {
-                    for (TabEntry entry : TAB_ENTRIES) {
-                        if (entry.tab().equals(t.tabId())) {
-                            output.accept(entry.item().get());
-                        }
-                    }
-                })
+                // The items of this tab are added by fillTabs, which also runs for ModJS tabs; adding them here too listed each twice.
+                .displayItems((parameters, output) -> { })
                 .build());
         }
         if (!CONTAINER_BLOCKS.isEmpty()) {

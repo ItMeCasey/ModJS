@@ -2,8 +2,8 @@
 // Startup scripts run on both the client and the server, so these handlers work in singleplayer and on a dedicated server.
 
 StartupEvents.registry('block', event => {
-  event.create('info_lamp').displayName('Info Lamp').hardness(1).lightLevel(10);
-  event.create('info_crate').displayName('Info Crate').container(1).hardness(2);
+  event.create('info_lamp').displayName('Info Lamp').hardness(1).lightLevel(10).texture('minecraft:block/glowstone');
+  event.create('info_crate').displayName('Info Crate').container(1).hardness(2).texture('minecraft:block/barrel_side');
 });
 
 // A block with no block entity: the handler runs on the client and sees the block state.
