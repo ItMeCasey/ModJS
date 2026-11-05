@@ -45,6 +45,7 @@ public final class RecipeReloadHook {
     }
 
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
+        LOGGER.debug("ModJS reload: adding the recipe listener");
         event.addListener(new Listener(event.getServerResources().getRecipeManager(), event.getServerResources().fullRegistries().lookup()));
     }
 
@@ -92,11 +93,21 @@ public final class RecipeReloadHook {
 
         @Override
         protected Void prepare(ResourceManager resources, ProfilerFiller profiler) {
+            LOGGER.debug("ModJS reload: prepare");
             return null;
         }
 
         @Override
         protected void apply(Void prepared, ResourceManager resources, ProfilerFiller profiler) {
+            LOGGER.debug("ModJS reload: apply start");
+            try {
+                applyChanges(resources);
+            } finally {
+                LOGGER.debug("ModJS reload: apply end");
+            }
+        }
+
+        private void applyChanges(ResourceManager resources) {
             RecipeChanges changes = RecipeChanges.current();
             com.itmecasey.modjs.unify.Unifier unifier = com.itmecasey.modjs.unify.UnifyReload.prepare(resources);
             if (changes.isEmpty() && !unifier.active()) {

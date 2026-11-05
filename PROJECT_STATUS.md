@@ -56,7 +56,8 @@ Spend: none
 - [x] Minecraft 26.2 and 26.3 on Forge and NeoForge: four modules build, pass unit tests and 81 self-test checks in a headless game-test server; CI and CurseForge tables list them (dev server and client not run) (w:4)
 - [x] Release gate: a tag uploads only builds whose own mod_version equals the tag; others are skipped and logged, and the run fails only when none match (checked with a local dry run of the collect step; not yet run in CI) (w:2)
 - [x] Script info API (InfoEvents.block and entity: lines, bars, icons, hide for Jade) with unit tests, docs, wiki page and example (w:3)
-- [~] Info bridges: SMWTI on all ten builds and Jade on the six that have one compile; seen on a real client (frames in docs/frames) on NeoForge 26.3, 26.2, 26.1.2 and 1.21.1 with both overlays and on NeoForge and Forge 1.20.1 with SMWTI; Forge 26.x and Forge 1.21.1 not seen yet (client stops on a screen before the server starts) (w:4)
+- [~] Info bridges: SMWTI on all ten builds and Jade on the six that have one compile; seen on a real client (frames in docs/frames) on NeoForge 26.3, 26.2, 26.1.2 and 1.21.1 with both overlays and on NeoForge and Forge 1.20.1 with SMWTI; all four Forge 26.x and 1.21.1 builds seen too (SMWTI only, no Jade build) (w:4)
+- [x] Forge 26.x and 1.21.1 clients could not open a world (the jar-shipped ore biome modifier flagged it experimental, a confirmation screen waited): modifier now generated only when Unify.ores() is on, seen on a real client on all four builds (w:4)
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
 - [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines and fluid art on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
 

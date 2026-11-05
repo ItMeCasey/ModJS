@@ -65,7 +65,7 @@ events and moves lines from server to client for Jade. The per-version files are
 | Block info | Jade plugin missing on Forge 26.1.2, 26.2, 26.3 and Forge 1.21.1 | Jade publishes no Forge build for those versions (checked 2026-11-05 on CurseForge). `compat/jade/` is copied from the NeoForge module when one appears. |
 | Block info | `hideTag` only works in Jade | SMWTI's API only lets a mod add lines, not remove another mod's. |
 | Block info | Jade shows a bar as a row of blocks | Jade's bar element differs between its 1.20.1, 1.21.1 and 26.x versions. |
-| Block info | No client frames yet for Forge 26.3, 26.2, 26.1.2 and Forge 1.21.1 | The dev client stops on a screen before the server starts when it loads the saved test world (seen on 26.3 and 1.21.1; NeoForge is fine). Needs a fresh world created inside the game. |
+| Forge 26.x and 1.21.1 | A biome modifier shipped in the mod jar makes every world "use experimental settings" | The world then waits on a vanilla confirmation screen. ModJS therefore writes its ore-swap modifier into the generated data pack only while `Unify.ores()` is on (`UnifyOreData`); with that on, players see the screen once per world. Forge 1.20.1 and NeoForge are not affected. |
 | Block info | Jade on 1.20.1 has no client frame | Jade's 1.20.1 jar uses SRG names and its mixins fail in the Mojang-named dev game; compile-checked only. |
 | Block info | Entity `nbt` is empty | Saving an entity changed on 26.x (value output), so scripts read `event.entity` instead. |
 | Item modification | Applies on the server and single player, not to a remote client | Components are not synced. |

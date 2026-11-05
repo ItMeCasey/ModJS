@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * Swaps the ore features of every biome for ones that place the canonical ore block, when {@code Unify.ores()} is on. It is
- * applied by the data file {@code data/modjs/forge/biome_modifier/unify_ores.json}, when the world or server starts, after
+ * applied by the biome modifier that {@code UnifyOreData} writes into the generated data pack, when the world or server starts, after
  * recipes have loaded and the unified groups are known.
  */
 public final class UnifyOreBiomeModifier implements BiomeModifier {

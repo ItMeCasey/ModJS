@@ -23,6 +23,12 @@ PlayerEvents.loggedIn(event => {
   // The reused test world has an item frame and a dropped sword near the spawn; they would be what the crosshair hits.
   run('kill @e[type=minecraft:item_frame]');
   run('kill @e[type=minecraft:item]');
+  // Not every test world is flat: clear a pocket around the player and lay a stone floor so the scenes sit on level ground.
+  const px = Math.floor(event.player.getX());
+  const pz = Math.floor(event.player.getZ());
+  run('fill ' + (px - 4) + ' ' + by + ' ' + (pz - 4) + ' ' + (px + 4) + ' ' + (by + 5) + ' ' + (pz + 6) + ' minecraft:air');
+  run('fill ' + (px - 4) + ' ' + (by - 1) + ' ' + (pz - 4) + ' ' + (px + 4) + ' ' + (by - 1) + ' ' + (pz + 6) + ' minecraft:stone');
+  run('gamemode creative ' + me);   // the saved worlds can have hostile mobs nearby
   run('time set noon');
   run('weather clear');
   scenes.forEach((scene, index) => {

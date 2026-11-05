@@ -62,6 +62,7 @@ public class ModJS {
         // Startup scripts run once, now, so they can register content before the registries open.
         ScriptManager.of(ScriptType.STARTUP).reload();
         RegistryManager.collect();
+        com.itmecasey.modjs.unify.UnifyOreData.install();
         ContentRegistry.register(context.getModBusGroup());
         com.itmecasey.modjs.unify.UnifyLootModifier.register(context.getModBusGroup());
         com.itmecasey.modjs.unify.UnifyOreBiomeModifier.register(context.getModBusGroup());
