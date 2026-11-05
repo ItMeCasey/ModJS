@@ -1,7 +1,7 @@
 # Releasing ModJS
 
-A release is a tag. Pushing `v<version>` makes GitHub build all six jars, run each build's self test, publish a GitHub
-release with the jars and upload them to CurseForge (project 1783874).
+A release is a tag. Pushing `v<version>` makes GitHub build every module, run each build's self test, publish a GitHub
+release and upload to CurseForge (project 1783874) only the builds that changed.
 
 ## One-time setup
 
@@ -14,16 +14,18 @@ Windows user environment (it is read from there and never printed):
 
 ## Each release
 
-1. Set `mod_version` to the new version (`YYYY.M.increment`) in all six `gradle.properties` files.
+1. Set `mod_version` to the new version (`YYYY.M.increment`) in the `gradle.properties` of only the builds that changed. Leave the
+   other builds at their old version: they are not uploaded again (duplicate uploads are denied on CurseForge).
 2. Commit and push to `main`, and wait for the `build` workflow to pass.
 3. Tag and push:
 
    ```
-   git tag v2026.11.24
-   git push origin v2026.11.24
+   git tag v2026.11.25
+   git push origin v2026.11.25
    ```
 
-The `release` workflow stops if the tag and `mod_version` disagree, or if the modules disagree with each other.
+The `release` workflow uploads a build only when its own `mod_version` equals the tag version, logs `skipping <module>` for the rest,
+and fails only when no build matches the tag. A manual run uses the newest `mod_version`. Every module is still built and self-tested.
 Releases are uploaded to CurseForge as **beta**. Run the workflow by hand (Actions, release, Run workflow) to pick
 `alpha` or `release`; a manual run only uploads when "Upload to CurseForge" is ticked.
 
@@ -31,6 +33,10 @@ Releases are uploaded to CurseForge as **beta**. Run the workflow by hand (Actio
 
 | File | Minecraft | Loader |
 |---|---|---|
+| `modjs-forge-mc26.3-<version>.jar` | 26.3 | Forge |
+| `modjs-neoforge-mc26.3-<version>.jar` | 26.3 | NeoForge |
+| `modjs-forge-mc26.2-<version>.jar` | 26.2 | Forge |
+| `modjs-neoforge-mc26.2-<version>.jar` | 26.2 | NeoForge |
 | `modjs-forge-mc26.1.2-<version>.jar` | 26.1.2 | Forge |
 | `modjs-neoforge-mc26.1.2-<version>.jar` | 26.1.2 | NeoForge |
 | `modjs-forge-mc1.21.1-<version>.jar` | 1.21.1 | Forge |

@@ -1,14 +1,14 @@
 # ModJS
 
-KubeJS-style scripting for Forge and NeoForge, powered by Rhino. Supports Minecraft 26.1.2, 1.21.1 and 1.20.1 on both loaders.
+KubeJS-style scripting for Forge and NeoForge, powered by Rhino. Supports Minecraft 26.3, 26.2, 26.1.2, 1.21.1 and 1.20.1 on both loaders.
 
 ## Layout
 
 - `common/` - script engine, events, data generation (no Minecraft code). Shared by both modules and unit tested.
-- `forge-26.1.2/` - Forge 26.1.2 module (ForgeGradle 7, Java 25, Gradle 9.3+).
+- `forge-26.3/`, `forge-26.2/`, `forge-26.1.2/` - Forge 26.x modules (ForgeGradle 7, Java 25, Gradle 9.3+).
 - `forge-1.21.1/` - Forge 1.21.1 module (ForgeGradle 6, Java 21, Gradle 8.14).
 - `forge-1.20.1/` - Forge 1.20.1 module (ForgeGradle 6, Java 17, Gradle 8.14).
-- `neoforge-26.1.2/`, `neoforge-1.21.1/` - NeoForge modules (ModDevGradle).
+- `neoforge-26.3/`, `neoforge-26.2/`, `neoforge-26.1.2/`, `neoforge-1.21.1/` - NeoForge modules (ModDevGradle).
 - `neoforge-1.20.1/` - NeoForge 1.20.1 module (NeoGradle 7, Java 17); ship the `-all` jar.
 
 `docs/PORTING.md` lists what each port needs and every known gap.

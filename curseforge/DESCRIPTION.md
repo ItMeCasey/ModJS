@@ -54,7 +54,7 @@ A hub plus a private dimension for every player, created while the server runs a
 
 ![Install](https://raw.githubusercontent.com/ItMeCasey/ModJS/main/branding/banners/h_install.png)
 
-- Pick the jar for your Minecraft version and loader: **26.1.2, 1.21.1 or 1.20.1** on **Forge or NeoForge**. On NeoForge 1.20.1 use the `-all` jar.
+- Pick the jar for your Minecraft version and loader: **26.3, 26.2, 26.1.2, 1.21.1 or 1.20.1** on **Forge or NeoForge**. On NeoForge 1.20.1 use the `-all` jar.
 - Install it on both the client and the server. Items and blocks you register are real registry entries.
 - Start the game once. ModJS creates the `modjs/` folder.
 - Just Enough Items (1.21.1 and 1.20.1) and Barely Enough Items (Forge 26.1.2) can be controlled from scripts: hide items, add information pages and hide categories.

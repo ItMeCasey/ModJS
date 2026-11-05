@@ -1,8 +1,8 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-04
-Summary: ModJS runs KubeJS-style scripts on Rhino in Forge 26.1.2 and 1.21.1; both are built, self-tested in a headless server and built by CI, while client scripts and networking are untested on a real client.
+Updated: 2026-11-05
+Summary: ModJS runs KubeJS-style scripts on Rhino on Forge and NeoForge for Minecraft 26.3, 26.2, 26.1.2, 1.21.1 and 1.20.1; all ten builds are built, self-tested in a headless server and built by CI, while client scripts and networking are untested on a real client.
 Spend: none
 
 ## Foundation
@@ -53,6 +53,8 @@ Spend: none
 - [x] Script errors shown in chat when operators join (server and startup scripts) and to players for client scripts; no separate overlay screen (w:2)
 - [x] Item unification: canonical items, materials (ores, crushed, clumps, shards), fluids, recipe, loot and inventory unification, config file (both versions self-tested with fake mods, not real ones) (w:5)
 - [x] Six ports built and self-tested: Forge 26.1.2, 1.21.1 and 1.20.1; NeoForge 26.1.2, 1.21.1 and 1.20.1 (w:5)
+- [x] Minecraft 26.2 and 26.3 on Forge and NeoForge: four modules build, pass unit tests and 81 self-test checks in a headless game-test server; CI and CurseForge tables list them (dev server and client not run) (w:4)
+- [x] Release gate: a tag uploads only builds whose own mod_version equals the tag; others are skipped and logged, and the run fails only when none match (checked with a local dry run of the collect step; not yet run in CI) (w:2)
 - [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines and fluid art on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
 
 ## Testing and release
