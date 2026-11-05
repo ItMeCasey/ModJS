@@ -1,0 +1,94 @@
+package com.itmecasey.modjs;
+
+import com.itmecasey.modjs.client.ClientBridge;
+import com.itmecasey.modjs.event.EventGroups;
+import com.itmecasey.modjs.event.EventJS;
+import com.itmecasey.modjs.format.ModernFormat;
+import com.itmecasey.modjs.format.VersionFormat;
+import com.itmecasey.modjs.game.TextBinding;
+import com.itmecasey.modjs.game.UtilsBinding;
+import com.itmecasey.modjs.network.NetworkBinding;
+import com.itmecasey.modjs.script.ExtraBindings;
+import com.itmecasey.modjs.script.PlatformBinding;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ScriptableObject;
+import com.itmecasey.modjs.command.ModJSCommands;
+import com.itmecasey.modjs.game.GameEvents;
+import com.itmecasey.modjs.game.GameRuleBinding;
+import com.itmecasey.modjs.game.SelfTest;
+import com.itmecasey.modjs.network.ModJSNetwork;
+import com.itmecasey.modjs.pack.ModJSPacks;
+import com.itmecasey.modjs.script.ScriptFolders;
+import com.itmecasey.modjs.script.ScriptManager;
+import com.itmecasey.modjs.script.ScriptType;
+import com.mojang.logging.LogUtils;
+import com.itmecasey.modjs.recipe.RecipeReloadHook;
+import com.itmecasey.modjs.registry.ContentRegistry;
+import com.itmecasey.modjs.registry.RegistryManager;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
+import org.slf4j.Logger;
+
+@Mod(ModJSInfo.MOD_ID)
+public class ModJS {
+    public static final String MOD_ID = ModJSInfo.MOD_ID;
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    public ModJS(IEventBus modBus, ModContainer container) {
+        com.itmecasey.modjs.format.LoaderNames.use("neoforge");
+        VersionFormat.use(new ModernFormat());
+        PlatformBinding.configure("26.2", FMLEnvironment.getDist() == Dist.CLIENT, id -> ModList.get().isLoaded(id));
+        ExtraBindings.register((type, cx, scope) -> {
+            ScriptableObject.putProperty(scope, "Utils", Context.javaToJS(new UtilsBinding(), scope));
+            ScriptableObject.putProperty(scope, "Text", Context.javaToJS(new TextBinding(), scope));
+            ScriptableObject.putProperty(scope, "GameRule", Context.javaToJS(new GameRuleBinding(), scope));
+            ScriptableObject.putProperty(scope, "Scoreboard", Context.javaToJS(new com.itmecasey.modjs.game.ScoreboardBinding(), scope));
+            ScriptableObject.putProperty(scope, "Dimensions", Context.javaToJS(new com.itmecasey.modjs.game.DimensionManager(), scope));
+            ScriptableObject.putProperty(scope, "Network", Context.javaToJS(new NetworkBinding(), scope));
+        });
+        com.itmecasey.modjs.unify.ColorSampler.setFinder(com.itmecasey.modjs.unify.ModTextureFinder.create());
+        ScriptManager.setRoot(FMLPaths.GAMEDIR.get().resolve(MOD_ID));
+        LOGGER.info("ModJS loading scripts from {}", ScriptManager.root());
+        ScriptFolders.prepare(ScriptManager.root());
+
+        // Startup scripts run once, now, so they can register content before the registries open.
+        ScriptManager.of(ScriptType.STARTUP).reload();
+        RegistryManager.collect();
+        ContentRegistry.register(modBus);
+        com.itmecasey.modjs.unify.UnifyLootModifier.register(modBus);
+        com.itmecasey.modjs.unify.UnifyOreBiomeModifier.register(modBus);
+
+        modBus.addListener((FMLCommonSetupEvent e) ->
+            {
+                e.enqueueWork(com.itmecasey.modjs.game.BlockModifier::apply);
+                EventGroups.STARTUP.post("init", new EventJS());
+            });
+        modBus.addListener((FMLLoadCompleteEvent e) ->
+            EventGroups.STARTUP.post("postInit", new EventJS()));
+        ModJSNetwork.init(modBus);
+        com.itmecasey.modjs.script.ModJSContextFactory.addWrapAdapter(com.itmecasey.modjs.game.BlockFacades::adapt);
+        GameEvents.register();
+        modBus.addListener(GameEvents::modifyComponents);
+        com.itmecasey.modjs.game.ExtraGameEvents.register();
+        SelfTest.register();
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
+            modBus.addListener(
+                (net.neoforged.fml.event.lifecycle.FMLClientSetupEvent e) -> EventGroups.CLIENT.post("init", new EventJS()));
+            ClientBridge.register();
+        }
+        modBus.addListener(ModJSPacks::onAddPackFinders);
+        NeoForge.EVENT_BUS.addListener(RecipeReloadHook::onAddReloadListeners);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOWEST, ModJSCommands::register);
+    }
+}

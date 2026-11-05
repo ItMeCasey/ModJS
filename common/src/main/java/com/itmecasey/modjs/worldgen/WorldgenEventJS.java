@@ -69,7 +69,7 @@ public final class WorldgenEventJS extends EventJS {
         JsonObject target = new JsonObject();
         target.add("target", predicate(replaces));
         JsonObject state = new JsonObject();
-        state.addProperty("Name", block);
+        state.addProperty(com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 3) ? "id" : "Name", block);
         target.add("state", state);
         JsonArray targets = new JsonArray();
         targets.add(target);
@@ -79,8 +79,14 @@ public final class WorldgenEventJS extends EventJS {
         config.addProperty("discard_chance_on_air_exposure", 0.0);
         JsonObject configured = new JsonObject();
         configured.addProperty("type", "minecraft:ore");
-        configured.add("config", config);
-        data.putJson(NAMESPACE, "worldgen/configured_feature/" + id, configured);
+        if (com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 3)) {
+            // 26.3 merged configured features into features: the config sits beside the type, in worldgen/feature.
+            config.entrySet().forEach(entry -> configured.add(entry.getKey(), entry.getValue()));
+            data.putJson(NAMESPACE, "worldgen/feature/" + id, configured);
+        } else {
+            configured.add("config", config);
+            data.putJson(NAMESPACE, "worldgen/configured_feature/" + id, configured);
+        }
 
         int minY = intOption(options, "minY", -64);
         int maxY = intOption(options, "maxY", 64);
@@ -158,8 +164,17 @@ public final class WorldgenEventJS extends EventJS {
         JsonObject spawner = new JsonObject();
         spawner.addProperty("type", entity);
         spawner.addProperty("weight", intOption(options, "weight", 10));
-        spawner.addProperty("minCount", intOption(options, "minCount", 1));
-        spawner.addProperty("maxCount", intOption(options, "maxCount", 3));
+        if (com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 3)) {
+            // 26.3 spawner entries carry one int provider instead of minCount and maxCount.
+            JsonObject count = new JsonObject();
+            count.addProperty("type", "minecraft:uniform");
+            count.addProperty("min_inclusive", intOption(options, "minCount", 1));
+            count.addProperty("max_inclusive", intOption(options, "maxCount", 3));
+            spawner.add("count", count);
+        } else {
+            spawner.addProperty("minCount", intOption(options, "minCount", 1));
+            spawner.addProperty("maxCount", intOption(options, "maxCount", 3));
+        }
         JsonObject json = new JsonObject();
         json.addProperty("type", com.itmecasey.modjs.format.LoaderNames.id("add_spawns"));
         json.add("biomes", biomes(options, "biomes", "#minecraft:is_overworld"));
@@ -173,7 +188,9 @@ public final class WorldgenEventJS extends EventJS {
     public void removeSpawn(Object options) {
         String id = requireId(options);
         JsonObject json = new JsonObject();
-        json.addProperty("type", com.itmecasey.modjs.format.LoaderNames.id("remove_spawns"));
+        // Forge 26.3's own remove_spawns crashes on biomes without spawns in a category; that build ships a fixed copy.
+        boolean forge263 = com.itmecasey.modjs.format.LoaderNames.loader().equals("forge") && com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 3);
+        json.addProperty("type", forge263 ? "modjs:remove_spawns" : com.itmecasey.modjs.format.LoaderNames.id("remove_spawns"));
         json.add("biomes", biomes(options, "biomes", "#minecraft:is_overworld"));
         json.add("entity_types", RecipeJson.selector(JsonUtil.property(options, "entities")));
         data.putJson(NAMESPACE, com.itmecasey.modjs.format.LoaderNames.biomeModifierFolder() + id, json);

@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[0,)"
+license = "${mod_license}"
+
+accessTransformers = [
+  "META-INF/accesstransformer.cfg"
+]
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+description = '''
+KubeJS-style scripting for Forge, powered by Rhino.
+'''
+
+[[dependencies.${mod_id}]]
+modId = "forge"
+mandatory = true
+versionRange = "[65,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[26.2,26.3)"
+ordering = "NONE"
+side = "BOTH"

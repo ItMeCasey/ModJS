@@ -18,6 +18,18 @@ public final class PlatformBinding {
         modLoaded = isModLoaded;
     }
 
+    /** True when the running Minecraft version is {@code major.minor} or newer (patch numbers are ignored). */
+    public static boolean atLeast(int major, int minor) {
+        String[] parts = mcVersion.split("[.]");
+        try {
+            int actualMajor = Integer.parseInt(parts[0]);
+            int actualMinor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+            return actualMajor > major || (actualMajor == major && actualMinor >= minor);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public String getMcVersion() {
         return mcVersion;
     }
