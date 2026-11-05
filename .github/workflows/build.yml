@@ -11,6 +11,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - module: forge-26.3
+            java: 25
+          - module: neoforge-26.3
+            java: 25
+          - module: forge-26.2
+            java: 25
+          - module: neoforge-26.2
+            java: 25
           - module: forge-26.1.2
             java: 25
           - module: forge-1.21.1

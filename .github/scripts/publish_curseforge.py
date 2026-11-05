@@ -23,6 +23,10 @@ API = "https://minecraft.curseforge.com/api"
 
 # module -> (Minecraft version, loader name on CurseForge, Java version name on CurseForge)
 BUILDS = {
+    "forge-26.3": ("26.3", "Forge", "Java 25"),
+    "neoforge-26.3": ("26.3", "NeoForge", "Java 25"),
+    "forge-26.2": ("26.2", "Forge", "Java 25"),
+    "neoforge-26.2": ("26.2", "NeoForge", "Java 25"),
     "forge-26.1.2": ("26.1.2", "Forge", "Java 25"),
     "neoforge-26.1.2": ("26.1.2", "NeoForge", "Java 25"),
     "forge-1.21.1": ("1.21.1", "Forge", "Java 21"),
@@ -31,6 +35,32 @@ BUILDS = {
     "neoforge-1.20.1": ("1.20.1", "NeoForge", "Java 17"),
 }
 RELEASE_TYPES = ("alpha", "beta", "release")
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def module_version(module):
+    """The mod_version in the module's gradle.properties, or None when the module folder is missing."""
+    props = ROOT / module / "gradle.properties"
+    if not props.is_file():
+        return None
+    for line in props.read_text(encoding="utf-8").splitlines():
+        if line.startswith("mod_version="):
+            return line.split("=", 1)[1].strip()
+    return None
+
+
+def selected(version):
+    """The builds to upload: only those whose own mod_version is this version; the rest are skipped and logged."""
+    chosen = []
+    for module in BUILDS:
+        own = module_version(module)
+        if own == version:
+            chosen.append(module)
+        else:
+            print(f"skipping {module}: mod_version {own} is not {version}")
+    if not chosen:
+        sys.exit(f"No build has mod_version {version}")
+    return chosen
 
 
 def token():
@@ -111,7 +141,7 @@ def main():
         if not (args.artifacts and args.version):
             parser.error("--collect needs --artifacts and --version")
         args.collect.mkdir(parents=True, exist_ok=True)
-        for module in BUILDS:
+        for module in selected(args.version):
             jar = pick_jar(args.artifacts / f"jar-{module}", module, args.version)
             target = args.collect / clean_name(module, args.version)
             target.write_bytes(jar.read_bytes())
@@ -123,7 +153,8 @@ def main():
     versions = game_versions()
     changelog = args.changelog_file.read_text(encoding="utf-8")
     plan = []
-    for module, (minecraft, loader, java) in BUILDS.items():
+    for module in selected(args.version):
+        minecraft, loader, java = BUILDS[module]
         folder = args.artifacts / f"jar-{module}"
         if not folder.is_dir():
             sys.exit(f"Missing build folder {folder}")
