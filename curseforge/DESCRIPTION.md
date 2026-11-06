@@ -68,7 +68,7 @@ A hub plus a private dimension for every player, created while the server runs a
 
 **Does it work with EMI or REI?** Not yet. Neither publishes a Forge build to compile against.
 
-**How well is it tested?** All six builds pass the same unit tests and a headless server self-test on every push. Client-side features have had little time on a real client, so report anything that looks wrong.
+**How well is it tested?** All ten builds pass the same unit tests and a headless server self-test on every push, and each has run a scripted tour in a real game client (gameplay events, networking, a scripted screen, commands, your own content). Main-menu features and some client events are still unseen, so report anything that looks wrong.
 
 **Can I use it in my modpack?** Yes.
 
