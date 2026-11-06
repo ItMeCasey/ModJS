@@ -42,6 +42,19 @@ class TitleScreenTest {
     }
 
     @Test
+    void inputStartingTextCanBeCalledInitialOrValue() {
+        TitleScreenConfig screen = TitleScreenConfig.forScreen();
+        org.mozilla.javascript.NativeObject initial = new org.mozilla.javascript.NativeObject();
+        initial.put("initial", initial, "ModJS");
+        org.mozilla.javascript.NativeObject value = new org.mozilla.javascript.NativeObject();
+        value.put("value", value, "Older");
+        screen.input("a", initial);
+        screen.input("b", value);
+        assertEquals("ModJS", screen.inputs().get(0).initial());
+        assertEquals("Older", screen.inputs().get(1).initial());
+    }
+
+    @Test
     void titleScreenDescription() {
         TitleScreenConfig config = new TitleScreenConfig();
         config.background(0x112233);

@@ -28,6 +28,7 @@ GRADLE_CACHE = Path.home() / ".gradle" / "caches" / "modules-2" / "files-2.1" / 
 FRAMES = ROOT / "docs" / "frames"
 TIMEOUT = 420
 WORLD = "modjs_info"
+LAUNCHER = r"C:/Users/casey/.claude/tools/launch-isolated.ps1"
 JSTACK = "C:/Program Files/Microsoft/jdk-25.0.4.7-hotspot/bin/jstack.exe"
 OPTIONS = (
     "soundCategory_master:0.0\nmusic:0.0\npauseOnLostFocus:false\nonboardAccessibility:false\nskipMultiplayerWarning:true\ntutorialStep:none\njoinedFirstServer:true\nchatVisibility:2\nfullscreen:false\nguiScale:3\nlang:en_us\n"
@@ -226,7 +227,6 @@ def run_checks(log):
 def tour(module):
     run, has_jade = prepare(module)
     FRAMES.mkdir(parents=True, exist_ok=True)
-    bounds = display_bounds()
     log = []
     saved = []
     done = threading.Event()
@@ -234,37 +234,61 @@ def tour(module):
     if shots.exists():
         for old in shots.glob("info_*.png"):
             old.unlink()
-    proc = subprocess.Popen(["cmd", "/c", str(ROOT / module / "gradlew.bat"), "runClient", "--no-daemon", "-q", f"-PquickWorld={WORLD}"] + (["-PnoSmwti"] if os.environ.get("INFO_TOUR_NO_SMWTI") else []),
-                            cwd=ROOT / module, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
+    # The client runs on a hidden Windows desktop through the mouse-safe launcher, so its window, focus and cursor warps never reach
+    # the real desktop. Its output goes to the launcher's log file, which this script follows.
+    gradle = r".\gradlew.bat runClient --no-daemon -q -PquickWorld=" + WORLD + (" -PnoSmwti" if os.environ.get("INFO_TOUR_NO_SMWTI") else "")
+    log_file = Path(os.environ["LOCALAPPDATA"]) / "launch-isolated" / "MCTest.log"
+    subprocess.run(["powershell", "-NoProfile", "-File", LAUNCHER, "-Kill"], capture_output=True)
+    offset = log_file.stat().st_size if log_file.exists() else 0
+    launched = subprocess.run(["powershell", "-NoProfile", "-File", LAUNCHER, "-Run", "-WorkDir", str(ROOT / module), "-Command", gradle],
+                              capture_output=True, text=True)
+    if launched.returncode != 0:
+        return f"TOUR FAIL {module}: launcher failed: {launched.stdout.strip()[:200]} {launched.stderr.strip()[:200]}"
+    if log_file.exists() and log_file.stat().st_size < offset:
+        offset = 0  # the launcher started a fresh log
+
+    def alive():
+        import psutil
+        folder = str(ROOT / module).lower()
+        for process in psutil.process_iter(["name", "cmdline", "cwd"]):
+            try:
+                if (process.info["name"] or "").lower().startswith("java") and (
+                        str(process.info["cwd"] or "").lower().startswith(folder) or any(folder in part.lower() for part in process.info["cmdline"] or [])):
+                    return True
+            except (psutil.Error, OSError):
+                continue
+        return False
+
+    stop = threading.Event()
 
     def pump():
-        for line in proc.stdout:
-            line = line.rstrip()
-            log.append(line)
-            if "INFO-TOUR RELOAD-READY" in line:
-                (run / "modjs" / "server_scripts" / "zz_reload_probe.js").write_text("console.log('RELOAD-PROBE v2');\nUtils.runAfter(40, () => console.log('INFO-TOUR DONE'));\n", encoding="utf-8")
-            if "INFO-TOUR DONE" in line:
-                done.set()
+        position = offset
+        while not done.is_set() and not stop.is_set():
+            time.sleep(0.5)
+            if not log_file.exists():
+                continue
+            if log_file.stat().st_size < position:
+                position = 0
+            if log_file.stat().st_size == position:
+                continue
+            with open(log_file, "rb") as handle:
+                handle.seek(position)
+                chunk = handle.read()
+                position += len(chunk)
+            for line in chunk.decode("utf-8", errors="replace").splitlines():
+                line = line.rstrip()
+                log.append(line)
+                if "INFO-TOUR RELOAD-READY" in line:
+                    (run / "modjs" / "server_scripts" / "zz_reload_probe.js").write_text("console.log('RELOAD-PROBE v2');\nUtils.runAfter(40, () => console.log('INFO-TOUR DONE'));\n", encoding="utf-8")
+                if "INFO-TOUR DONE" in line:
+                    done.set()
 
     threading.Thread(target=pump, daemon=True).start()
-    def keep_placed():
-        # Moves only this build's own game window onto DISPLAY6 as soon as it exists.
-        placed = None
-        for _ in range(360):
-            hwnd = my_window(module)
-            if hwnd and hwnd != placed:
-                place(hwnd, bounds, False)
-                placed = hwnd
-            if done.is_set() or proc.poll() is not None:
-                return
-            time.sleep(1.0)
-
-    threading.Thread(target=keep_placed, daemon=True).start()
     start = time.time()
     try:
         quiet_since = time.time()
         seen = 0
-        while proc.poll() is None and not done.is_set() and time.time() - start < TIMEOUT:
+        while (alive() or time.time() - start < 60) and not done.is_set() and time.time() - start < TIMEOUT:
             time.sleep(2)
             if len(log) != seen:
                 seen = len(log)
@@ -275,9 +299,10 @@ def tour(module):
                 break
     finally:
         # Whatever happens above, the game is closed: a client left running blocks every other project.
-        timed_out = proc.poll() is None and not done.is_set()
+        timed_out = not done.is_set() and time.time() - start >= TIMEOUT
         time.sleep(4.0)
-        subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
+        stop.set()
+        subprocess.run(["powershell", "-NoProfile", "-File", LAUNCHER, "-Kill"], capture_output=True)
     for shot in sorted((run / "screenshots").glob("info_*.png")):
         name = f"info-{module}-{shot.stem[len('info_'):]}.png"
         shutil.copy2(shot, FRAMES / name)

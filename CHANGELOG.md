@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.11.28
+
+All ten builds.
+
+- **Fix: the text box in your own screens ignored `initial`,** the option name the wiki and reference document. `initial` now sets the
+  starting text; `value`, the older name, still works.
+- Checked on a real client on every build: 31 of the 34 gameplay events (blocks, items, players, entities, ticks, explosions), a script
+  message from the client to the server and the reply back, and a scripted screen. Forge 1.21.1 has an open problem in the development
+  client (see docs/PORTING.md).
+
 ## 2026.11.27
 
 Forge and NeoForge 26.3, 26.2 and 26.1.2 (six builds); the other four builds stay at 2026.11.26.

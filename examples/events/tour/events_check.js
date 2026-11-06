@@ -122,8 +122,16 @@ PlayerEvents.loggedIn(event => {
     // The game's own packet handler, as when a player right-clicks an entity: the client sends interact-at, then interact.
     const Interact = Packets('ServerboundInteractPacket');
     const target = cows.get(0);
-    try { player.connection.handleInteract(Interact.createInteractionPacket(target, false, hand, target.position())); } catch (e) { note('interact-at', e); }
-    player.connection.handleInteract(Interact.createInteractionPacket(target, false, hand));
+    const sendInteract = () => {
+      // up to 1.21.1 two packets (interact-at, interact) built with a factory; 26.x has one packet that carries the click position
+      try {
+        player.connection.handleInteract(Interact.createInteractionPacket(target, false, hand, target.position()));
+        player.connection.handleInteract(Interact.createInteractionPacket(target, false, hand));
+      } catch (e) {
+        player.connection.handleInteract(new Interact(target.getId(), hand, target.position(), false));
+      }
+    };
+    sendInteract();
   });
   at(90, 'EntityEvents.hurt', () => run('damage @e[type=minecraft:cow,limit=1,sort=nearest] 1'));
   at(100, 'EntityEvents.death', () => run('kill @e[type=minecraft:cow]'));

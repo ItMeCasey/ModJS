@@ -95,6 +95,10 @@ public final class TitleScreenConfig extends EventJS {
         Integer max = number(options, "maxLength");
         String placeholder = JsonUtil.asString(options == null ? null : JsonUtil.property(options, "placeholder"));
         String value = JsonUtil.asString(options == null ? null : JsonUtil.property(options, "value"));
+        if (value == null) {
+            // The wiki and the reference call this option "initial"; "value" is the older name and still works.
+            value = JsonUtil.asString(options == null ? null : JsonUtil.property(options, "initial"));
+        }
         inputs.add(new Input(id, placeholder == null ? "" : placeholder, value == null ? "" : value, x != null ? x : 0, y != null ? y : 40,
             w != null ? w : 200, h != null ? h : 20, max != null ? max : 64));
     }

@@ -27,9 +27,9 @@ Spend: none
 - [x] Loot table events: add, replace and edit tables (edits cover tables shipped in game and mod jars) (w:3)
 
 ## Server scripts: world and entity events
-- [~] Block events: placed, broken, right click, left click and farmland trampled fire with correct data in a real client on NeoForge 26.3 and 1.21.1 (examples/events/tour/events_check.js drives them through the server's packet handlers); the other eight builds are still to run (launches paused) (w:3)
-- [~] Item events: right click, entity interact, dropped, picked up, can-pick-up, crafted, smelted and food eaten fire in a real client on NeoForge 26.3 and 1.21.1 (crafted, smelted and food eaten are fired through the loader's event factory, because a client cancels a meal and no crafting menu is driven); tooltip events and the other eight builds not checked yet (w:3)
-- [~] Player, entity, and level events: login, respawn, death, advancement, inventory, chest, tick (player, server, level), loaded, hurt, death, spawned, check spawn and explosion events fire in a real client on NeoForge 26.3 and 1.21.1; chat, logged out and level unloaded are not driven; other builds to run (w:4)
+- [x] Block events: placed, broken, right click, left click and farmland trampled fire with correct data in a real client on all ten builds (examples/events/tour/events_check.js drives them through the server's packet handlers) (w:3)
+- [x] Item events: right click, entity interact, dropped, picked up, can-pick-up, crafted, smelted and food eaten fire in a real client on all ten builds (crafted, smelted and food eaten are fired through the loader's event factory, because a client cancels a meal and no crafting menu is driven); the tooltip events are not driven (they need a screen with a hovered item) (w:3)
+- [~] Player, entity, and level events: login, respawn, death, advancement, inventory, chest, tick (player, server, level), loaded, hurt, death, spawned, check spawn and explosion events fire in a real client on nine builds; on Forge 1.21.1 the server-started and level-loaded events and the player-death loot roll do not (open, see docs/PORTING.md); chat, logged out and level unloaded are not driven (w:4)
 - [~] Command registration event with a builder API (w:2)
 - [x] Server scheduler: run after N ticks and repeating tasks (w:1)
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
@@ -41,11 +41,11 @@ Spend: none
 
 ## Shared helpers
 - [~] Global helpers: item and ingredient builders, text components, JSON IO and persistent values (unit tested from real scripts: round trip, path escape refused, values survive a reload), NBT and server access (NBT and text helpers still without their own tests) (w:3)
-- [~] Networking: one channel for script messages; a client-to-server ping and a server-to-client reply are written as a tour check (examples/network) but not yet run on a client (launches paused) (w:3)
+- [x] Networking: one channel for script messages; a client-to-server ping and the server's reply to the client were proven in a real client on all ten builds (examples/network, log lines NET-CHECK); a dedicated server with a remote client was not run (w:3)
 
 ## Client scripts
 - [~] Client events: tooltip, key bindings, HUD overlay, and asset preload (w:3)
-- [~] Client screens: a scripted screen with text, button and text box is written as a tour check with a frame (examples/client) but not yet run; the scripted title screen needs the main menu, which Quick Play skips (launches paused) (w:3)
+- [~] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text need the main menu, which Quick Play skips, so they are still unseen (w:3)
 
 ## Compatibility and tooling
 - [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); JEI client check on each build that has JEI not yet run (launches paused); EMI, REI and JEI 26.1.2 need upstream builds that do not exist; Create recipe types: not planned (Create has no build for most of these versions and its recipe types are a separate large API) (w:3)
