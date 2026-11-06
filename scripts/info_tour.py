@@ -144,6 +144,8 @@ def prepare(module):
     server.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / "examples" / "block-info" / "startup_scripts" / "block_info.js", startup)
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "tab_check.js", startup)
+    shutil.copy2(ROOT / "examples" / "registry" / "startup_scripts" / "registry_example.js", startup)
+    shutil.copy2(ROOT / "examples" / "registry" / "tour" / "registry_tour.js", server)
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour_client.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour.js", server)
     return run, jade is not None
@@ -151,7 +153,9 @@ def prepare(module):
 
 def cleanup(run):
     for path in (run / "modjs" / "startup_scripts" / "block_info.js", run / "modjs" / "startup_scripts" / "tab_check.js", run / "modjs" / "server_scripts" / "info_tour.js",
-                 run / "modjs" / "client_scripts" / "info_tour_client.js"):
+                 run / "modjs" / "client_scripts" / "info_tour_client.js",
+                 run / "modjs" / "startup_scripts" / "registry_example.js", run / "modjs" / "server_scripts" / "registry_tour.js",
+                 run / "modjs" / "server_scripts" / "zz_reload_probe.js"):
         path.unlink(missing_ok=True)
     for saved in (run / "modjs").glob("*/*.js.tourbak"):
         saved.replace(saved.with_name(saved.name[:-len(".tourbak")]))
@@ -175,6 +179,24 @@ def dump_threads(folder, target):
     target.write_text(out.stdout + out.stderr, encoding="utf-8")
 
 
+CHECKS = [
+    ("/modjs hand", r"Main hand: minecraft:diamond_sword"),
+    ("/modjs toolbar item 1", r"Toolbar 1: minecraft:diamond_sword"),
+    ("/modjs toolbar item 2", r"Toolbar 2: minecraft:apple x5"),
+    ("/modjs toolbar total", r"Toolbar: \d+ items?\."),
+    ("/modjs inventory total", r"Inventory: \d+ items?\."),
+    ("/modjs reload ran", r"Reloading data packs and server scripts"),
+    ("reload picked up a new script", r"RELOAD-PROBE v2"),
+    ("player death (loot roll) does not crash", r"Killed Dev|Dev died"),
+]
+
+
+def run_checks(log):
+    text = "\n".join(log)
+    results = [(name, re.search(pattern, text) is not None) for name, pattern in CHECKS]
+    return results
+
+
 def tour(module):
     run, has_jade = prepare(module)
     FRAMES.mkdir(parents=True, exist_ok=True)
@@ -193,6 +215,8 @@ def tour(module):
         for line in proc.stdout:
             line = line.rstrip()
             log.append(line)
+            if "INFO-TOUR RELOAD-READY" in line:
+                (run / "modjs" / "server_scripts" / "zz_reload_probe.js").write_text("console.log('RELOAD-PROBE v2');\nUtils.runAfter(40, () => console.log('INFO-TOUR DONE'));\n", encoding="utf-8")
             if "INFO-TOUR DONE" in line:
                 done.set()
 
@@ -232,8 +256,11 @@ def tour(module):
     (run / "info_tour.log").write_text("\n".join(log), encoding="utf-8")
     cleanup(run)
     errors = [line for line in log if " 0 error(s)" not in line and re.search(r"modjs/]: .*(Exception|Error)|ModLoadingException|Crash report saved|Exception in thread", line, re.I)]
-    status = "TOUR PASS" if done.is_set() and len(saved) >= 4 and not errors else "TOUR FAIL"
-    detail = "" if status == "TOUR PASS" else f": done={done.is_set()} timed_out={timed_out} frames={len(saved)} first_error={errors[:1]}"
+    checks = run_checks(log)
+    failed_checks = [name for name, ok in checks if not ok]
+    (run / "info_tour_checks.txt").write_text("\n".join(("ok   " if ok else "FAIL ") + name for name, ok in checks), encoding="utf-8")
+    status = "TOUR PASS" if done.is_set() and len(saved) >= 5 and not errors and not failed_checks else "TOUR FAIL"
+    detail = "" if status == "TOUR PASS" else f": done={done.is_set()} timed_out={timed_out} frames={len(saved)} failed_checks={failed_checks} first_error={errors[:1]}"
     return f"{status} {module} (jade={'yes' if has_jade else 'no build'}, {len(saved)} frames, {int(time.time() - start)}s){detail}"
 
 

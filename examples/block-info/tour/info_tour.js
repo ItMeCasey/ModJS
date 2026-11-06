@@ -45,5 +45,4 @@ PlayerEvents.loggedIn(event => {
     });
     Utils.runAfter(start + 120, () => console.log('INFO-TOUR READY ' + scene.name));
   });
-  Utils.runAfter(100 + scenes.length * 200 + 40, () => console.log('INFO-TOUR DONE'));
 });

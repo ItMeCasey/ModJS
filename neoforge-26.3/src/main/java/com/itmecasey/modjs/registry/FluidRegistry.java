@@ -26,6 +26,7 @@ final class FluidRegistry {
     private static final DeferredRegister<FluidType> TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, RegistryManager.NAMESPACE);
     private static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, RegistryManager.NAMESPACE);
 
+    private static final java.util.List<FluidModels.Entry> MODELS = new java.util.ArrayList<>();
     private static final java.util.Map<String, DeferredHolder<FluidType, ? extends FluidType>> TYPE_HOLDERS = new java.util.HashMap<>();
 
     private FluidRegistry() {
@@ -41,8 +42,7 @@ final class FluidRegistry {
         }
     }
 
-    // NeoForge 26.1.2 draws fluids from fluid models rather than the old client extension texture methods; the vanilla
-    // water look is not wired up here yet, so a script fluid renders with the loader's default until that is done.
+    // NeoForge 26 draws fluids from fluid models rather than client extension textures; see FluidModels.
 
     static void register(IEventBus modBus, DeferredRegister<Block> blocks, DeferredRegister<Item> items, java.util.List<ContentRegistry.TabEntry> tabEntries) {
         for (FluidBuilderJS builder : RegistryManager.fluids()) {
@@ -64,6 +64,7 @@ final class FluidRegistry {
             DeferredHolder<Fluid, ? extends Fluid> source = FLUIDS.register(b.id(), () -> new BaseFlowingFluid.Source(props[0]));
             DeferredHolder<Fluid, ? extends Fluid> flowing = FLUIDS.register(b.id() + "_flowing", () -> new BaseFlowingFluid.Flowing(props[0]));
             holder[0] = source;
+            MODELS.add(new FluidModels.Entry(source, flowing, b.color()));
             TYPE_HOLDERS.put(b.id(), type);
             props[0] = new BaseFlowingFluid.Properties(type, source, flowing).block(() -> (LiquidBlock) block.get());
             if (bucketRef != null) {
@@ -72,6 +73,9 @@ final class FluidRegistry {
         }
         TYPES.register(modBus);
         FLUIDS.register(modBus);
+        if (net.neoforged.fml.loading.FMLEnvironment.getDist() == net.neoforged.api.distmarker.Dist.CLIENT) {
+            FluidModels.register(modBus, MODELS);
+        }
     }
 
     @SuppressWarnings("unchecked")

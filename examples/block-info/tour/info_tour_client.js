@@ -2,6 +2,7 @@
 // info_tour.js: each scene is placed at 100 + 200 * n server ticks after login and is looked at a little later.
 // If the client is still not in a world after 30 seconds, one frame of whatever screen is open is saved as info_stall.png.
 const names = ['lamp', 'crate', 'furnace', 'cow'];
+const registryTick = 1000 + 110;   // examples/registry/tour/registry_tour.js
 let ticks = -1;
 let waiting = 0;
 ClientEvents.loggedIn(() => { ticks = 0; });
@@ -15,4 +16,5 @@ ClientEvents.tick(() => {
   names.forEach((name, index) => {
     if (ticks === 100 + index * 200 + 110) Client.screenshot('info_' + name + '.png');
   });
+  if (ticks === registryTick) Client.screenshot('info_registry.png');
 });
