@@ -146,6 +146,10 @@ def prepare(module):
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "tab_check.js", startup)
     shutil.copy2(ROOT / "examples" / "registry" / "startup_scripts" / "registry_example.js", startup)
     shutil.copy2(ROOT / "examples" / "registry" / "tour" / "registry_tour.js", server)
+    shutil.copy2(ROOT / "examples" / "events" / "tour" / "events_check.js", server)
+    shutil.copy2(ROOT / "examples" / "network" / "tour" / "net_check.js", server)
+    shutil.copy2(ROOT / "examples" / "network" / "tour" / "net_check_client.js", run / "modjs" / "client_scripts")
+    shutil.copy2(ROOT / "examples" / "client" / "tour" / "screens_check.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour_client.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour.js", server)
     return run, jade is not None
@@ -154,7 +158,8 @@ def prepare(module):
 def cleanup(run):
     for path in (run / "modjs" / "startup_scripts" / "block_info.js", run / "modjs" / "startup_scripts" / "tab_check.js", run / "modjs" / "server_scripts" / "info_tour.js",
                  run / "modjs" / "client_scripts" / "info_tour_client.js",
-                 run / "modjs" / "startup_scripts" / "registry_example.js", run / "modjs" / "server_scripts" / "registry_tour.js",
+                 run / "modjs" / "startup_scripts" / "registry_example.js", run / "modjs" / "server_scripts" / "registry_tour.js", run / "modjs" / "server_scripts" / "events_check.js", run / "modjs" / "server_scripts" / "net_check.js",
+                 run / "modjs" / "client_scripts" / "net_check_client.js", run / "modjs" / "client_scripts" / "screens_check.js",
                  run / "modjs" / "server_scripts" / "zz_reload_probe.js"):
         path.unlink(missing_ok=True)
     for saved in (run / "modjs").glob("*/*.js.tourbak"):
@@ -187,6 +192,9 @@ CHECKS = [
     ("/modjs inventory total", r"Inventory: \d+ items?\."),
     ("/modjs reload ran", r"Reloading data packs and server scripts"),
     ("reload picked up a new script", r"RELOAD-PROBE v2"),
+    ("network: server got the client message", r"NET-CHECK server got ping 1"),
+    ("network: client got the server message", r"NET-CHECK client got pong 2 back again"),
+    ("screen: a scripted screen opened and closed", r"SCREEN-CHECK opened[\s\S]*SCREEN-CHECK closed"),
     ("player death (loot roll) does not crash", r"Killed Dev|Dev died"),
 ]
 
@@ -196,9 +204,22 @@ CHECKS = [
 KNOWN_OPEN = {"forge-1.21.1"}
 
 
+EVENT_CHECKS = [
+    "BlockEvents.placed", "BlockEvents.broken", "BlockEvents.rightClicked", "BlockEvents.leftClicked", "BlockEvents.farmlandTrampled",
+    "ItemEvents.rightClicked", "ItemEvents.entityInteracted", "ItemEvents.crafted", "ItemEvents.smelted", "ItemEvents.foodEaten",
+    "ItemEvents.dropped", "ItemEvents.canPickUp", "ItemEvents.pickedUp", "PlayerEvents.loggedIn", "PlayerEvents.respawned",
+    "PlayerEvents.death", "PlayerEvents.advancement", "PlayerEvents.inventoryChanged", "PlayerEvents.inventoryOpened",
+    "PlayerEvents.inventoryClosed", "PlayerEvents.chestOpened", "PlayerEvents.chestClosed", "PlayerEvents.tick", "ServerEvents.tick",
+    "LevelEvents.tick", "ServerEvents.loaded", "LevelEvents.loaded", "EntityEvents.hurt", "EntityEvents.death", "EntityEvents.spawned",
+    "LevelEvents.beforeExplosion", "LevelEvents.afterExplosion", "ServerEvents.command", "ServerEvents.basicCommand",
+]
+
+
 def run_checks(log):
     text = "\n".join(log)
     results = [(name, re.search(pattern, text) is not None) for name, pattern in CHECKS]
+    for name in EVENT_CHECKS:
+        results.append(("event " + name, "EVENTS-CHECK ok " + name in text))
     return results
 
 

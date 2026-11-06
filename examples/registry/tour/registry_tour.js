@@ -47,15 +47,15 @@ PlayerEvents.loggedIn(event => {
 
   // A death rolls the player's loot table. The Forge 1.21.1 dev client once crashed there with Forge's own
   // "Can not retrieve LootModifierManager until resources have loaded once", so the tour checks it on every build.
-  Utils.runAfter(start + 400, () => {
+  Utils.runAfter(start + 1300, () => {
     console.log('INFO-TOUR DEATH now');
     run('kill ' + me);
   });
 
   // The driver writes server_scripts/zz_reload_probe.js when it sees this line; the reload then has to pick it up. A reload
   // drops scheduled tasks, so the probe script itself logs the final "INFO-TOUR DONE".
-  Utils.runAfter(start + 500, () => console.log('INFO-TOUR RELOAD-READY'));
-  Utils.runAfter(start + 700, () => {
+  Utils.runAfter(start + 1400, () => console.log('INFO-TOUR RELOAD-READY'));
+  Utils.runAfter(start + 1600, () => {
     console.log('INFO-TOUR RELOAD now');
     run('modjs reload');
   });
