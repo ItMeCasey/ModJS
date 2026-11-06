@@ -71,6 +71,6 @@ Spend: none
 - [x] Deploy the ModJS wiki to the droplet and check it live (w:1)
 - [x] Logo, banners, section headers and CurseForge description in branding/ and curseforge/ (not yet pushed or uploaded) (w:2)
 - [x] CurseForge project 1783874 created and 2026.11.24 beta uploaded by the release workflow (a v<version> tag builds, self-tests, makes a GitHub release and uploads) (w:3)
-- [ ] Modrinth project and uploads (on hold) (w:2)
+- [x] Modrinth project and uploads: frozen indefinitely by Casey (2026-11-06), nothing to do (w:2)
 - [x] Command editing (add, remove, edit, alias, rename), Scoreboard global, toast hiding and editing, tutorial and experimental-warning switches; 20 new self-test checks and 12 unit tests pass on all six builds (client parts compiled, not seen on a client) (w:4)
 - [x] World types (StartupEvents.worldTypes): add, edit, duplicate, hide, rename, drop; 9 new self-test checks pass on all six builds (button not seen on a client) (w:3)
