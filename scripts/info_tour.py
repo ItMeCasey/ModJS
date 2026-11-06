@@ -240,20 +240,23 @@ def tour(module):
 
     threading.Thread(target=keep_placed, daemon=True).start()
     start = time.time()
-    quiet_since = time.time()
-    seen = 0
-    while proc.poll() is None and not done.is_set() and time.time() - start < TIMEOUT:
-        time.sleep(2)
-        if len(log) != seen:
-            seen = len(log)
-            quiet_since = time.time()
-        elif time.time() - quiet_since > 100:
-            # The game wrote nothing for 100 seconds: record where every thread is, then stop waiting.
-            dump_threads(ROOT / module, run / "stall_jstack.txt")
-            break
-    timed_out = proc.poll() is None and not done.is_set()
-    time.sleep(4.0)
-    subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
+    try:
+        quiet_since = time.time()
+        seen = 0
+        while proc.poll() is None and not done.is_set() and time.time() - start < TIMEOUT:
+            time.sleep(2)
+            if len(log) != seen:
+                seen = len(log)
+                quiet_since = time.time()
+            elif time.time() - quiet_since > 100:
+                # The game wrote nothing for 100 seconds: record where every thread is, then stop waiting.
+                dump_threads(ROOT / module, run / "stall_jstack.txt")
+                break
+    finally:
+        # Whatever happens above, the game is closed: a client left running blocks every other project.
+        timed_out = proc.poll() is None and not done.is_set()
+        time.sleep(4.0)
+        subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
     for shot in sorted((run / "screenshots").glob("info_*.png")):
         name = f"info-{module}-{shot.stem[len('info_'):]}.png"
         shutil.copy2(shot, FRAMES / name)
