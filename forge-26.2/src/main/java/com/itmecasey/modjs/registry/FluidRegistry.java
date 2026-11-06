@@ -63,6 +63,8 @@ final class FluidRegistry {
         }
     }
 
+    private static final java.util.List<FluidModels.Entry> MODELS = new java.util.ArrayList<>();
+
     static void register(BusGroup modBus, DeferredRegister<Block> blocks, DeferredRegister<Item> items, java.util.List<ContentRegistry.TabEntry> tabEntries) {
         for (FluidBuilderJS builder : RegistryManager.fluids()) {
             FluidBuilderJS b = builder;
@@ -83,6 +85,7 @@ final class FluidRegistry {
             RegistryObject<FlowingFluid> source = FLUIDS.register(b.id(), () -> new ForgeFlowingFluid.Source(props[0]));
             RegistryObject<FlowingFluid> flowing = FLUIDS.register(b.id() + "_flowing", () -> new ForgeFlowingFluid.Flowing(props[0]));
             holder[0] = source;
+            MODELS.add(new FluidModels.Entry(source, flowing, b.color()));
             props[0] = new ForgeFlowingFluid.Properties(type, source, flowing).block(() -> (LiquidBlock) block.get());
             if (bucketRef != null) {
                 props[0].bucket(bucketRef);
@@ -90,6 +93,9 @@ final class FluidRegistry {
         }
         TYPES.register(modBus);
         FLUIDS.register(modBus);
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
+            FluidModels.register(modBus, MODELS);
+        }
     }
 
     @SuppressWarnings("unchecked")
