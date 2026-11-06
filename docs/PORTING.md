@@ -16,7 +16,7 @@ what a new port has to provide and every gap that exists because a version could
 | `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | full except rarity changes in `ItemEvents.modification` (no components in that version); the same 81 self-test checks and 71 unit tests pass |
 | `neoforge-1.20.1` | 1.20.1 | NeoForge 47.1.106 | same as Forge 1.20.1 (same sources); 81 self-test checks and 71 unit tests pass. Ship the `-all` jar (it carries Rhino) |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 81 self-test checks and 71 unit tests pass |
-| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full except F3 debug lines and the fluid art; the same 81 self-test checks and 71 unit tests pass |
+| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full except F3 debug lines; the same 81 self-test checks and 71 unit tests pass |
 
 The 1.20.1 module copies the Forge 1.21.1 one and adapts to the older game: plural data folders and `item`/string recipe results (`DataFolders`, `Legacy120Format`), `FriendlyByteBuf` messages on a `SimpleChannel`, the old `Tier` and `ArmorMaterial` interfaces, `RecipeManager.fromJson`, reflection for item stack size and durability, `Codec` instead of `MapCodec`, and Rhino through `minecraftLibrary`. Its self test needs a connected test player (an `EmbeddedChannel`) because Forge reacts to logins.
 
@@ -68,6 +68,7 @@ events and moves lines from server to client for Jade. The per-version files are
 | Forge 26.x and 1.21.1 | A biome modifier shipped in the mod jar makes every world "use experimental settings" | The world then waits on a vanilla confirmation screen. ModJS therefore writes its ore-swap modifier into the generated data pack only while `Unify.ores()` is on (`UnifyOreData`); with that on, players see the screen once per world. Forge 1.20.1 and NeoForge are not affected. |
 | Block info | Jade on 1.20.1 has no client frame | Jade's 1.20.1 jar uses SRG names and its mixins fail in the Mojang-named dev game; compile-checked only. |
 | Block info | Entity `nbt` is empty | Saving an entity changed on 26.x (value output), so scripts read `event.entity` instead. |
+| Forge 1.21.1 | In a dev client opened with Quick Play, `/modjs ...` is an unknown command and a player death throws Forge's "Can not retrieve LootModifierManager until resources have loaded once" | Seen on 2026-11-06 in three launches (BEI's flat world, SMWTI's saved world, ModJS alone): the `modjs` command is missing even for the console, and Forge's own `ForgeInternalHandler` loot manager is never created, with no exception logged. The same command code passes on Forge 1.20.1, 26.x and NeoForge 1.21.1, and the headless self test passes. Looks like the Forge 52.1.21 dev client's Quick Play world open, not ModJS code, but a normal world was not tried (it needs a person at the keyboard). Open. |
 | Item modification | Applies on the server and single player, not to a remote client | Components are not synced. |
 
 Unification needs from a port: the item tag folder name (`tags/item`), an item-exists check, the recipe reload hook calling

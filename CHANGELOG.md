@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.11.27
+
+NeoForge 26.3, 26.2 and 26.1.2 only; the other seven builds stay at 2026.11.26.
+
+- **Fix: fluids registered by scripts were drawn as the pink missing texture on NeoForge 26.x.** They now use the vanilla water
+  textures tinted with the fluid's color, as on the older versions.
+- Checked on a real client on every build: the `/modjs hand`, `toolbar`, `inventory` and `reload` commands (a script added while the game ran
+  is picked up by the reload), a player death, and one example script that registers every kind of content (`examples/registry`).
+  Known open problem: on Forge 1.21.1, a dev client opened with Quick Play has no `/modjs` command (see docs/PORTING.md).
+
 ## 2026.11.26
 
 All ten builds (Forge and NeoForge for 26.3, 26.2, 26.1.2, 1.21.1 and 1.20.1).

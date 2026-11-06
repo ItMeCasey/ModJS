@@ -56,6 +56,8 @@ Storage blocks: `event.create('crate').container(3)` makes a chest-like block wi
 
 Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier. Armor: `.armor('helmet' | 'chestplate' | 'leggings' | 'boots', 'leather' | 'chainmail' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla material. Add items to existing tabs: `StartupEvents.modifyCreativeTab('minecraft:tools_and_utilities', e => e.add('modjs:ruby'))`.
 
+One example script with every kind of registration is in `examples/registry` (tab, item, tool tier and tool, armor material and armor, blocks, slab, stairs, crate and a fluid).
+
 Fluids: `StartupEvents.registry('fluid', e => e.create('goo').color(0x44FF44).luminosity(6).density(1500).noBucket())` registers `modjs:goo`, `modjs:goo_flowing`, a liquid block and `modjs:goo_bucket`; it uses the vanilla water textures tinted by `color`.
 
 Everything is registered as `modjs:<id>`. Put textures at `modjs/assets/modjs/textures/item/<id>.png` and

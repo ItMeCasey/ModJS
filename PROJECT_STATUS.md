@@ -1,7 +1,7 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-05
+Updated: 2026-11-06
 Summary: ModJS runs KubeJS-style scripts on Rhino on Forge and NeoForge for Minecraft 26.3, 26.2, 26.1.2, 1.21.1 and 1.20.1; all ten builds are built, self-tested in a headless server and built by CI, while client scripts and networking are untested on a real client.
 Spend: none
 
@@ -10,11 +10,11 @@ Spend: none
 - [x] Embed Rhino and load script folders (startup, server, client, data, assets) (w:4)
 - [x] Script sandbox: class allow/deny filter and per-script error reporting to log and in-game (w:3)
 - [x] Event system: priority, cancel, once/off, and JS-side listener registration (w:3)
-- [~] `/modjs reload` command for script hot reload (w:2)
-- [~] Item commands `/modjs hand`, `toolbar` and `inventory` list held item ids (registered, not yet run by a player) (w:1)
+- [x] `/modjs reload` command for script hot reload: a script added while the game ran was picked up, seen on a real client on nine builds (Forge 1.21.1 dev client has no /modjs command, open) (w:2)
+- [x] Item commands `/modjs hand`, `toolbar` and `inventory` run on a real client on nine builds with the expected output (Forge 1.21.1: command missing in the dev client, open) (w:1)
 
 ## Startup scripts
-- [~] Registry events: items, blocks, creative tabs, fluids, tool tiers, armor materials and container block entities done; entity types left out on purpose (w:5)
+- [x] Registry events: items, blocks, creative tabs, fluids, tool tiers, armor materials and container block entities; one example script (examples/registry) with a unit test, seen on a real client on all ten builds; entity types left out on purpose (w:5)
 - [~] Item and block builders: properties, tooltip, food, tool, armor, and block types (w:4)
 - [x] Data generation: tags, loot tables, and recipes written as data pack output (w:3)
 - [~] Asset generation: lang, models, blockstates, and textures via a generated resource pack (w:4)
@@ -60,7 +60,8 @@ Spend: none
 - [x] Forge 26.x and 1.21.1 clients could not open a world (the jar-shipped ore biome modifier flagged it experimental, a confirmation screen waited): modifier now generated only when Unify.ores() is on, seen on a real client on all four builds (w:4)
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
 - [x] Release 2026.11.26 prepared locally for all ten builds: versions bumped, changelog, README and CurseForge text, wiki pages written (not tagged or uploaded) (w:2)
-- [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines and fluid art on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
+- [x] NeoForge 26.x script fluids drawn with tinted water (a fluid model) instead of the pink missing texture, seen on a real client on 26.3, 26.2 and 26.1.2 (w:2)
+- [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
 
 ## Testing and release
 - [x] Automated tests: shared unit tests plus a game-test self test in both modules (w:3)
