@@ -57,8 +57,9 @@ events and moves lines from server to client for Jade. The per-version files are
 
 | Area | Gap | Why |
 |---|---|---|
-| Recipe viewers | EMI and REI not implemented anywhere | No Forge build to compile against for 1.21.1 or 26.1.2 (EMI Forge builds stop at 1.20.x, REI Forge artifacts stop at 12.x). A NeoForge or Fabric port can use their real APIs. |
-| Recipe viewers | JEI not implemented on 26.1.2 | JEI publishes 26.1.2 for NeoForge and Fabric only. The 1.21.1 plugin is `compat/jei/ModJSJeiPlugin.java`; copy it when a build exists. |
+| Recipe viewers | EMI and REI not implemented anywhere (needs upstream build) | No Forge build to compile against for 1.21.1 or 26.1.2 (EMI Forge builds stop at 1.20.x, REI Forge artifacts stop at 12.x). A NeoForge or Fabric port can use their real APIs. |
+| Recipe viewers | JEI not implemented on 26.1.2 (needs upstream build) | JEI publishes 26.1.2 for NeoForge and Fabric only. The 1.21.1 plugin is `compat/jei/ModJSJeiPlugin.java`; copy it when a build exists. |
+| Recipe viewers | Create recipe types: not planned | Create has no build for most supported versions and its recipe types are a large separate API. |
 | Recipe viewers | KubeJS events beyond hide items, add information, hide categories | Not built (custom categories, hiding single recipes, and so on). |
 | Scripts | On 26.1.2 `Block` and `BlockState` are replaced by stand-ins (`BlockFacades`) | The script engine would inspect client-only classes and crash a dedicated server. Check whether each new version needs the same. |
 | Title screen | Vanilla panorama background only on 1.21.1 | `PanoramaRenderer` was removed in 26.1.2. |
@@ -69,6 +70,8 @@ events and moves lines from server to client for Jade. The per-version files are
 | Block info | Jade on 1.20.1 has no client frame | Jade's 1.20.1 jar uses SRG names and its mixins fail in the Mojang-named dev game; compile-checked only. |
 | Block info | Entity `nbt` is empty | Saving an entity changed on 26.x (value output), so scripts read `event.entity` instead. |
 | Forge 1.21.1 | In a dev client opened with Quick Play, `/modjs ...` is an unknown command and a player death throws Forge's "Can not retrieve LootModifierManager until resources have loaded once" | Seen on 2026-11-06 in three launches (BEI's flat world, SMWTI's saved world, ModJS alone): the `modjs` command is missing even for the console, and Forge's own `ForgeInternalHandler` loot manager is never created, with no exception logged. The same command code passes on Forge 1.20.1, 26.x and NeoForge 1.21.1, and the headless self test passes. Looks like the Forge 52.1.21 dev client's Quick Play world open, not ModJS code, but a normal world was not tried (it needs a person at the keyboard). Open. |
+| Events | Client check of the 34 gameplay events done on NeoForge 26.3 and 1.21.1 only so far; chat, logged out and level unloaded are not driven | Driving them needs a second player or a real chat packet; logged out and unloaded fire only when the server stops. The rest of the builds wait for client launches to be allowed again. |
+| Dimensions | Restart persistence of run-time dimensions is not tested | A restart test needs the dedicated server (EULA, Casey only) or a client that quits and reopens the world. |
 | Item modification | Applies on the server and single player, not to a remote client | Components are not synced. |
 
 Unification needs from a port: the item tag folder name (`tags/item`), an item-exists check, the recipe reload hook calling

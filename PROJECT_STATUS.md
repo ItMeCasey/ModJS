@@ -27,28 +27,28 @@ Spend: none
 - [x] Loot table events: add, replace and edit tables (edits cover tables shipped in game and mod jars) (w:3)
 
 ## Server scripts: world and entity events
-- [~] Block events: placed, broken, right and left click (broken checked in an in-game self test; the rest compile) (w:3)
-- [~] Item events: right click, first right click, entity interact, tooltip, modification, food eaten, crafted, and smelted (w:3)
-- [~] Player, entity, and level events: chat, login and hurt checked in-game; the rest compile (w:4)
+- [~] Block events: placed, broken, right click, left click and farmland trampled fire with correct data in a real client on NeoForge 26.3 and 1.21.1 (examples/events/tour/events_check.js drives them through the server's packet handlers); the other eight builds are still to run (launches paused) (w:3)
+- [~] Item events: right click, entity interact, dropped, picked up, can-pick-up, crafted, smelted and food eaten fire in a real client on NeoForge 26.3 and 1.21.1 (crafted, smelted and food eaten are fired through the loader's event factory, because a client cancels a meal and no crafting menu is driven); tooltip events and the other eight builds not checked yet (w:3)
+- [~] Player, entity, and level events: login, respawn, death, advancement, inventory, chest, tick (player, server, level), loaded, hurt, death, spawned, check spawn and explosion events fire in a real client on NeoForge 26.3 and 1.21.1; chat, logged out and level unloaded are not driven; other builds to run (w:4)
 - [~] Command registration event with a builder API (w:2)
 - [x] Server scheduler: run after N ticks and repeating tasks (w:1)
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
-- [~] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers (w:4)
+- [~] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers; the generated data is checked, but no test generates a chunk and counts the ore; open: needs a world-generation check (w:4)
 - [x] Item modification: change max stack size, max damage and rarity of existing items (checked on both versions) (w:2)
-- [~] Dimensions: DimensionEvents (data pack) and run-time Dimensions.create/delete/teleport; levels self-tested headless, real-player teleport and restart persistence unchecked (w:4)
+- [~] Dimensions: DimensionEvents (data pack) and run-time Dimensions.create/delete/teleport; levels self-tested headless, real-player teleport in a client not yet run; restart persistence cannot be tested here: a server restart needs the dedicated server, which needs the EULA accepted (Casey only), and the game-test server cannot restart (w:4)
 - [x] Block shapes (slab, stairs, wall, fence), vanilla-tier tools and armor, fluids, and modifyCreativeTab (add only); registered and self-tested, models not checked on a client (w:2)
 - [x] GitHub Actions build runs both modules and the self test (passing) (w:1)
 
 ## Shared helpers
-- [~] Global helpers: item and ingredient builders, text components, JSON IO, NBT, and server access (w:3)
-- [~] Networking: one channel for script messages; builds and loads, sending not yet tested with a client (w:3)
+- [~] Global helpers: item and ingredient builders, text components, JSON IO and persistent values (unit tested from real scripts: round trip, path escape refused, values survive a reload), NBT and server access (NBT and text helpers still without their own tests) (w:3)
+- [~] Networking: one channel for script messages; a client-to-server ping and a server-to-client reply are written as a tour check (examples/network) but not yet run on a client (launches paused) (w:3)
 
 ## Client scripts
 - [~] Client events: tooltip, key bindings, HUD overlay, and asset preload (w:3)
-- [~] Client screens: scripted title screen, splash text and your own screens with buttons, text and text boxes (compiled, not seen on a client) (w:3)
+- [~] Client screens: a scripted screen with text, button and text box is written as a tour check with a frame (examples/client) but not yet run; the scripted title screen needs the main menu, which Quick Play skips (launches paused) (w:3)
 
 ## Compatibility and tooling
-- [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); EMI, REI and 26.1.2 blocked by missing Forge builds; Create recipe types not started (w:3)
+- [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); JEI client check on each build that has JEI not yet run (launches paused); EMI, REI and JEI 26.1.2 need upstream builds that do not exist; Create recipe types: not planned (Create has no build for most of these versions and its recipe types are a separate large API) (w:3)
 - [x] Type definitions: a hand-written modjs.d.ts and jsconfig.json are written to modjs/ on launch (w:3)
 - [x] Script errors shown in chat when operators join (server and startup scripts) and to players for client scripts; no separate overlay screen (w:2)
 - [x] Item unification: canonical items, materials (ores, crushed, clumps, shards), fluids, recipe, loot and inventory unification, config file (both versions self-tested with fake mods, not real ones) (w:5)
