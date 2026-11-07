@@ -218,13 +218,27 @@ public final class SelfTest {
         BlockPos stonePos = new BlockPos(6, 100, 6);
         level.setBlockAndUpdate(stonePos, Blocks.STONE.defaultBlockState());
         net.minecraft.world.level.block.state.BlockState stoneState = level.getBlockState(stonePos);
+        ServerLevel genLevel = level;
+        if (level.getChunkSource().getGenerator().getClass().getSimpleName().equals("FlatLevelSource")) {
+            // The game-test overworld is flat and places no features, so generate in a run-time dimension that copies the overworld.
+            org.mozilla.javascript.NativeObject genSpec = new org.mozilla.javascript.NativeObject();
+            genSpec.put("generator", genSpec, "overworld");
+            dimensions.delete("modjs:selftest_gen");
+            if (dimensions.create("modjs:selftest_gen", genSpec)) {
+                ServerLevel made = server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,
+            net.minecraft.resources.ResourceLocation.parse("modjs:selftest_gen")));
+                if (made != null) {
+                    genLevel = made;
+                }
+            }
+        }
         // The test world is saved between runs, so use chunks far from anything an earlier run generated.
         int baseChunk = 4000 + new java.util.Random().nextInt(20000);
         int generatedOre = 0;
         int vanillaOre = 0;
         for (int cx = baseChunk; cx < baseChunk + 4; cx++) {
             for (int cz = baseChunk; cz < baseChunk + 4; cz++) {
-                net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunk(cx, cz);
+                net.minecraft.world.level.chunk.LevelChunk chunk = genLevel.getChunk(cx, cz);
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         for (int y = 0; y <= 60; y++) {
@@ -239,11 +253,14 @@ public final class SelfTest {
                 }
             }
         }
-        LOGGER.info("SELFTEST worldgen: {} script-added ore blocks and {} vanilla iron ore blocks in 16 generated chunks ({})", generatedOre, vanillaOre, level.getChunkSource().getGenerator().getClass().getSimpleName());
-        if (level.getChunkSource().getGenerator().getClass().getSimpleName().equals("FlatLevelSource")) {
+        LOGGER.info("SELFTEST worldgen: {} script-added ore blocks and {} vanilla iron ore blocks in 16 generated chunks ({})", generatedOre, vanillaOre, genLevel.getChunkSource().getGenerator().getClass().getSimpleName());
+        if (genLevel.getChunkSource().getGenerator().getClass().getSimpleName().equals("FlatLevelSource")) {
             LOGGER.info("SELFTEST worldgen check skipped: the game-test overworld is a flat world, which places no features");
         } else {
             check("WorldgenEvents.addOre ore appears in generated chunks", generatedOre > 0 && vanillaOre > 0);
+        }
+        if (genLevel != level) {
+            dimensions.delete("modjs:selftest_gen");
         }
         TextBinding textHelper = new TextBinding();
         check("Text.of and Text.translate build components", textHelper.of("plain").getString().equals("plain") && textHelper.translate("modjs.selftest.key").getString().equals("modjs.selftest.key"));
