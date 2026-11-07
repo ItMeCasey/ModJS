@@ -59,7 +59,7 @@ Spend: none
 - [~] Info bridges: SMWTI on all ten builds and Jade on the six that have one compile; seen on a real client (frames in docs/frames) on NeoForge 26.3, 26.2, 26.1.2 and 1.21.1 with both overlays and on NeoForge and Forge 1.20.1 with SMWTI; all four Forge 26.x and 1.21.1 builds seen too (SMWTI only, no Jade build) (w:4)
 - [x] Forge 26.x and 1.21.1 clients could not open a world (the jar-shipped ore biome modifier flagged it experimental, a confirmation screen waited): modifier now generated only when Unify.ores() is on, seen on a real client on all four builds (w:4)
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
-- [x] Release 2026.11.29 uploaded as ten beta files through tag v2026.11.29; the GitHub release and upload workflow passed, and CurseForge review is pending (w:2)
+- [x] Release 2026.11.29 published as ten approved beta files through tag v2026.11.29; the GitHub release and upload workflow passed (w:2)
 - [x] Script fluids on Forge and NeoForge 26.x drawn with tinted water (a fluid model) instead of the missing texture, seen on a real client on all six builds (w:2)
 - [~] Close the per-version gaps in docs/PORTING.md: item rarity changes on 1.20.1 done (self-tested on Forge and NeoForge); EMI, REI and JEI on 26.1.2 need upstream builds; F3 lines on NeoForge 26.x done (debug entry, seen on a client on 26.1.2 and 26.3, frames docs/frames/f3-*.png) (w:3)
 
@@ -70,7 +70,7 @@ Spend: none
 - [x] Wiki at itmecasey.com/wiki/modjs: 38 pages with examples, written and checked locally in the site folder (w:3)
 - [x] Deploy the ModJS wiki to the droplet and check it live (w:1)
 - [x] Logo, banners, section headers and CurseForge description in branding/ and curseforge/ (not yet pushed or uploaded) (w:2)
-- [x] CurseForge project 1783874 uses a tag-triggered beta release workflow; v2026.11.29 built, self-tested and uploaded all ten files, pending CurseForge review (w:3)
+- [x] CurseForge project 1783874 uses a tag-triggered beta release workflow; v2026.11.29 built, self-tested and published all ten approved files (w:3)
 - [x] Modrinth project and uploads: frozen indefinitely by Casey (2026-11-06), nothing to do (w:2)
 - [x] Command editing (add, remove, edit, alias, rename), Scoreboard global, toast hiding and editing, tutorial and experimental-warning switches; 20 new self-test checks and 12 unit tests pass on all six builds (client parts compiled, not seen on a client) (w:4)
 - [x] World types (StartupEvents.worldTypes): add, edit, duplicate, hide, rename, drop; 9 new self-test checks pass on all six builds (button not seen on a client) (w:3)
