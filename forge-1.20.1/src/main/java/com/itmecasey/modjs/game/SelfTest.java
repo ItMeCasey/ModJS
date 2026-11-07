@@ -225,6 +225,10 @@ public final class SelfTest {
         BlockPos stonePos = new BlockPos(6, 100, 6);
         level.setBlockAndUpdate(stonePos, Blocks.STONE.defaultBlockState());
         net.minecraft.world.level.block.state.BlockState stoneState = level.getBlockState(stonePos);
+        TextBinding textHelper = new TextBinding();
+        check("Text.of and Text.translate build components", textHelper.of("plain").getString().equals("plain") && textHelper.translate("modjs.selftest.key").getString().equals("modjs.selftest.key"));
+        check("Text.red and Text.color style the text", textHelper.red("warn").getStyle().getColor() != null && textHelper.gold("x").getStyle().getColor() != null
+            && textHelper.color("no_such_color", "y").getStyle().getColor() == null && textHelper.color("no_such_color", "y").getString().equals("y"));
         check("BlockEvents.modification changes hardness, resistance and light",
             stoneState.getDestroySpeed(level, stonePos) == 9.0f && Blocks.STONE.getExplosionResistance() == 77.0f && stoneState.getLightEmission() == 5);
         level.setBlockAndUpdate(stonePos, Blocks.AIR.defaultBlockState());

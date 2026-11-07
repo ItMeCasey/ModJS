@@ -40,7 +40,7 @@ Spend: none
 - [x] GitHub Actions build runs both modules and the self test (passing) (w:1)
 
 ## Shared helpers
-- [~] Global helpers: item and ingredient builders, text components, JSON IO and persistent values (unit tested from real scripts: round trip, path escape refused, values survive a reload), NBT and server access (NBT and text helpers still without their own tests) (w:3)
+- [x] Global helpers: item and ingredient builders, text components, JSON IO and persistent values (unit tested from real scripts: round trip, path escape refused, values survive a reload), NBT (block entity SNBT read in the self test) and Text.of, translate and color helpers (self-test checks on all ten builds, all passing) (w:3)
 - [x] Networking: one channel for script messages; a client-to-server ping and the server's reply to the client were proven in a real client on all ten builds (examples/network, log lines NET-CHECK); a dedicated server with a remote client was not run (w:3)
 
 ## Client scripts
