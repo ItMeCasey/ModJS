@@ -45,7 +45,7 @@ Spend: none
 
 ## Client scripts
 - [~] Client events: tooltip, key bindings, HUD overlay, and asset preload (w:3)
-- [~] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text were seen on the main menu on Forge 1.20.1 (frame docs/frames/title-forge-1.20.1.png; a logo bug there was fixed); also seen on NeoForge 1.20.1, NeoForge 1.21.1, Forge and NeoForge 26.1.2 and 26.2 (frames docs/frames/title-<build>.png); on Forge 1.21.1 the dev client shows the vanilla menu (see docs/PORTING.md); Forge and NeoForge 26.3 not run yet (w:3)
+- [~] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text were seen on the main menu on Forge 1.20.1 (frame docs/frames/title-forge-1.20.1.png; a logo bug there was fixed); also seen on NeoForge 1.20.1, NeoForge 1.21.1, Forge and NeoForge 26.1.2 and 26.2 (frames docs/frames/title-<build>.png); on Forge 1.21.1 the dev client shows the vanilla menu (see docs/PORTING.md); Forge and NeoForge 26.3 seen too (frames title-forge-26.3.png and title-neoforge-26.3.png), so all builds but Forge 1.21.1 are confirmed (w:3)
 
 ## Compatibility and tooling
 - [~] Recipe viewers: JEI on 1.21.1 (hide items, info pages, hide categories); JEI client check on each build that has JEI not yet run (launches paused); EMI, REI and JEI 26.1.2 need upstream builds that do not exist; Create recipe types: not planned (Create has no build for most of these versions and its recipe types are a separate large API) (w:3)
