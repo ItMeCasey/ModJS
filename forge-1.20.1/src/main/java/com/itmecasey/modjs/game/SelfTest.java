@@ -151,6 +151,10 @@ public final class SelfTest {
             runtime.setBlockAndUpdate(new BlockPos(0, 64, 0), Blocks.STONE.defaultBlockState());
             check("run-time dimension keeps blocks", runtime.getBlockState(new BlockPos(0, 64, 0)).is(Blocks.STONE));
             check("Dimensions.teleport rejects an unknown dimension", !dimensions.teleport(player, "modjs:no_such_world", 0, 64, 0));
+            check("Dimensions.teleport moves a player into the dimension", dimensions.teleport(player, "modjs:selftest_world", 0.5, 70, 0.5)
+                && player.level() == runtime && Math.abs(player.getX() - 0.5) < 0.01);
+            player.teleportTo(level, 0.5, 100, 0.5, 0.0f, 0.0f);
+            check("a player teleported into the dimension can return", player.level() == level);
         }
         check("Dimensions.delete removes it", dimensions.delete("modjs:selftest_world") && !dimensions.exists("modjs:selftest_world"));
 
