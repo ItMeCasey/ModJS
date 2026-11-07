@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 
 /**
  * Applies {@code ItemEvents.modification} on versions without data components, by rewriting the item's own fields. Rarity is
- * not supported here: in this version it comes from code, not data.
+ * the item's own final {@code rarity} field in this version, so it is rewritten the same way.
  */
 public final class ItemModifier {
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
@@ -24,6 +24,8 @@ public final class ItemModifier {
         try {
             Field stack = ObfuscationReflectionHelper.findField(Item.class, "maxStackSize");
             Field damage = ObfuscationReflectionHelper.findField(Item.class, "maxDamage");
+            Field rarity = ObfuscationReflectionHelper.findField(Item.class, "rarity");
+            rarity.setAccessible(true);
             stack.setAccessible(true);
             damage.setAccessible(true);
             for (String id : ItemModifications.ids()) {
@@ -41,7 +43,12 @@ public final class ItemModifier {
                     damage.setInt(item, changes.getMaxDamage());
                 }
                 if (changes.getRarity() != null) {
-                    LOGGER.warn("ItemEvents.modification: rarity cannot be changed on this Minecraft version ({})", id);
+                    rarity.set(item, switch (changes.getRarity().toLowerCase(java.util.Locale.ROOT)) {
+                        case "uncommon" -> net.minecraft.world.item.Rarity.UNCOMMON;
+                        case "rare" -> net.minecraft.world.item.Rarity.RARE;
+                        case "epic" -> net.minecraft.world.item.Rarity.EPIC;
+                        default -> net.minecraft.world.item.Rarity.COMMON;
+                    });
                 }
             }
         } catch (ReflectiveOperationException | RuntimeException e) {

@@ -224,6 +224,8 @@ public final class SelfTest {
         check("BlockEvents.modification changes hardness, resistance and light",
             stoneState.getDestroySpeed(level, stonePos) == 9.0f && Blocks.STONE.getExplosionResistance() == 77.0f && stoneState.getLightEmission() == 5);
         level.setBlockAndUpdate(stonePos, Blocks.AIR.defaultBlockState());
+        check("ItemEvents.modification changes stack size and rarity",
+            Items.ENDER_PEARL.getMaxStackSize() == 64 && new ItemStack(Items.ENDER_PEARL).getRarity() == net.minecraft.world.item.Rarity.EPIC);
 
         ItemStack rubyPick = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation("modjs:ruby_pickaxe")));
         ItemStack rubyHelmet = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation("modjs:ruby_helmet")));

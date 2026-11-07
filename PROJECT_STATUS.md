@@ -61,7 +61,7 @@ Spend: none
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
 - [x] Release 2026.11.26 prepared locally for all ten builds: versions bumped, changelog, README and CurseForge text, wiki pages written (not tagged or uploaded) (w:2)
 - [x] Script fluids on Forge and NeoForge 26.x drawn with tinted water (a fluid model) instead of the missing texture, seen on a real client on all six builds (w:2)
-- [ ] Close the per-version gaps in docs/PORTING.md: EMI, REI, JEI on 26.1.2, F3 lines on NeoForge 26.1.2, item rarity changes on 1.20.1 (w:3)
+- [~] Close the per-version gaps in docs/PORTING.md: item rarity changes on 1.20.1 done (self-tested on Forge and NeoForge); EMI, REI and JEI on 26.1.2 need upstream builds; F3 lines on NeoForge 26.1.2 open (w:3)
 
 ## Testing and release
 - [x] Automated tests: shared unit tests plus a game-test self test in both modules (w:3)

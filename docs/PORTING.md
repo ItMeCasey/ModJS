@@ -13,8 +13,8 @@ what a new port has to provide and every gap that exists because a version could
 | `neoforge-26.2` | 26.2 | NeoForge 26.2.0.93 | full; 81 self-test checks and the unit tests pass in a headless game-test server (no client run) |
 | `forge-26.1.2` | 26.1.2 | Forge 64.1.6 | full; self test passes |
 | `forge-1.21.1` | 1.21.1 | Forge 52.1.21 | full; self test passes |
-| `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | full except rarity changes in `ItemEvents.modification` (no components in that version); the same 81 self-test checks and 71 unit tests pass |
-| `neoforge-1.20.1` | 1.20.1 | NeoForge 47.1.106 | same as Forge 1.20.1 (same sources); 81 self-test checks and 71 unit tests pass. Ship the `-all` jar (it carries Rhino) |
+| `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | full (rarity is rewritten through the item's `rarity` field); the same 82 self-test checks and 71 unit tests pass |
+| `neoforge-1.20.1` | 1.20.1 | NeoForge 47.1.106 | same as Forge 1.20.1 (same sources); 82 self-test checks and 71 unit tests pass. Ship the `-all` jar (it carries Rhino) |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 81 self-test checks and 71 unit tests pass |
 | `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full except F3 debug lines; the same 81 self-test checks and 71 unit tests pass |
 

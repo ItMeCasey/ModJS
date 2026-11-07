@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.11.29
+
+Forge and NeoForge 1.20.1 only; the other eight builds stay at 2026.11.28.
+
+- **`ItemEvents.modification` can now change `rarity` on 1.20.1.** Before, it was logged as unsupported. A new self-test check covers it.
+
 ## 2026.11.28
 
 All ten builds.
