@@ -4,6 +4,7 @@
 
 Forge and NeoForge 1.20.1 only; the other eight builds stay at 2026.11.28.
 
+- **Fix: a scripted title screen drew the Minecraft logo twice and garbled on 1.20.1.** It now draws the logo like the game does. Seen on a real client (docs/frames/title-forge-1.20.1.png), with the panorama, the scripted buttons and text, and a script-added splash line.
 - Test only (all ten builds): the self test generates chunks and counts the ore a script added with `WorldgenEvents.addOre`.
 - **`ItemEvents.modification` can now change `rarity` on 1.20.1.** Before, it was logged as unsupported. A new self-test check covers it.
 

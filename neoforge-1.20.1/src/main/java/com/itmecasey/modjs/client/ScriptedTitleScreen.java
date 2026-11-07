@@ -187,8 +187,7 @@ public final class ScriptedTitleScreen extends Screen implements ScriptedScreens
             case "none" -> {
             }
             case "vanilla" -> {
-                graphics.blit(MINECRAFT_LOGO, width / 2 - 137, 30, 0.0f, 0.0f, 155, 44, 256, 64);
-                graphics.blit(MINECRAFT_LOGO, width / 2 + 18, 30, 0.0f, 45.0f, 155, 44, 256, 64);
+                graphics.blit(MINECRAFT_LOGO, width / 2 - 128, 30, 0.0f, 0.0f, 256, 44, 256, 64);
                 graphics.blit(EDITION_LOGO, width / 2 - 64, 67, 0.0f, 0.0f, 128, 14, 128, 16);
             }
             default -> {
