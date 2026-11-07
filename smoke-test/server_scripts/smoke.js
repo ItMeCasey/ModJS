@@ -15,7 +15,7 @@ ServerEvents.loaded(event => {
   Utils.runAfter(5, () => console.log('scheduled task ran'));
 });
 WorldgenEvents.add(event => {
-  event.addOre({ id: 'smoke_ore', block: 'minecraft:diamond_ore', size: 4, count: 2, minY: -64, maxY: 0 });
+  event.addOre({ id: 'smoke_ore', block: 'minecraft:sea_lantern', size: 8, count: 40, minY: 0, maxY: 60 });
   event.removeFeature({ id: 'smoke_no_coal', features: 'minecraft:ore_coal_upper' });
   event.addSpawn({ id: 'smoke_cows', entity: 'minecraft:cow', weight: 20 });
   event.removeSpawn({ id: 'smoke_no_zombies', entities: ['minecraft:zombie'] });

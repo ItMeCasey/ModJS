@@ -4,6 +4,7 @@
 
 Forge and NeoForge 1.20.1 only; the other eight builds stay at 2026.11.28.
 
+- Test only (all ten builds): the self test generates chunks and counts the ore a script added with `WorldgenEvents.addOre`.
 - **`ItemEvents.modification` can now change `rarity` on 1.20.1.** Before, it was logged as unsupported. A new self-test check covers it.
 
 ## 2026.11.28

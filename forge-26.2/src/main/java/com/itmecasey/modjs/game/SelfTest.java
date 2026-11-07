@@ -217,6 +217,33 @@ public final class SelfTest {
         BlockPos stonePos = new BlockPos(6, 100, 6);
         level.setBlockAndUpdate(stonePos, Blocks.STONE.defaultBlockState());
         net.minecraft.world.level.block.state.BlockState stoneState = level.getBlockState(stonePos);
+        // The test world is saved between runs, so use chunks far from anything an earlier run generated.
+        int baseChunk = 4000 + new java.util.Random().nextInt(20000);
+        int generatedOre = 0;
+        int vanillaOre = 0;
+        for (int cx = baseChunk; cx < baseChunk + 4; cx++) {
+            for (int cz = baseChunk; cz < baseChunk + 4; cz++) {
+                net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunk(cx, cz);
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        for (int y = 0; y <= 60; y++) {
+                            net.minecraft.world.level.block.state.BlockState found = chunk.getBlockState(new BlockPos(cx * 16 + x, y, cz * 16 + z));
+                            if (found.is(Blocks.SEA_LANTERN)) {
+                                generatedOre++;
+                            } else if (found.is(Blocks.IRON_ORE)) {
+                                vanillaOre++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        LOGGER.info("SELFTEST worldgen: {} script-added ore blocks and {} vanilla iron ore blocks in 16 generated chunks ({})", generatedOre, vanillaOre, level.getChunkSource().getGenerator().getClass().getSimpleName());
+        if (level.getChunkSource().getGenerator().getClass().getSimpleName().equals("FlatLevelSource")) {
+            LOGGER.info("SELFTEST worldgen check skipped: the game-test overworld is a flat world, which places no features");
+        } else {
+            check("WorldgenEvents.addOre ore appears in generated chunks", generatedOre > 0 && vanillaOre > 0);
+        }
         check("BlockEvents.modification changes hardness, resistance and light",
             stoneState.getDestroySpeed(level, stonePos) == 9.0f && Blocks.STONE.getExplosionResistance() == 77.0f && stoneState.getLightEmission() == 5);
         level.setBlockAndUpdate(stonePos, Blocks.AIR.defaultBlockState());

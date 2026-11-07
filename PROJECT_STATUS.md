@@ -33,7 +33,7 @@ Spend: none
 - [~] Command registration event with a builder API (w:2)
 - [x] Server scheduler: run after N ticks and repeating tasks (w:1)
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
-- [~] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers; the generated data is checked, but no test generates a chunk and counts the ore; open: needs a world-generation check (w:4)
+- [~] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers; the generated data is checked, a self-test check generates 16 chunks and counts the script-added ore next to vanilla iron (passes on Forge and NeoForge 1.20.1 and NeoForge 26.1.2, 26.2 and 26.3); open: the game-test overworld is flat on Forge 1.21.1, 26.1.2, 26.2, 26.3 and NeoForge 1.21.1, so the check is skipped there (w:4)
 - [x] Item modification: change max stack size, max damage and rarity of existing items (checked on both versions) (w:2)
 - [~] Dimensions: DimensionEvents (data pack) and run-time Dimensions.create/delete/teleport; levels self-tested headless, real-player teleport in a client not yet run; restart persistence cannot be tested here: a server restart needs the dedicated server, which needs the EULA accepted (Casey only), and the game-test server cannot restart (w:4)
 - [x] Block shapes (slab, stairs, wall, fence), vanilla-tier tools and armor, fluids, and modifyCreativeTab (add only); registered and self-tested, models not checked on a client (w:2)
