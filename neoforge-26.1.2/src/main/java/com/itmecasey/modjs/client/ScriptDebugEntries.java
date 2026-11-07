@@ -19,6 +19,16 @@ public final class ScriptDebugEntries {
 
     public static void register(IEventBus modBus) {
         modBus.addListener(ScriptDebugEntries::onRegister);
+        // The player's saved debug screen settings do not know this entry, so it would stay off. A script that adds F3 lines
+        // wants them shown: switch the entry on when joining a world, whenever it is off.
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingIn e) -> {
+            if (EventGroups.CLIENT.hasHandlers("leftDebugInfo") || EventGroups.CLIENT.hasHandlers("rightDebugInfo")) {
+                var entries = net.minecraft.client.Minecraft.getInstance().debugEntries;
+                if (entries.getStatus(ID) == DebugScreenEntryStatus.NEVER) {
+                    entries.setStatus(ID, DebugScreenEntryStatus.IN_OVERLAY);
+                }
+            }
+        });
     }
 
     private static void onRegister(RegisterDebugEntriesEvent event) {
