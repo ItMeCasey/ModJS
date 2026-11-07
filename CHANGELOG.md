@@ -2,7 +2,9 @@
 
 ## 2026.11.29
 
-Forge and NeoForge 1.20.1 only; the other eight builds stay at 2026.11.28.
+Forge and NeoForge 1.20.1, and NeoForge 26.1.2, 26.2 and 26.3; the other four builds stay at 2026.11.28.
+
+- **`ClientEvents.leftDebugInfo` and `rightDebugInfo` now work on NeoForge 26.x.** The loader dropped its F3 text event, so the lines of both events show as one block, left ones first. Compiled, not yet seen on a client.
 
 - **Fix: a scripted title screen drew the Minecraft logo twice and garbled on 1.20.1.** It now draws the logo like the game does. Seen on a real client (docs/frames/title-forge-1.20.1.png), with the panorama, the scripted buttons and text, and a script-added splash line.
 - Test only (all ten builds): the self test generates chunks and counts the ore a script added with `WorldgenEvents.addOre`.
