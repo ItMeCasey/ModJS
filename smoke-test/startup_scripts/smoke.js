@@ -48,3 +48,12 @@ StartupEvents.worldTypes(event => {
   event.add('modjs:selftest_gone', {});
   event.drop('modjs:selftest_gone');
 });
+
+StartupEvents.registry('item', event => {
+  event.create('props_item').maxStackSize(16).rarity('rare').glow(true).food(4, 0.6).alwaysEdible();
+  event.create('props_unstackable').unstackable();
+});
+StartupEvents.registry('block', event => {
+  event.create('props_block').lightLevel(7).requiresTool(true).resistance(11).hardness(3);
+  event.create('props_noitem').noItem();
+});

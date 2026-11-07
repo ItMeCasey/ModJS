@@ -272,7 +272,7 @@ public final class RegistryManager {
             JsonObject table = new JsonObject();
             table.addProperty("type", "minecraft:block");
             JsonArray pools = new JsonArray();
-            if (!block.isDropsNothing()) {
+            if (!block.isDropsNothing() && !(block.isNoItem() && block.dropItem() == null)) {
                 JsonObject entry = new JsonObject();
                 entry.addProperty("type", "minecraft:item");
                 entry.addProperty("name", block.dropItem() != null ? block.dropItem() : NAMESPACE + ":" + block.id());

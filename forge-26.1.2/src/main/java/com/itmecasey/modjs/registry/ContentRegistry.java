@@ -132,6 +132,14 @@ public final class ContentRegistry {
                         default -> properties.pickaxe(material, 1.0f, -2.8f);
                     }
                 }
+                if (b.glow()) {
+                    return new Item(properties) {
+                        @Override
+                        public boolean isFoil(net.minecraft.world.item.ItemStack stack) {
+                            return true;
+                        }
+                    };
+                }
                 return new Item(properties);
             });
             TAB_ENTRIES.add(new TabEntry(b.tab(), item));

@@ -262,6 +262,16 @@ public final class SelfTest {
         check("ItemEvents.modification changes stack size and rarity",
             Items.ENDER_PEARL.getMaxStackSize() == 64 && new ItemStack(Items.ENDER_PEARL).getRarity() == net.minecraft.world.item.Rarity.EPIC);
 
+        ItemStack propsStack = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation("modjs:props_item")));
+        check("item builder: maxStackSize", propsStack.getMaxStackSize() == 16);
+        check("item builder: rarity", propsStack.getRarity() == net.minecraft.world.item.Rarity.RARE);
+        check("item builder: glow", propsStack.hasFoil());
+        check("item builder: food", propsStack.getItem().isEdible());
+        check("item builder: unstackable", new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation("modjs:props_unstackable"))).getMaxStackSize() == 1);
+        net.minecraft.world.level.block.Block propsBlock = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(new net.minecraft.resources.ResourceLocation("modjs:props_block"));
+        check("block builder: light level, tool requirement and resistance", propsBlock.defaultBlockState().getLightEmission() == 7
+            && propsBlock.defaultBlockState().requiresCorrectToolForDrops() && propsBlock.getExplosionResistance() == 11.0f);
+        check("block builder: noItem registers no block item", net.minecraft.world.item.Item.byBlock(net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(new net.minecraft.resources.ResourceLocation("modjs:props_noitem"))) == Items.AIR);
         ItemStack rubyPick = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation("modjs:ruby_pickaxe")));
         ItemStack rubyHelmet = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation("modjs:ruby_helmet")));
         check("custom tool tier sets durability", rubyPick.getMaxDamage() == 900);

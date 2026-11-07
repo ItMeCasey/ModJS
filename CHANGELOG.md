@@ -2,7 +2,10 @@
 
 ## 2026.11.29
 
-Forge and NeoForge 1.20.1, and NeoForge 26.1.2, 26.2 and 26.3; the other four builds stay at 2026.11.28.
+All ten builds.
+
+- **Fix: `.glow(true)` on an item builder did nothing.** Plain items now shimmer like enchanted ones (tools and armor made with `.tool` or `.armor` do not take it yet).
+- **Fix: a block made with `.noItem()` broke data loading on 26.3.** Its loot table named an item that does not exist; such a block now drops nothing unless `.drops(...)` is set.
 
 - **`ClientEvents.leftDebugInfo` and `rightDebugInfo` now work on NeoForge 26.x.** The loader dropped its F3 text event, so the lines of both events show as one block, left ones first. Seen on a real client on 26.1.2 and 26.3.
 

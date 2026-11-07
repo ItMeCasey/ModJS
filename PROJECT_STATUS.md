@@ -15,7 +15,7 @@ Spend: none
 
 ## Startup scripts
 - [x] Registry events: items, blocks, creative tabs, fluids, tool tiers, armor materials and container block entities; one example script (examples/registry) with a unit test, seen on a real client on all ten builds; entity types left out on purpose (w:5)
-- [~] Item and block builders: properties, tooltip, food, tool, armor, and block types (w:4)
+- [x] Item and block builders: stack size, rarity, glow, food, unstackable, tooltip, tool, armor, light level, tool requirement, resistance, container and noItem blocks and the block types are self-tested on all ten builds (a new check set found and fixed a no-op glow and a noItem data error on 26.3) (w:4)
 - [x] Data generation: tags, loot tables, and recipes written as data pack output (w:3)
 - [~] Asset generation: lang, models, blockstates, and textures via a generated resource pack (w:4)
 

@@ -253,6 +253,16 @@ public final class SelfTest {
             stoneState.getDestroySpeed(level, stonePos) == 9.0f && Blocks.STONE.getExplosionResistance() == 77.0f && stoneState.getLightEmission() == 5);
         level.setBlockAndUpdate(stonePos, Blocks.AIR.defaultBlockState());
 
+        ItemStack propsStack = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("modjs:props_item")));
+        check("item builder: maxStackSize", propsStack.getMaxStackSize() == 16);
+        check("item builder: rarity", propsStack.getRarity() == net.minecraft.world.item.Rarity.RARE);
+        check("item builder: glow", propsStack.hasFoil());
+        check("item builder: food", propsStack.has(net.minecraft.core.component.DataComponents.FOOD));
+        check("item builder: unstackable", new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("modjs:props_unstackable"))).getMaxStackSize() == 1);
+        net.minecraft.world.level.block.Block propsBlock = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(net.minecraft.resources.ResourceLocation.parse("modjs:props_block"));
+        check("block builder: light level, tool requirement and resistance", propsBlock.defaultBlockState().getLightEmission() == 7
+            && propsBlock.defaultBlockState().requiresCorrectToolForDrops() && propsBlock.getExplosionResistance() == 11.0f);
+        check("block builder: noItem registers no block item", net.minecraft.world.item.Item.byBlock(net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(net.minecraft.resources.ResourceLocation.parse("modjs:props_noitem"))) == Items.AIR);
         ItemStack rubyPick = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("modjs:ruby_pickaxe")));
         ItemStack rubyHelmet = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("modjs:ruby_helmet")));
         check("custom tool tier sets durability", rubyPick.getMaxDamage() == 900);

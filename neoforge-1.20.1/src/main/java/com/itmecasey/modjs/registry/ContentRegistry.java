@@ -103,6 +103,14 @@ public final class ContentRegistry {
                 if (b.armorSlot() != null) {
                     return armor(b, properties);
                 }
+                if (b.glow()) {
+                    return new Item(properties) {
+                        @Override
+                        public boolean isFoil(net.minecraft.world.item.ItemStack stack) {
+                            return true;
+                        }
+                    };
+                }
                 return new Item(properties);
             });
             TAB_ENTRIES.add(new TabEntry(b.tab(), item));
