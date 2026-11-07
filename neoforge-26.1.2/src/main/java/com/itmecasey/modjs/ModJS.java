@@ -89,6 +89,7 @@ public class ModJS {
                     EventGroups.CLIENT.post("init", new EventJS());
                 });
             ClientBridge.register();
+            com.itmecasey.modjs.client.ScriptDebugEntries.register(modBus);
         }
         modBus.addListener(ModJSPacks::onAddPackFinders);
         NeoForge.EVENT_BUS.addListener(RecipeReloadHook::onAddReloadListeners);

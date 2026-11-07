@@ -16,7 +16,7 @@ what a new port has to provide and every gap that exists because a version could
 | `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | full (rarity is rewritten through the item's `rarity` field); the same 82 self-test checks and 71 unit tests pass |
 | `neoforge-1.20.1` | 1.20.1 | NeoForge 47.1.106 | same as Forge 1.20.1 (same sources); 82 self-test checks and 71 unit tests pass. Ship the `-all` jar (it carries Rhino) |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 81 self-test checks and 71 unit tests pass |
-| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full except F3 debug lines; the same 81 self-test checks and 71 unit tests pass |
+| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full (F3 lines through a debug entry, compiled but not yet seen on a client); the same 81 self-test checks and 71 unit tests pass |
 
 The 1.20.1 module copies the Forge 1.21.1 one and adapts to the older game: plural data folders and `item`/string recipe results (`DataFolders`, `Legacy120Format`), `FriendlyByteBuf` messages on a `SimpleChannel`, the old `Tier` and `ArmorMaterial` interfaces, `RecipeManager.fromJson`, reflection for item stack size and durability, `Codec` instead of `MapCodec`, and Rhino through `minecraftLibrary`. Its self test needs a connected test player (an `EmbeddedChannel`) because Forge reacts to logins.
 
@@ -27,7 +27,7 @@ The 26.2 modules copy the 26.1.2 ones and the 26.3 modules copy the 26.2 ones. 2
 The NeoForge 1.21.1 and 26.1.2 modules copy the Forge 1.21.1 one and changes only loader API names: events on `NeoForge.EVENT_BUS` with `net.neoforged` packages, `PlayerTickEvent.Post` and friends for ticks, `LivingIncomingDamageEvent` for hurt,
 `ItemEntityPickupEvent.Pre`, `ModifyDefaultComponentsEvent` for item changes, payload handlers instead of a channel for networking, `DeferredHolder` instead of `RegistryObject`, `BaseFlowingFluid`,
 and `neoforge:` ids and data folders (`LoaderNames`). Build files use ModDevGradle with Gradle 9.3.1, Rhino on `additionalRuntimeClasspath` and as Jar-in-Jar.
-On NeoForge 26.1.2 `ClientEvents.leftDebugInfo` and `rightDebugInfo` do nothing (the loader has no F3 text event any more), and a script fluid has no custom client art (the old texture methods are gone; fluid models are not wired up yet). JEI has no 26.1.2 build. Block breaking uses `BreakBlockEvent`, reload listeners `AddServerReloadListenersEvent`, and the client can only send with `ClientPacketDistributor`.
+On NeoForge 26.1.2, 26.2 and 26.3 `ClientEvents.leftDebugInfo` and `rightDebugInfo` go through a `RegisterDebugEntriesEvent` entry (`client/ScriptDebugEntries`): the loader has no F3 text event any more, so both events show as one block of lines, left ones first (compiled on all three, not yet seen on a client). A script fluid has no custom client art (the old texture methods are gone; fluid models are not wired up yet). JEI has no 26.1.2 build. Block breaking uses `BreakBlockEvent`, reload listeners `AddServerReloadListenersEvent`, and the client can only send with `ClientPacketDistributor`.
 On NeoForge 1.21.1 fluid client art still uses the deprecated `FluidType.initializeClient`; move it to `RegisterClientExtensionsEvent` when a later NeoForge removes it.
 
 ## What a port provides
