@@ -1,8 +1,8 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-06
-Summary: ModJS runs KubeJS-style scripts on Rhino on Forge and NeoForge for Minecraft 26.3, 26.2, 26.1.2, 1.21.1 and 1.20.1; all ten builds are built, self-tested in a headless server and built by CI, while client scripts and networking are untested on a real client.
+Updated: 2026-11-07
+Summary: ModJS runs KubeJS-style scripts on Rhino on Forge and NeoForge for Minecraft 26.3, 26.2, 26.1.2, 1.21.1 and 1.20.1; all ten builds are self-tested and have completed real-client tours, with documented upstream and Forge development-environment limits.
 Spend: none
 
 ## Foundation
@@ -35,7 +35,7 @@ Spend: none
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
 - [x] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers; the self test generates 16 chunks and counts the script-added ore next to vanilla iron on all ten builds (flat game-test overworlds use a run-time dimension that copies the overworld), all passing (w:4)
 - [x] Item modification: change max stack size, max damage and rarity of existing items (checked on both versions) (w:2)
-- [~] Dimensions: DimensionEvents (data pack) and run-time Dimensions.create/delete/teleport; levels self-tested headless; a player teleported into a run-time dimension and back is self-tested on Forge and NeoForge 1.20.1 (the other eight builds have no connection on the test player, so a real-client teleport is still not run); restart persistence cannot be tested here: a server restart needs the dedicated server, which needs the EULA accepted (Casey only), and the game-test server cannot restart (w:4)
+- [~] Dimensions: DimensionEvents (data pack) and run-time Dimensions.create/delete/teleport; levels self-tested headless and a real client entered a run-time dimension on all ten builds (docs/frames/dim-<build>.png); restart persistence remains untested because the game-test server cannot restart and a dedicated server needs Casey to accept the EULA (w:4)
 - [x] Block shapes (slab, stairs, wall, fence), vanilla-tier tools and armor, fluids, and modifyCreativeTab (add only); registered and self-tested, models not checked on a client (w:2)
 - [x] GitHub Actions build runs both modules and the self test (passing) (w:1)
 
@@ -53,13 +53,13 @@ Spend: none
 - [x] Script errors shown in chat when operators join (server and startup scripts) and to players for client scripts; no separate overlay screen (w:2)
 - [x] Item unification: canonical items, materials (ores, crushed, clumps, shards), fluids, recipe, loot and inventory unification, config file (both versions self-tested with fake mods, not real ones) (w:5)
 - [x] Six ports built and self-tested: Forge 26.1.2, 1.21.1 and 1.20.1; NeoForge 26.1.2, 1.21.1 and 1.20.1 (w:5)
-- [x] Minecraft 26.2 and 26.3 on Forge and NeoForge: four modules build, pass unit tests and 81 self-test checks in a headless game-test server; CI and CurseForge tables list them (dev server and client not run) (w:4)
+- [x] Minecraft 26.2 and 26.3 on Forge and NeoForge: four modules build, pass unit tests and 81 self-test checks in a headless game-test server; real-client tours include scripted dimensions, screens and title menus (w:4)
 - [x] Release gate: a tag uploads only builds whose own mod_version equals the tag; others are skipped and logged, and the run fails only when none match (checked with a local dry run of the collect step; not yet run in CI) (w:2)
 - [x] Script info API (InfoEvents.block and entity: lines, bars, icons, hide for Jade) with unit tests, docs, wiki page and example (w:3)
 - [~] Info bridges: SMWTI on all ten builds and Jade on the six that have one compile; seen on a real client (frames in docs/frames) on NeoForge 26.3, 26.2, 26.1.2 and 1.21.1 with both overlays and on NeoForge and Forge 1.20.1 with SMWTI; all four Forge 26.x and 1.21.1 builds seen too (SMWTI only, no Jade build) (w:4)
 - [x] Forge 26.x and 1.21.1 clients could not open a world (the jar-shipped ore biome modifier flagged it experimental, a confirmation screen waited): modifier now generated only when Unify.ores() is on, seen on a real client on all four builds (w:4)
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
-- [x] Release 2026.11.26 prepared locally for all ten builds: versions bumped, changelog, README and CurseForge text, wiki pages written (not tagged or uploaded) (w:2)
+- [x] Release 2026.11.29 prepared locally for all ten builds: versions bumped, changelog, README and CurseForge text are committed; tag and upload are pending (w:2)
 - [x] Script fluids on Forge and NeoForge 26.x drawn with tinted water (a fluid model) instead of the missing texture, seen on a real client on all six builds (w:2)
 - [~] Close the per-version gaps in docs/PORTING.md: item rarity changes on 1.20.1 done (self-tested on Forge and NeoForge); EMI, REI and JEI on 26.1.2 need upstream builds; F3 lines on NeoForge 26.x done (debug entry, seen on a client on 26.1.2 and 26.3, frames docs/frames/f3-*.png) (w:3)
 

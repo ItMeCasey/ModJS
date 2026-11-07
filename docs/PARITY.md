@@ -4,9 +4,9 @@ Event names come from the KubeJS wiki's event list (kubejs.com/wiki/events, read
 event and it either passed an in-game check or is the same bridge as one that did; `compiled` means the bridge builds
 and registers but nobody has triggered it in a running game; `no` means not implemented.
 
-How things were checked: server-side data (recipes, tags, loot, worldgen files, registry) and the event bridges listed in
-the self test ran in a real Forge game-test server on both 26.1.2 and 1.21.1. Client events, networking and generated
-textures and models have not been run on a real client.
+How things were checked: server-side data (recipes, tags, loot, worldgen files and registry) and the event bridges listed in
+the self test ran in a real Forge game-test server. Real-client tours now cover gameplay events, networking, scripted
+screens, generated assets and run-time dimensions on all ten builds; individual rows retain any limits.
 
 See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to provide.
 
@@ -62,7 +62,7 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | Scoreboard global (ModJS only) | objectives, scores, display slots, teams | checked in the self test on all six builds |
 | Toasts (ModJS only) | `Client.hideToasts`, `ClientEvents.toast`, `Client.showToast`, `Client.disableTutorial`, `Client.skipExperimentalWarning` | compiled; not seen on a client |
 | World types (ModJS only) | `StartupEvents.worldTypes` add, edit, duplicate, hide, rename, drop | JSON parsed by the game's world preset codec in the self test on all six builds; the button not seen on a client |
-| Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in headless self test; teleport with a real player and restart persistence unchecked |
+| Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in the headless self test; a real client entered a run-time dimension on all ten builds (frames `docs/frames/dim-<build>.png`); restart persistence unchecked |
 | DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
 | NetworkEvents | dataReceived | compiled |
 | RecipeViewerEvents | hideItems, addInformation, hideCategories | JEI on 1.21.1: compiles against JEI 19.70.0.469, not run with JEI |
