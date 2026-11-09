@@ -20,11 +20,20 @@ public final class ItemModifier {
     private ItemModifier() {
     }
 
+    /** A game field by its official name. A real (not dev) 1.20.1 game only knows Forge's own names, so try those first. */
+    static java.lang.reflect.Field fieldByName(Class<?> type, String name, String srgName) {
+        try {
+            return ObfuscationReflectionHelper.findField(type, srgName);
+        } catch (RuntimeException e) {
+            return ObfuscationReflectionHelper.findField(type, name);
+        }
+    }
+
     public static void apply() {
         try {
-            Field stack = ObfuscationReflectionHelper.findField(Item.class, "maxStackSize");
-            Field damage = ObfuscationReflectionHelper.findField(Item.class, "maxDamage");
-            Field rarity = ObfuscationReflectionHelper.findField(Item.class, "rarity");
+            Field stack = fieldByName(Item.class, "maxStackSize", "f_41370_");
+            Field damage = fieldByName(Item.class, "maxDamage", "f_41371_");
+            Field rarity = fieldByName(Item.class, "rarity", "f_41369_");
             rarity.setAccessible(true);
             stack.setAccessible(true);
             damage.setAccessible(true);

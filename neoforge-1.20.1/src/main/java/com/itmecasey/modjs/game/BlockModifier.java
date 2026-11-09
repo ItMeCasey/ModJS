@@ -20,11 +20,13 @@ import java.util.Map;
 public final class BlockModifier {
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
 
+    private static final java.util.Map<String, String> SRG = java.util.Map.of("explosionResistance", "f_60444_", "friction", "f_60447_", "speedFactor", "f_60448_", "jumpFactor", "f_60449_", "destroySpeed", "f_60599_", "lightEmission", "f_60594_", "requiresCorrectToolForDrops", "f_60600_");
+
     private BlockModifier() {
     }
 
     private static Field field(Class<?> type, String name) {
-        Field field = ObfuscationReflectionHelper.findField(type, name);
+        Field field = ItemModifier.fieldByName(type, name, SRG.getOrDefault(name, name));
         field.setAccessible(true);
         return field;
     }

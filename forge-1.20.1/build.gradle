@@ -31,7 +31,6 @@ sourceSets.main.output.resourcesDir = sourceSets.main.java.destinationDirectory.
 
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
-    reobf = false
     copyIdeResources = true
 
     runs {
@@ -155,6 +154,8 @@ tasks.named('jar', Jar) {
 
 tasks.named('jarJar') {
     archiveClassifier = ''
+    // A game that is not a dev game uses Forge's own (SRG) names, so the shipped jar must be reobfuscated to them.
+    finalizedBy 'reobfJarJar'
 }
 
 tasks.named('build') {
