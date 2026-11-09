@@ -9,7 +9,7 @@ KubeJS-style scripting for Forge and NeoForge, powered by Rhino. Supports Minecr
 - `forge-1.21.1/` - Forge 1.21.1 module (ForgeGradle 6, Java 21, Gradle 8.14).
 - `forge-1.20.1/` - Forge 1.20.1 module (ForgeGradle 6, Java 17, Gradle 8.14).
 - `neoforge-26.3/`, `neoforge-26.2/`, `neoforge-26.1.2/`, `neoforge-1.21.1/` - NeoForge modules (ModDevGradle).
-- `neoforge-1.20.1/` - NeoForge 1.20.1 module (NeoGradle 7, Java 17); ship the `-all` jar.
+- `neoforge-1.20.1/` - NeoForge 1.20.1 module (NeoGradle 7, Java 17); the Forge 1.20.1 jar (converted to the names a real 1.20.1 game uses) is the one uploaded for both loaders.
 
 `docs/PORTING.md` lists what each port needs and every known gap.
 
@@ -36,6 +36,13 @@ by ModJS itself, because Forge 52.1.21 never delivers its screen-opening event.
 Examples: `examples/client/client_scripts`. JEI, EMI and REI adapters support item hiding,
 information pages and category hiding where each viewer supports the target loader and version;
 see the [viewer matrix](docs/REFERENCE.md#recipe-viewers-jei-emi-and-rei).
+
+## Scripts and Minecraft classes
+
+Use ids first: `Item.of('minecraft:diamond')` and the ids in recipes, tags, loot and events work the same on every version. For what ModJS
+has no function for, scripts can call Minecraft's own classes by their usual names (`Items.DIAMOND`, `server.getRecipeManager()`). A real
+Minecraft 1.20.1 game only knows those under other internal names, so the 1.20.1 builds translate them with a table made from the build's
+mappings (`scripts/gen_name_map.py`, `script/names/`). Checked in real Forge 47.4.28 and NeoForge 47.1.106 installs.
 
 ## Docs
 
