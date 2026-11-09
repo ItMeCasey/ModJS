@@ -41,6 +41,7 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
+          cache: gradle
       - run: chmod +x gradlew
       - run: ./gradlew build --no-daemon
       - name: Game test server (self test)
