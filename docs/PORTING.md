@@ -88,6 +88,9 @@ events and moves lines from server to client for Jade. The per-version files are
 
 | Area | Gap | Why |
 |---|---|---|
+| 1.20.1 production | Scripts cannot call Minecraft classes and methods by Mojang names in a normal game | Forge and NeoForge 1.20.1 run on SRG names. The jar is reobfuscated (`reobfJarJar` in forge-1.20.1/build.gradle) so ModJS's own code works, but Rhino reflects on the names the game has, so `Items.DIAMOND` or `server.getRecipeManager()` fail ("has no public instance field or method named"). Fields found by string name in ModJS code (item and block modification) use the SRG name first. A fix needs a name translation layer in the script wrapper, with a mapping table made from `build/createSrgToMcp/output.srg`. Seen 2026-11-09 in real Forge 47.4.28 and NeoForge 47.1.106 installs. |
+| 1.20.1 production | `ClientTweaks` (toast hiding, tutorial off, experimental warning skip) looks Minecraft methods up by Mojang name | Same cause: it logs "not available on this Minecraft version" and carries on. |
+| 1.20.1 production | The NeoForge 1.20.1 module builds a jar with development names | NeoGradle 7 does not reobfuscate. CI uploads the Forge 1.20.1 jar for both loaders (`.github/scripts/publish_curseforge.py`); it loads and works on NeoForge 47.1.106. |
 | Recipe viewers | Create recipe types: not planned | Create has no build for most supported versions and its recipe types are a large separate API. |
 | Recipe viewers | `hideItems` and `hideCategories` not seen in a client | BEI's JEI bridge (2026.11.8) feeds ModJS's plugin `registerRecipes` (info pages work) but never calls `onRuntimeAvailable`; real JEI on 1.21.1 or 1.20.1 has not been run in a client. |
 | Recipe viewers | KubeJS events beyond hide items, add information, hide categories | Not built (custom categories, hiding single recipes, and so on). |

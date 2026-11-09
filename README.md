@@ -28,7 +28,11 @@ On first launch ModJS creates a `modjs/` folder in the game directory with `star
 
 ## Client scripting and recipe viewers
 
-Client scripts can draw HUD text and rectangles and register keys that players can rebind in Controls.
+Client scripts can draw HUD text and rectangles, register keys that players can rebind in Controls, and keep an
+overlay of progress bars, text, rectangles, pictures and item icons that they create once and update later
+(`Overlay.bar('hp', { value: 80, max: 100 })`, with anchors, colors, alpha, smooth fills and animations). Buttons on the title
+screen and on your own screens can carry an icon (an item or a texture). On Forge 1.21.1 the scripted title screen is swapped in
+by ModJS itself, because Forge 52.1.21 never delivers its screen-opening event.
 Examples: `examples/client/client_scripts`. JEI, EMI and REI adapters support item hiding,
 information pages and category hiding where each viewer supports the target loader and version;
 see the [viewer matrix](docs/REFERENCE.md#recipe-viewers-jei-emi-and-rei).

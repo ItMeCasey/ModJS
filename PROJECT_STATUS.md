@@ -2,7 +2,7 @@
 <!-- status-format: 1 -->
 
 Updated: 2026-11-09
-Summary: Local 2026.11.30 candidate adds scripted HUDs, rebindable keys and native recipe-viewer adapters; all ten builds pass unit and headless tests, all sixteen supported viewer combinations pass real-client checks, and remaining development-environment limits are documented.
+Summary: 2026.11.31 candidate: all ten builds pass unit and headless tests; adds the overlay and button icons, fixes the 1.20.1 jars (they crashed in a normal game) and the Forge 1.21.1 title screen; scripts cannot call Minecraft classes by Mojang names on 1.20.1 yet.
 Spend: none
 
 ## Foundation
@@ -77,3 +77,7 @@ Spend: none
 - [x] World types (StartupEvents.worldTypes): add, edit, duplicate, hide, rename, drop; 9 new self-test checks pass on all six builds (button not seen on a client) (w:3)
 - [x] Local 2026.11.30 validation: 87 unit tests per module, all ten headless self-tests, all ten HUD/key client checks, all ten two-launch dimension-restoration checks, and all sixteen supported native viewer checks pass; candidate remains unpublished pending approval (w:3)
 - [x] BEI spot check with 2026.11.30 on Forge 26.1.2: all four viewer events including grouping pass, live index and group checks recorded; release collector assembles all ten jars locally without upload (w:1)
+
+## Planned
+- [ ] Name translation for scripts on Forge and NeoForge 1.20.1: calling Minecraft classes and methods by their usual names (`Items.DIAMOND`, `server.getRecipeManager()`, `Commands.literal`) fails in a normal 1.20.1 game, and ClientTweaks needs the same (w:4)
+- [x] 1.20.1 jars load in a normal game: the Forge jar is reobfuscated to the names a real game uses and uploaded for both loaders; seen loading, firing events and applying recipe changes in real Forge 47.4.28 and NeoForge 47.1.106 installs (w:4)

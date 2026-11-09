@@ -93,11 +93,11 @@ def resolve(versions, name):
 
 
 def pick_jar(folder, module, version):
-    jars = [p for p in sorted(folder.glob("*.jar")) if version in p.name and not any(p.name.endswith(s) for s in ("-sources.jar", "-slim.jar", "-javadoc.jar"))]
+    # NeoForge 1.20.1 still runs on Forge's own (SRG) names, and only the Forge build is reobfuscated to them. The Forge 1.20.1
+    # jar loads on NeoForge 47.1.106 (checked in a real install), so that one file is uploaded for both loaders.
     if module == "neoforge-1.20.1":
-        jars = [p for p in jars if p.name.endswith("-all.jar")] or jars
-    else:
-        jars = [p for p in jars if not p.name.endswith("-all.jar")] or jars
+        folder = folder.parent / "jar-forge-1.20.1"
+    jars = [p for p in sorted(folder.glob("*.jar")) if version in p.name and not any(p.name.endswith(s) for s in ("-sources.jar", "-slim.jar", "-javadoc.jar", "-all.jar"))]
     if len(jars) != 1:
         sys.exit(f"Expected exactly one jar to upload for {module} in {folder}, found {[p.name for p in jars]}")
     return jars[0]
