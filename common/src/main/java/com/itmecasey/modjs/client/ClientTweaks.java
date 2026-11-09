@@ -1,5 +1,6 @@
 package com.itmecasey.modjs.client;
 
+import com.itmecasey.modjs.script.names.NameMap;
 import com.itmecasey.modjs.event.EventGroups;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public final class ClientTweaks {
     }
 
     private static Object minecraft() throws ReflectiveOperationException {
-        return Class.forName("net.minecraft.client.Minecraft").getMethod("getInstance").invoke(null);
+        return NameMap.method(Class.forName("net.minecraft.client.Minecraft"), "getInstance").invoke(null);
     }
 
     private static Field fieldOfType(Class<?> owner, String... simpleTypeNames) {
@@ -80,12 +81,10 @@ public final class ClientTweaks {
 
     private static Field fieldNamed(Class<?> owner, String name) {
         for (Class<?> c = owner; c != null && c != Object.class; c = c.getSuperclass()) {
-            try {
-                Field field = c.getDeclaredField(name);
+            Field field = NameMap.declaredField(c, name);
+            if (field != null) {
                 field.setAccessible(true);
                 return field;
-            } catch (NoSuchFieldException e) {
-                // keep looking in the parent class
             }
         }
         return null;
@@ -94,7 +93,7 @@ public final class ClientTweaks {
     private static Method methodNamed(Class<?> owner, String name, int parameters) {
         for (Class<?> c = owner; c != null && c != Object.class; c = c.getSuperclass()) {
             for (Method method : c.getDeclaredMethods()) {
-                if (method.getName().equals(name) && method.getParameterCount() == parameters) {
+                if (NameMap.sameMethodName(c, method.getName(), name) && method.getParameterCount() == parameters) {
                     method.setAccessible(true);
                     return method;
                 }
@@ -104,12 +103,12 @@ public final class ClientTweaks {
     }
 
     private static Object literal(String text) throws ReflectiveOperationException {
-        return Class.forName("net.minecraft.network.chat.Component").getMethod("literal", String.class).invoke(null, text);
+        return NameMap.method(Class.forName("net.minecraft.network.chat.Component"), "literal", String.class).invoke(null, text);
     }
 
     private static String text(Object component) {
         try {
-            return component == null ? null : (String) component.getClass().getMethod("getString").invoke(component);
+            return component == null ? null : (String) NameMap.method(component.getClass(), "getString").invoke(component);
         } catch (ReflectiveOperationException e) {
             return null;
         }
@@ -118,7 +117,7 @@ public final class ClientTweaks {
     private static void onMainThread(Runnable task) {
         try {
             Object mc = minecraft();
-            mc.getClass().getMethod("execute", Runnable.class).invoke(mc, task);
+            NameMap.method(mc.getClass(), "execute", Runnable.class).invoke(mc, task);
         } catch (ReflectiveOperationException e) {
             task.run();
         }
@@ -201,7 +200,7 @@ public final class ClientTweaks {
                     }
                     return method.getName().equals("toString") ? "sink" : null;
                 });
-                line.getClass().getMethod("accept", sinkClass).invoke(line, sink);
+                NameMap.method(line.getClass(), "accept", sinkClass).invoke(line, sink);
             }
             return out.toString();
         } catch (ReflectiveOperationException | RuntimeException e) {
@@ -268,7 +267,7 @@ public final class ClientTweaks {
             try {
                 Object component = toastComponent();
                 if (component != null) {
-                    component.getClass().getMethod("clear").invoke(component);
+                    NameMap.method(component.getClass(), "clear").invoke(component);
                 }
             } catch (ReflectiveOperationException | RuntimeException e) {
                 warnOnce("toast-clear", "clearing toasts", e);
@@ -295,7 +294,7 @@ public final class ClientTweaks {
                     save.invoke(options);
                 }
             }
-            Object tutorial = mc.getClass().getMethod("getTutorial").invoke(mc);
+            Object tutorial = NameMap.method(mc.getClass(), "getTutorial").invoke(mc);
             if (tutorial != null) {
                 methodNamed(tutorial.getClass(), "setStep", 1).invoke(tutorial, none);
             }
@@ -318,10 +317,10 @@ public final class ClientTweaks {
             String name = screen.getClass().getSimpleName();
             boolean warning = name.equals("ConfirmExperimentalFeaturesScreen");
             if (!warning && name.equals("ConfirmScreen")) {
-                Object title = screen.getClass().getMethod("getTitle").invoke(screen);
-                Object contents = title.getClass().getMethod("getContents").invoke(title);
+                Object title = NameMap.method(screen.getClass(), "getTitle").invoke(screen);
+                Object contents = NameMap.method(title.getClass(), "getContents").invoke(title);
                 if (contents.getClass().getSimpleName().equals("TranslatableContents")) {
-                    String key = (String) contents.getClass().getMethod("getKey").invoke(contents);
+                    String key = (String) NameMap.method(contents.getClass(), "getKey").invoke(contents);
                     warning = key.equals("selectWorld.warning.experimental.title");
                 }
             }
@@ -334,7 +333,7 @@ public final class ClientTweaks {
                 return false;
             }
             Object consumer = callback.get(screen);
-            Method accept = callback.getType().getMethod("accept", boolean.class);
+            Method accept = NameMap.method(callback.getType(), "accept", boolean.class);
             onMainThread(() -> {
                 try {
                     accept.invoke(consumer, true);

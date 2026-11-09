@@ -56,7 +56,7 @@ final class ClassGlobals {
                 resolved = true;
                 for (String className : classNames) {
                     try {
-                        value = new NativeJavaClass(scope, Class.forName(className, false, ClassGlobals.class.getClassLoader()));
+                        value = com.itmecasey.modjs.script.names.NameMap.classObject(scope, Class.forName(className, false, ClassGlobals.class.getClassLoader()));
                         break;
                     } catch (ClassNotFoundException | LinkageError ignored) {
                         // try the next candidate

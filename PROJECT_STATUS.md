@@ -2,7 +2,7 @@
 <!-- status-format: 1 -->
 
 Updated: 2026-11-09
-Summary: 2026.11.31 candidate: all ten builds pass unit and headless tests; adds the overlay and button icons, fixes the 1.20.1 jars (they crashed in a normal game) and the Forge 1.21.1 title screen; scripts cannot call Minecraft classes by Mojang names on 1.20.1 yet.
+Summary: 2026.11.31 candidate: all ten builds pass unit and headless tests; adds the overlay and button icons, fixes the 1.20.1 jars (they crashed in a normal game) and the Forge 1.21.1 title screen; scripts call Minecraft classes by their usual names on 1.20.1 through a name table.
 Spend: none
 
 ## Foundation
@@ -79,5 +79,5 @@ Spend: none
 - [x] BEI spot check with 2026.11.30 on Forge 26.1.2: all four viewer events including grouping pass, live index and group checks recorded; release collector assembles all ten jars locally without upload (w:1)
 
 ## Planned
-- [ ] Name translation for scripts on Forge and NeoForge 1.20.1: calling Minecraft classes and methods by their usual names (`Items.DIAMOND`, `server.getRecipeManager()`, `Commands.literal`) fails in a normal 1.20.1 game, and ClientTweaks needs the same (w:4)
+- [x] Name translation for scripts on Forge and NeoForge 1.20.1: a table made from the build mappings (scripts/gen_name_map.py, 6536 classes) lets scripts call Minecraft classes and methods by their usual names in a normal 1.20.1 game; 6 unit tests, and `Items.DIAMOND`, `server.getRecipeManager()`, `Commands.literal`, `player.health` ran in real Forge 47.4.28 and NeoForge 47.1.106 installs (examples/events/tour/names_check.js); all ten development-game self tests still pass (w:4)
 - [x] 1.20.1 jars load in a normal game: the Forge jar is reobfuscated to the names a real game uses and uploaded for both loaders; seen loading, firing events and applying recipe changes in real Forge 47.4.28 and NeoForge 47.1.106 installs (w:4)

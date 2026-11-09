@@ -19,7 +19,7 @@ public final class JavaBinding {
         }
         Context cx = Context.getCurrentContext();
         Scriptable scope = ScriptRuntime.getTopCallScope(cx);
-        return new NativeJavaClass(scope, cls);
+        return com.itmecasey.modjs.script.names.NameMap.classObject(scope, cls);
     }
 
     public boolean exists(String name) {

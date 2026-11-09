@@ -49,6 +49,20 @@ public final class ModJSContextFactory extends ContextFactory {
             }
             return super.wrap(cx, scope, adapted, adapted == obj ? staticType : null);
         }
+
+        @Override
+        public org.mozilla.javascript.Scriptable wrapAsJavaObject(Context cx, org.mozilla.javascript.Scriptable scope, Object javaObject, Class<?> staticType) {
+            com.itmecasey.modjs.script.names.NameMap names = com.itmecasey.modjs.script.names.NameMap.get();
+            if (names == null) {
+                return super.wrapAsJavaObject(cx, scope, javaObject, staticType);
+            }
+            return new com.itmecasey.modjs.script.names.MappedJavaObject(names, scope, javaObject, staticType);
+        }
+
+        @Override
+        public org.mozilla.javascript.Scriptable wrapJavaClass(Context cx, org.mozilla.javascript.Scriptable scope, Class<?> javaClass) {
+            return com.itmecasey.modjs.script.names.NameMap.classObject(scope, javaClass);
+        }
     };
 
     private ModJSContextFactory() {
