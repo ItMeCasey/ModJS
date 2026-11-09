@@ -89,6 +89,7 @@ events and moves lines from server to client for Jade. The per-version files are
 | Area | Gap | Why |
 |---|---|---|
 | Recipe viewers | Create recipe types: not planned | Create has no build for most supported versions and its recipe types are a large separate API. |
+| Recipe viewers | `hideItems` and `hideCategories` not seen in a client | BEI's JEI bridge (2026.11.8) feeds ModJS's plugin `registerRecipes` (info pages work) but never calls `onRuntimeAvailable`; real JEI on 1.21.1 or 1.20.1 has not been run in a client. |
 | Recipe viewers | KubeJS events beyond hide items, add information, hide categories | Not built (custom categories, hiding single recipes, and so on). |
 | Scripts | On 26.1.2 `Block` and `BlockState` are replaced by stand-ins (`BlockFacades`) | The script engine would inspect client-only classes and crash a dedicated server. Check whether each new version needs the same. |
 | Title screen | Vanilla panorama background only on 1.21.1 | `PanoramaRenderer` was removed in 26.1.2. |
