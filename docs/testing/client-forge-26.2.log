@@ -1,0 +1,29 @@
+[08Nov2026 21:23:20.576] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok highPriorityAssets
+[08Nov2026 21:23:21.139] [Worker-Main-7/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok init
+[08Nov2026 21:23:25.865] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok loggedOut
+[08Nov2026 21:23:28.641] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok loggedIn
+[08Nov2026 21:23:28.693] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok tick
+[08Nov2026 21:23:29.469] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok hud
+[08Nov2026 21:23:30.527] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS exists-before-create-stage-1
+[08Nov2026 21:23:30.533] [Server thread/INFO] [modjs/]: ModJS created dimension modjs:restart_probe
+[08Nov2026 21:23:30.535] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS created
+[08Nov2026 21:23:30.596] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS teleport-stage-1
+[08Nov2026 21:23:32.486] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS block-stage-1
+[08Nov2026 21:23:32.486] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK READY stage-1
+[08Nov2026 21:23:32.553] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK tooltip lines: Diamond | CHECK-TIP dynamic | CHECK-TIP static
+[08Nov2026 21:23:32.553] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok ItemEvents.tooltip
+[08Nov2026 21:23:32.553] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok ItemEvents.dynamicTooltips
+[08Nov2026 21:23:34.540] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyPressed key=65 action=1
+[08Nov2026 21:23:35.543] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyBindings
+[08Nov2026 21:23:36.039] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyBindingRebound
+[08Nov2026 21:23:36.547] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok chat-sent
+[08Nov2026 21:23:36.551] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT chat chat check from the client
+[08Nov2026 21:23:36.787] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyBindingPressed
+[08Nov2026 21:23:40.544] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK clean client exit
+[08Nov2026 21:23:40.586] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT loggedOut Dev
+[08Nov2026 21:23:42.201] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 21:23:42.212] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 21:23:42.215] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 21:23:42.219] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 21:23:42.223] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 21:23:42.226] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded

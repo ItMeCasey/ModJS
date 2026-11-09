@@ -1,0 +1,108 @@
+[21:21:35] [main/INFO] [modjs/]: [SERVER] SELFTEST script: globals 1 5 36 up
+[21:21:35] [Worker-Main-3/INFO] [modjs/]: [SERVER] SELFTEST script: commands exist true false true
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: gamerule false -> true of 59
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: facade minecraft:stone
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: scoreboard 8 st_team
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: broken minecraft:stone by ModJSTester
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.broken cancel
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.broken id filter leaves other blocks alone
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: chat "hello there?"
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS PlayerEvents.chat rewrites the message
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: loggedIn ModJSTester
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS trace reports events with details
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: loggedIn ModJSTester
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: crafted minecraft:stick
+[21:21:37] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: hurt amount 3
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS EntityEvents.hurt changes the amount
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_slab
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_stairs
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_wall
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered shaped block test_fence
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_pickaxe
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_sword
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_helmet
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered tool test_boots
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered fluid test_goo
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered fluid test_goo_flowing
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS registered bucket test_goo_bucket
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS block entity found at a chest
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS block entity inventory round trip
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS block entity nbt readable
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS no block entity on plain blocks
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS generated dimension void_test parses as a level stem
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS generated dimension flat_test parses as a level stem
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS generated dimension nether_copy parses as a level stem
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS DimensionEvents.drop removes a dimension
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.create builds a dimension at run time
+[21:21:37] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.create refuses a duplicate id
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS run-time dimension is a real level
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS run-time dimension keeps blocks
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.teleport rejects an unknown dimension
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Dimensions.delete removes it
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST unify groups [Group[tag=c:ingots/tin, canonical=modjs:tin_ingot, inputs=CANONICAL, members=[minecraft:iron_ingot]], Group[tag=c:ores/zinc, canonical=modjs:zinc_ore, inputs=CANONICAL, members=[minecraft:coal_ore, minecraft:deepslate_coal_ore]]]
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify picks our item as canonical
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify rewrote recipe outputs and inputs
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify added a conversion recipe
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify loot modifier loads through the resource manager
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify replaces non-canonical drops
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify swaps inventory stacks
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify fluid group picks our fluid
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify block zinc_ore
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item crushed_zinc
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item zinc_clump
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item zinc_shard
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item zinc_dirty_dust
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS registered unify item raw_zinc
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify maps foreign ores to the canonical ore
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify swaps ore features in biomes
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify converts ore blocks in a chunk
+[21:21:38] [Server thread/INFO] [modjs/]: [SERVER] SELFTEST script: inventoryChanged slot 7 minecraft:apple
+[21:21:38] [Server thread/INFO] [modjs/]: SELFTEST PASS ServerEvents.compostableRecipes sets a chance
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST worldgen: 2613 script-added ore blocks and 850 vanilla iron ore blocks in 16 generated chunks (NoiseBasedChunkGenerator)
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS WorldgenEvents.addOre ore appears in generated chunks
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Text.of and Text.translate build components
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Text.red and Text.color style the text
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS BlockEvents.modification changes hardness, resistance and light
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS item builder: maxStackSize
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS item builder: rarity
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS item builder: glow
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS item builder: food
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS item builder: unstackable
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS block builder: light level, tool requirement and resistance
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS block builder: noItem registers no block item
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS custom tool tier sets durability
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS custom armor material sets durability
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS container block has a block entity with its rows
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS container block keeps items in its data
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST sampled copper color b05434
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Unify samples a material color from the game's textures
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry add runs a script command with an argument
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry add rejects a bad argument
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry add with a number range
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry add keeps a permission level
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry alias runs the same command
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry remove drops a vanilla command and its aliases
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry remove drops a sub-command
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry edit changes who may use a command
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry edit replaces what a command does
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS commandRegistry rename moves a command
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard script call set and added a score
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard takes a player as holder
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard add returns the new total
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard scores lists highest first
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard shows an objective in a display slot
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard clears a display slot
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard teams hold members
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard reset removes a score
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard removeObjective deletes it
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS Scoreboard removeTeam deletes it
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS generated world type modjs:selftest_void parses as a world preset
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS generated world type modjs:selftest_amp parses as a world preset
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS generated world type minecraft:large_biomes parses as a world preset
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS world types: new ones join the list and vanilla ones stay
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS world types: hide removes a vanilla one, visible false keeps one out
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS world types: a hidden one still exists
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS world types: drop removes a script-made one
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS world types: edit keeps the other dimensions and swaps the one given
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST PASS world types: labels become language entries
+[21:21:41] [Server thread/INFO] [modjs/]: SELFTEST DONE failures=0

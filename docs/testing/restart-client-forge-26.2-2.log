@@ -1,0 +1,25 @@
+[08Nov2026 16:28:53.188] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok highPriorityAssets
+[08Nov2026 16:28:53.987] [Worker-Main-7/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok init
+[08Nov2026 16:28:58.488] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok loggedOut
+[08Nov2026 16:28:59.497] [Server thread/INFO] [modjs/]: ModJS created dimension modjs:restart_probe
+[08Nov2026 16:29:00.678] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok loggedIn
+[08Nov2026 16:29:00.813] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok tick
+[08Nov2026 16:29:00.856] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok hud
+[08Nov2026 16:29:02.503] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS exists-before-create-stage-2
+[08Nov2026 16:29:02.519] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS teleport-stage-2
+[08Nov2026 16:29:04.505] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS block-stage-2
+[08Nov2026 16:29:04.505] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK READY stage-2
+[08Nov2026 16:29:04.614] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK tooltip lines: Diamond | CHECK-TIP dynamic | CHECK-TIP static
+[08Nov2026 16:29:04.614] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok ItemEvents.tooltip
+[08Nov2026 16:29:04.614] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok ItemEvents.dynamicTooltips
+[08Nov2026 16:29:06.608] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyPressed key=65 action=1
+[08Nov2026 16:29:08.608] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok chat-sent
+[08Nov2026 16:29:08.613] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT chat chat check from the client
+[08Nov2026 16:29:12.605] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK clean client exit
+[08Nov2026 16:29:12.670] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT loggedOut Dev
+[08Nov2026 16:29:12.844] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:29:12.848] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:29:12.852] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:29:12.856] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:29:12.860] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:29:12.864] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded

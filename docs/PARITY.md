@@ -33,22 +33,23 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | | basicCommand | compiled |
 | | compostableRecipes | yes (checked) |
 | | recipeTypeRegistry, specialRecipeSerializers | no |
-| ClientEvents | lang, highPriorityAssets, tick | yes / compiled |
-| | loggedIn, loggedOut | compiled |
-| | splashes, titleScreen (ModJS only) | compiled; splash and screen unchecked on a client |
-| | init, leftDebugInfo, rightDebugInfo | compiled |
+| ClientEvents | lang, highPriorityAssets, tick | yes; generated assets and client callbacks checked |
+| | loggedIn, loggedOut | yes; client login and clean logout |
+| | splashes, titleScreen (ModJS only) | seen on nine builds; Forge 1.21.1 development first-menu limitation remains in PORTING.md |
+| | init, leftDebugInfo, rightDebugInfo | init checked on all ten clients; F3 frames retained in docs/frames, with NeoForge 26.x debug-entry adaptation |
+| | hud, keyBindings, keyBindingPressed (ModJS only) | yes; native HUD and rebindable Minecraft key mappings checked on all ten builds, client evidence in docs/testing/2026.11.30.md |
 | | painterUpdated, paintScreen | no (use `ClientEvents.screens` for your own screens) |
-| | screens (ModJS only): scripted screens with buttons, text and text boxes; `Client.openScreen` | compiled; not seen on a client |
+| | screens (ModJS only): scripted screens with buttons, text and text boxes; `Client.openScreen` | yes; real-client frames on all ten builds |
 | BlockEvents | broken, placed, rightClicked, leftClicked | yes (broken checked in game test) |
 | | farmlandTrampled | compiled |
 | | modification | yes (hardness, resistance, light, friction, speed, jump, tool requirement; checked) |
 | | detectorChanged, detectorPowered, detectorUnpowered | no |
 | ItemEvents | rightClicked, entityInteracted, crafted, smelted, foodEaten, dropped, pickedUp | crafted checked; others compiled |
-| | tooltip (KubeJS: modifyTooltips) | compiled |
+| | tooltip (KubeJS: modifyTooltips) | yes; real item tooltip construction in client tours |
 | | modification (max stack size, max damage, rarity) | yes, checked on both versions |
 | | firstLeftClicked, firstRightClicked, canPickUp | compiled |
 | | armorTierRegistry, toolTierRegistry (as `StartupEvents.registry` `armor_material` and `tool_tier`) | yes (checked) |
-| | dynamicTooltips | compiled (same data as `tooltip`, filtered by item id) |
+| | dynamicTooltips | yes; filtered diamond tooltip checked in client tours |
 | | modelProperties | no |
 | EntityEvents | hurt | yes (checked) |
 | | death, spawned | compiled |
@@ -62,15 +63,13 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | Scoreboard global (ModJS only) | objectives, scores, display slots, teams | checked in the self test on all six builds |
 | Toasts (ModJS only) | `Client.hideToasts`, `ClientEvents.toast`, `Client.showToast`, `Client.disableTutorial`, `Client.skipExperimentalWarning` | compiled; not seen on a client |
 | World types (ModJS only) | `StartupEvents.worldTypes` add, edit, duplicate, hide, rename, drop | JSON parsed by the game's world preset codec in the self test on all six builds; the button not seen on a client |
-| Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in the headless self test; a real client entered a run-time dimension on all ten builds (frames `docs/frames/dim-<build>.png`); restart persistence unchecked |
+| Dimensions global (ModJS only) | create, exists, list, teleport, delete at run time; saved per world | created, loaded as real levels, edited and deleted in the headless self test; a real client entered a run-time dimension on all ten builds (frames `docs/frames/dim-<build>.png`); restart restoration and saved block verified across two clean launches on all ten builds |
 | DimensionEvents (ModJS only) | add, edit, duplicate, drop; dimension types | JSON checked against the game's codec; not seen in a real world |
-| NetworkEvents | dataReceived | compiled |
-| RecipeViewerEvents | hideItems, addInformation, hideCategories | JEI on 1.21.1: compiles against JEI 19.70.0.469, not run with JEI |
+| NetworkEvents | dataReceived | yes; client/server ping and reply checked in the existing all-ten-build tours |
+| RecipeViewerEvents | hideItems, addInformation, hideCategories | native JEI, EMI and REI adapters; supported targets and exact client evidence in docs/testing/2026.11.30.md |
 | | groupItems (for viewers with grouping, such as Barely Enough Items) | event defined and unit tested; read by BEI, ignored by JEI |
 | | the other four (custom categories, recipe hiding, and so on) | no |
 | | Barely Enough Items (26.1.2) | reads hideItems, addInformation, hideCategories and groupItems by reflection; tested by the BEI session in a dev client for the first three, groupItems untested |
-| | EMI, REI | blocked: no Forge build to compile against. EMI's published Forge builds stop at 1.20.x and its 1.21.1 build is NeoForge only; REI's Forge artifacts stop at 12.x (1.20.x) and REI 16 for Forge 1.21.1 is not on a Maven. |
-| | JEI on 26.1.2 | blocked: JEI lists 26.1.2 for NeoForge and Fabric, no Forge artifact on its Maven |
 
 ## Registry builders
 

@@ -1,0 +1,35 @@
+[08Nov2026 19:06:07.807] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok highPriorityAssets
+[08Nov2026 19:06:08.259] [modloading-worker-0/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok init
+[08Nov2026 19:06:11.932] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok loggedOut
+[08Nov2026 19:06:13.646] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok loggedIn
+[08Nov2026 19:06:15.414] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS exists-before-create-stage-1
+[08Nov2026 19:06:15.420] [Server thread/INFO] [modjs/]: ModJS created dimension modjs:restart_probe
+[08Nov2026 19:06:15.421] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS created
+[08Nov2026 19:06:15.463] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS teleport-stage-1
+[08Nov2026 19:06:15.772] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok tick
+[08Nov2026 19:06:16.299] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok hud
+[08Nov2026 19:06:17.424] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS block-stage-1
+[08Nov2026 19:06:17.425] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK READY stage-1
+[08Nov2026 19:06:19.230] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK tooltip lines: Diamond | CHECK-TIP dynamic | CHECK-TIP static
+[08Nov2026 19:06:19.231] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok ItemEvents.tooltip
+[08Nov2026 19:06:19.231] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok ItemEvents.dynamicTooltips
+[08Nov2026 19:06:21.227] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyPressed key=65 action=1
+[08Nov2026 19:06:22.223] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyBindings
+[08Nov2026 19:06:22.722] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyBindingRebound
+[08Nov2026 19:06:23.225] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok chat-sent
+[08Nov2026 19:06:23.228] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT chat chat check from the client
+[08Nov2026 19:06:23.473] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK ok keyBindingPressed
+[08Nov2026 19:06:24.221] [Render thread/INFO] [modjs/]: [CLIENT] JEI-CHECK registered item count 2009
+[08Nov2026 19:06:24.259] [Render thread/INFO] [modjs/]: [CLIENT] JEI-CHECK PASS stone hidden
+[08Nov2026 19:06:24.259] [Render thread/INFO] [modjs/]: [CLIENT] JEI-CHECK PASS diamond visible
+[08Nov2026 19:06:24.265] [Render thread/INFO] [modjs/]: [CLIENT] JEI-CHECK PASS smelting category hidden
+[08Nov2026 19:06:24.267] [Render thread/INFO] [modjs/]: [CLIENT] JEI-CHECK PASS information registered
+[08Nov2026 19:06:35.224] [Render thread/INFO] [modjs/]: [CLIENT] CLIENT-CHECK dimension ResourceKey[minecraft:dimension / modjs:restart_probe]
+[08Nov2026 19:06:36.223] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK clean client exit
+[08Nov2026 19:06:36.263] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT loggedOut Dev
+[08Nov2026 19:06:36.340] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 19:06:36.344] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 19:06:36.348] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 19:06:36.353] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 19:06:36.357] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 19:06:36.367] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded

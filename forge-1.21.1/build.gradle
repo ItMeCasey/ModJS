@@ -99,6 +99,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation "org.mozilla:rhino:${rhino_version}"
     compileOnly "mezz.jei:jei-1.21.1-common-api:${jei_version}"
+    if (project.hasProperty('jeiTour')) { runtimeOnly fg.deobf("mezz.jei:jei-1.21.1-forge:${jei_version}") }
     compileOnly "mezz.jei:jei-1.21.1-forge-api:${jei_version}"
     jarJar("org.mozilla:rhino:${rhino_version}") {
         jarJar.ranged(it, "[${rhino_version},1.8)")

@@ -46,6 +46,10 @@ minecraft {
         }
 
         client {
+            if (project.hasProperty('emiTour') || project.hasProperty('reiTour')) {
+                property 'mixin.env.remapRefMap', 'true'
+                property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            }
             // `-PquickWorld=<folder>` opens that saved world on launch, for the screenshot tour in docs/frames.
             if (project.hasProperty('quickWorld')) { args '--quickPlaySingleplayer', project.property('quickWorld') }
         }
@@ -71,6 +75,9 @@ minecraft {
 jarJar.enable()
 
 repositories {
+    maven { url = 'https://maven.shedaniel.me' }
+    maven { url = 'https://maven.architectury.dev' }
+    maven { url = 'https://repo.sleeping.town' }
     maven {
         name = 'Cursemaven (Jade API, compile only)'
         url = 'https://cursemaven.com'
@@ -92,6 +99,15 @@ repositories {
 }
 
 dependencies {
+    compileOnly fg.deobf("dev.architectury:architectury-forge:9.2.14")
+    if (project.hasProperty('reiTour')) {
+        runtimeOnly fg.deobf("dev.architectury:architectury-forge:9.2.14")
+        runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.0.99")
+    }
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.1.785")
+    if (project.hasProperty('reiTour')) { runtimeOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.1.785") }
+    compileOnly fg.deobf("dev.emi:emi-forge:1.1.24+1.20.1:api")
+    if (project.hasProperty('emiTour')) { runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.24+1.20.1") }
     // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
     compileOnly files('../libs/smwti-api-1.20.1.jar')
     compileOnly fg.deobf('curse.maven:jade-324717:8479276')
@@ -101,6 +117,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     minecraftLibrary "org.mozilla:rhino:${rhino_version}"
     compileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"
+    if (project.hasProperty('jeiTour')) { runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${jei_version}") }
     compileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
     jarJar("org.mozilla:rhino:${rhino_version}") {
         jarJar.ranged(it, "[${rhino_version},1.8)")

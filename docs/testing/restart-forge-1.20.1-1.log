@@ -1,0 +1,16 @@
+[08Nov2026 15:59:16.679] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS exists-before-create-stage-1
+[08Nov2026 15:59:16.684] [Server thread/INFO] [modjs/]: ModJS created dimension modjs:restart_probe
+[08Nov2026 15:59:16.685] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS created
+[08Nov2026 15:59:16.977] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS teleport-stage-1
+[08Nov2026 15:59:18.693] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS block-stage-1
+[08Nov2026 15:59:18.693] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK READY stage-1
+[08Nov2026 15:59:26.868] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK clean client exit
+[08Nov2026 15:59:26.926] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT loggedOut Dev
+[08Nov2026 15:59:27.934] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.947] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.947] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.947] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.948] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.948] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.949] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 15:59:27.949] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded

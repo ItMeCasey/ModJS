@@ -84,6 +84,13 @@ public final class DataBuilder {
         EventGroups.CLIENT.post("highPriorityAssets", new DataEventJS(data));
         CLIENT_CONTRIBUTORS.forEach(contributor -> contributor.accept(data));
 
+        com.itmecasey.modjs.client.KeyBindingEventJS.rebuild();
+        if (!com.itmecasey.modjs.client.KeyBindingEventJS.current().isEmpty()) {
+            JsonObject keyNames = existingLang(data, "en_us");
+            com.itmecasey.modjs.client.KeyBindingEventJS.addNames(keyNames);
+            data.putJson("modjs", "lang/en_us", keyNames);
+        }
+
         for (String language : EventGroups.CLIENT.extraIds("lang")) {
             LangEventJS lang = new LangEventJS(language);
             EventGroups.CLIENT.postExact("lang", language, lang);

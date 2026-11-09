@@ -43,7 +43,7 @@
       pressed++;
       try {
         const kids = screen.children(); const buttons = [];
-        for (let i = 0; i < kids.size(); i++) { const k = kids.get(i); if (('' + k).indexOf('Button') >= 0) buttons.push(k); }
+        for (let i = 0; i < kids.size(); i++) { let k = kids.get(i); if (('' + k).indexOf('Button') >= 0) buttons.push(k); }
         if (buttons.length > 1) { try { buttons[1].onPress(); } catch (e0) { buttons[1].onPress(null); } }
       } catch (e) { note('confirm-screen', e); }
     }
@@ -55,16 +55,17 @@
       try { const l = lines(new (J('net.minecraft.world.item.ItemStack'))(J('net.minecraft.world.item.Items').DIAMOND)); if (l == null) note('tooltip', 'no getTooltipLines overload worked'); else { const t = text(l); console.log('CLIENT-CHECK tooltip lines: ' + t); if (t.indexOf('CHECK-TIP static') >= 0) ok('ItemEvents.tooltip'); if (t.indexOf('CHECK-TIP dynamic') >= 0) ok('ItemEvents.dynamicTooltips'); } } catch (e) { note('tooltip', e); }
     }
     if (inWorld === 120) {
-      const kh = mc.keyboardHandler; const win = mc.getWindow();
-      const handle = (() => { try { return win.handle(); } catch (e) { try { return win.getWindow(); } catch (e2) { return 0; } } })();
-      const tries = [
-        () => kh.keyPress(handle, 65, 30, 1, 0),
-        () => kh.keyPress(handle, 1, new (J('net.minecraft.client.input.KeyEvent'))(65, 30, 0)),
-        () => kh.keyPress(handle, 65, 30, 1, 0, 0)
-      ];
-      let done = false;
-      for (let i = 0; i < tries.length; i++) { try { tries[i](); done = true; break; } catch (e) { note('keyPress-attempt', e); } }
-      if (!done) note('keyPressed', 'no keyPress overload worked');
+      // KeyboardHandler.keyPress is private on newer Minecraft versions. Use the loader's
+      // own input hook to exercise its real event bridge without sending desktop input.
+      try {
+        const hooks = J(Java.exists('net.neoforged.neoforge.client.ClientHooks')
+          ? 'net.neoforged.neoforge.client.ClientHooks' : 'net.minecraftforge.client.ForgeHooksClient');
+        if (Java.exists('net.minecraft.client.input.KeyEvent')) {
+          hooks.onKeyInput(new (J('net.minecraft.client.input.KeyEvent'))(65, 30, 0), 1);
+        } else {
+          hooks.onKeyInput(65, 30, 1, 0);
+        }
+      } catch (e) { note('keyPressed', e); }
     }
     if (inWorld === 160) { try { mc.player.connection.sendChat('chat check from the client'); ok('chat-sent'); } catch (e) { note('chat', e); } }
     if (inWorld === 400) { try { console.log('CLIENT-CHECK dimension ' + mc.level.dimension()); Client.screenshot('dim_check.png'); } catch (e) { note('dimension', e); } }

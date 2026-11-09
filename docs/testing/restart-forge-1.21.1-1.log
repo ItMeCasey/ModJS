@@ -1,0 +1,18 @@
+[08Nov2026 16:08:32.338] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK waiting screen net.minecraft.client.gui.screens.BackupConfirmScreen@48f08e9
+[08Nov2026 16:08:32.342] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK accepting backup prompt for copied test world
+[08Nov2026 16:08:36.221] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS exists-before-create-stage-1
+[08Nov2026 16:08:36.226] [Server thread/INFO] [modjs/]: ModJS created dimension modjs:restart_probe
+[08Nov2026 16:08:36.226] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS created
+[08Nov2026 16:08:36.277] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS teleport-stage-1
+[08Nov2026 16:08:38.294] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK PASS block-stage-1
+[08Nov2026 16:08:38.294] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK READY stage-1
+[08Nov2026 16:08:46.646] [Render thread/INFO] [modjs/]: [CLIENT] RESTART-CHECK clean client exit
+[08Nov2026 16:08:46.702] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT loggedOut Dev
+[08Nov2026 16:08:49.223] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.238] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.240] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.240] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.240] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.241] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.241] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded
+[08Nov2026 16:08:49.259] [Server thread/INFO] [modjs/]: [SERVER] RESTART-CHECK EVENT unloaded

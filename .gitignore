@@ -11,3 +11,4 @@ crash-reports/
 st*.log
 nf*.log
 release/
+__pycache__/

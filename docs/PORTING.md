@@ -1,22 +1,22 @@
 # Porting ModJS to more versions
 
-ModJS ships Forge 26.1.2 and Forge 1.21.1 today. More Minecraft versions and loaders are planned, so this file lists
+ModJS ships Forge and NeoForge for 1.20.1, 1.21.1, 26.1.2, 26.2 and 26.3. This file lists
 what a new port has to provide and every gap that exists because a version could not do something yet.
 
 ## Ports so far
 
 | Module | Minecraft | Loader | Status |
 |---|---|---|---|
-| `forge-26.3` | 26.3 | Forge 66.1.5 | full; 81 self-test checks and the unit tests pass in a headless game-test server (no client run) |
-| `neoforge-26.3` | 26.3 | NeoForge 26.3.0.101 | full; 81 self-test checks and the unit tests pass in a headless game-test server (no client run) |
-| `forge-26.2` | 26.2 | Forge 65.1.6 | full; 81 self-test checks and the unit tests pass in a headless game-test server (no client run) |
-| `neoforge-26.2` | 26.2 | NeoForge 26.2.0.93 | full; 81 self-test checks and the unit tests pass in a headless game-test server (no client run) |
-| `forge-26.1.2` | 26.1.2 | Forge 64.1.6 | full; self test passes |
-| `forge-1.21.1` | 1.21.1 | Forge 52.1.21 | full; self test passes |
-| `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | full (rarity is rewritten through the item's `rarity` field); the same 82 self-test checks and 71 unit tests pass |
-| `neoforge-1.20.1` | 1.20.1 | NeoForge 47.1.106 | same as Forge 1.20.1 (same sources); 82 self-test checks and 71 unit tests pass. Ship the `-all` jar (it carries Rhino) |
-| `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | full; the same 81 self-test checks and 71 unit tests pass |
-| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | full (F3 lines through a debug entry, seen on a client); the same 81 self-test checks and 71 unit tests pass |
+| `forge-26.3` | 26.3 | Forge 66.1.5 | build, 87 unit tests and 91 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `neoforge-26.3` | 26.3 | NeoForge 26.3.0.101 | build, 87 unit tests and 92 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `forge-26.2` | 26.2 | Forge 65.1.6 | build, 87 unit tests and 91 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `neoforge-26.2` | 26.2 | NeoForge 26.2.0.93 | build, 87 unit tests and 92 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `forge-26.1.2` | 26.1.2 | Forge 64.1.6 | build, 87 unit tests and 91 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `forge-1.21.1` | 1.21.1 | Forge 52.1.21 | build, 87 unit tests and 91 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `forge-1.20.1` | 1.20.1 | Forge 47.4.28 | build, 87 unit tests and 94 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `neoforge-1.20.1` | 1.20.1 | NeoForge 47.1.106 | build, 87 unit tests and 94 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `neoforge-1.21.1` | 1.21.1 | NeoForge 21.1.265 | build, 87 unit tests and 91 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
+| `neoforge-26.1.2` | 26.1.2 | NeoForge 26.1.2.125 | build, 87 unit tests and 92 headless self-test checks pass; client evidence in docs/testing/2026.11.30.md |
 
 The 1.20.1 module copies the Forge 1.21.1 one and adapts to the older game: plural data folders and `item`/string recipe results (`DataFolders`, `Legacy120Format`), `FriendlyByteBuf` messages on a `SimpleChannel`, the old `Tier` and `ArmorMaterial` interfaces, `RecipeManager.fromJson`, reflection for item stack size and durability, `Codec` instead of `MapCodec`, and Rhino through `minecraftLibrary`. Its self test needs a connected test player (an `EmbeddedChannel`) because Forge reacts to logins.
 
@@ -27,8 +27,39 @@ The 26.2 modules copy the 26.1.2 ones and the 26.3 modules copy the 26.2 ones. 2
 The NeoForge 1.21.1 and 26.1.2 modules copy the Forge 1.21.1 one and changes only loader API names: events on `NeoForge.EVENT_BUS` with `net.neoforged` packages, `PlayerTickEvent.Post` and friends for ticks, `LivingIncomingDamageEvent` for hurt,
 `ItemEntityPickupEvent.Pre`, `ModifyDefaultComponentsEvent` for item changes, payload handlers instead of a channel for networking, `DeferredHolder` instead of `RegistryObject`, `BaseFlowingFluid`,
 and `neoforge:` ids and data folders (`LoaderNames`). Build files use ModDevGradle with Gradle 9.3.1, Rhino on `additionalRuntimeClasspath` and as Jar-in-Jar.
-On NeoForge 26.1.2, 26.2 and 26.3 `ClientEvents.leftDebugInfo` and `rightDebugInfo` go through a `RegisterDebugEntriesEvent` entry (`client/ScriptDebugEntries`): the loader has no F3 text event any more, so both events show as one block of lines, left ones first (seen on a client on 26.1.2 and 26.3, frames docs/frames/f3-neoforge-26.1.2.png and f3-neoforge-26.3.png; 26.2 shares the code and compiles). The entry is switched on when a player joins a world, because saved debug screen settings do not know it. A script fluid has no custom client art (the old texture methods are gone; fluid models are not wired up yet). JEI has no 26.1.2 build. Block breaking uses `BreakBlockEvent`, reload listeners `AddServerReloadListenersEvent`, and the client can only send with `ClientPacketDistributor`.
+On NeoForge 26.1.2, 26.2 and 26.3 `ClientEvents.leftDebugInfo` and `rightDebugInfo` go through a `RegisterDebugEntriesEvent` entry (`client/ScriptDebugEntries`): the loader has no F3 text event any more, so both events show as one block of lines, left ones first (seen on a client on 26.1.2 and 26.3, frames docs/frames/f3-neoforge-26.1.2.png and f3-neoforge-26.3.png; 26.2 shares the code and compiles). The entry is switched on when a player joins a world, because saved debug screen settings do not know it. Script fluids use tinted water fluid models, verified in real clients on all six 26.x builds. Native JEI adapters are available on NeoForge 26.1.2, 26.2 and 26.3. Block breaking uses `BreakBlockEvent`, reload listeners `AddServerReloadListenersEvent`, and the client can only send with `ClientPacketDistributor`.
 On NeoForge 1.21.1 fluid client art still uses the deprecated `FluidType.initializeClient`; move it to `RegisterClientExtensionsEvent` when a later NeoForge removes it.
+
+## Optional recipe viewers
+
+The [reference matrix](REFERENCE.md#recipe-viewers-jei-emi-and-rei) lists native adapters.
+Forge 26.x has no JEI, EMI or REI adapter because those viewer builds target other loaders;
+Forge 1.21.1 has JEI, while EMI and REI use NeoForge on that Minecraft version.
+Each adapter is discovered by its viewer, with compile-only API dependencies, so absent viewers
+never load the adapter classes. BEI consumes the shared script events through its own bridge.
+
+Development profiles `-PjeiTour`, `-PemiTour` and `-PreiTour` install one viewer for a client check.
+NeoForge 1.20.1 uses the same Forge sources; its NeoGradle 7 development runtime needs the
+Mojang-named optional mod jars produced by running the corresponding Forge 1.20.1 profile first.
+The build resolves those opt-in files from the local Gradle cache and fails clearly if missing.
+The profiles also remap viewer access-transformer rules for the Mojang-named development runtime.
+Ordinary builds and shipped jars do not depend on those cached development artifacts or include the dev-only rules.
+Forge/NeoForge 1.20.1 EMI and REI profiles also remap their SRG mixin refmaps in development.
+
+## Client and restart verification
+
+`python scripts/client_tour.py <module> [--jei|--emi|--rei]` checks tooltip callbacks, raw loader
+input, rebindable keys, HUD rendering, client events, chat receipt, logout and level unload.
+`python scripts/restart_tour.py <module>` creates a runtime dimension, saves a diamond block,
+exits the client cleanly, relaunches and verifies the restored dimension and block.
+`client_tour.py --restart` combines both stages. Logs are retained in `docs/testing` and frames
+in `docs/frames`. Checks call game and loader APIs inside the client; they never send OS input.
+
+Copied worlds are prepared before launch: Peaceful difficulty, mob spawning disabled, special
+spawn sources disabled, and a fresh player for restart/client tours. Modern copied gamerules
+exclude optional-mod entries because the isolated tour removes optional mods; stale registry keys
+would otherwise make Minecraft discard the saved rules. Test helpers preserve scripts and mods
+in a `finally` block and refuse to overwrite an existing restart/client test world.
 
 ## What a port provides
 
@@ -57,8 +88,6 @@ events and moves lines from server to client for Jade. The per-version files are
 
 | Area | Gap | Why |
 |---|---|---|
-| Recipe viewers | EMI and REI not implemented anywhere (needs upstream build) | No Forge build to compile against for 1.21.1 or 26.1.2 (EMI Forge builds stop at 1.20.x, REI Forge artifacts stop at 12.x). A NeoForge or Fabric port can use their real APIs. |
-| Recipe viewers | JEI not implemented on 26.1.2 (needs upstream build) | JEI publishes 26.1.2 for NeoForge and Fabric only. The 1.21.1 plugin is `compat/jei/ModJSJeiPlugin.java`; copy it when a build exists. |
 | Recipe viewers | Create recipe types: not planned | Create has no build for most supported versions and its recipe types are a large separate API. |
 | Recipe viewers | KubeJS events beyond hide items, add information, hide categories | Not built (custom categories, hiding single recipes, and so on). |
 | Scripts | On 26.1.2 `Block` and `BlockState` are replaced by stand-ins (`BlockFacades`) | The script engine would inspect client-only classes and crash a dedicated server. Check whether each new version needs the same. |
@@ -71,10 +100,8 @@ events and moves lines from server to client for Jade. The per-version files are
 | Block info | Entity `nbt` is empty | Saving an entity changed on 26.x (value output), so scripts read `event.entity` instead. |
 | Forge 1.21.1 | In the Forge 52.1.21 dev client, `RegisterCommandsEvent` and `AddReloadListenerEvent` never reach any listener: `/modjs ...` is an unknown command, ModJS's recipe hook does not run, and Forge's own `LootModifierManager` is never created (so a player death throws "Can not retrieve LootModifierManager until resources have loaded once") | Probed on 2026-11-06 with scripts that log `ServerEvents.loaded`, `LevelEvents.loaded`, `PlayerEvents.loggedIn` and `ServerEvents.commandRegistry`: the first three fire (the earlier note that the server-start events were missing was wrong, a tour artifact), `commandRegistry` does not, and `ModJS recipes:` is absent from the log while `Loaded 1292 recipes` is there. Both missing events are the ones Forge's own patched `ReloadableServerResources` posts while the world's resources load, and Forge's own listener for one of them is missing as well, so this is not ModJS code: the same listeners run in the headless self test and on NeoForge 1.21.1 and Forge 26.x, 1.20.1. Quick Play is not the cause (it calls the same `openWorld` as the menu). Forge 52.1.21 is the newest 1.21.1 build, so there is no newer one to try. A production Forge launcher was not available to see whether it also happens outside the dev client. Left as a Forge dev-environment issue. |
 | Forge 1.21.1 | In the dev client the scripted title screen does not replace the main menu either (frame docs/frames/title-forge-1.21.1-vanilla.png, Forge 1.21.1 client with only ModJS loaded; the same script replaces it on Forge 1.20.1) | Same family as the row above: some Forge events (`ScreenEvent.Opening` for the first screen, `RegisterCommandsEvent`, server lifecycle) seem not to reach ModJS there, while block, item and player events do. The run configs of Forge 1.21.1 and 1.20.1 are identical, so this is most likely a Forge 52.1.21 dev-client issue, but it was not proven. |
-| Events | chat, logged out and level unloaded are not driven in the client check | Driving them needs a second player or a real chat packet; logged out and unloaded fire only when the server stops. The other 31 gameplay events fire with correct data in a real client on all ten builds (Forge 1.21.1: see its own row). |
 | Worldgen | The chunk-generation self-test check runs in a run-time dimension that copies the overworld on builds whose game-test overworld is flat (Forge 1.21.1, 26.x and NeoForge 1.21.1) | A flat world places no features. The test world is saved between runs, so the check uses random far-away chunks. NeoForge 1.21.1's headless self test also fails if `run/mods` holds Jade (NPE in Jade's player join handler); move the jar away first (do not rename the whole `mods` folder: Gradle recreates it and a later move nests it). |
 | Dimensions | Teleporting the self-test player is only checked on 1.20.1 | On 1.21.1 and 26.x the headless test player has no network connection and `teleportTo` throws a NullPointerException. A real-client tour now enters a run-time dimension on all ten builds (`docs/frames/dim-<build>.png`). |
-| Dimensions | Restart persistence of run-time dimensions is not tested | A restart test needs the dedicated server (EULA, Casey only) or a client that quits and reopens the world. |
 | Item modification | Applies on the server and single player, not to a remote client | Components are not synced. |
 
 Unification needs from a port: the item tag folder name (`tags/item`), an item-exists check, the recipe reload hook calling

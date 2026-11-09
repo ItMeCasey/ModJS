@@ -1,0 +1,10 @@
+0e5a434522b70b762fa4157d28649334a95ced0e64eb5f281ff238097f42cdb9  forge-1.20.1/build/libs/modjs-mc1.20.1-2026.11.30.jar
+1b42cc334a2885cb93e8005610207cd85f8b7133cd476faafdfdbff97def14be  forge-1.21.1/build/libs/modjs-mc1.21.1-2026.11.30.jar
+6b07eb0f8ded2683af6aedaee9069081868ff28298092ad98c568c5fe980f822  forge-26.1.2/build/libs/modjs-2026.11.30.jar
+0077a81e8ca67cde3e2fc2a041a8381ddc9073a5ad29e8b7b10f2ef355311279  forge-26.2/build/libs/modjs-2026.11.30.jar
+133c41f052fe2ff0d452216f804142f4542f5446556a99e8d3c7af5569135ab9  forge-26.3/build/libs/modjs-2026.11.30.jar
+1753b701bd0832ac08f639d2c35c17b51cfd85825fa3867b4a70fd17ef9e2e8f  neoforge-1.20.1/build/libs/modjs-neoforge-mc1.20.1-2026.11.30-all.jar
+2a895e748ecead5b07444b7cf3b969becb2c77558e795c15dbd7ab329ec6a5ac  neoforge-1.21.1/build/libs/modjs-neoforge-mc1.21.1-2026.11.30.jar
+1789691e5c7f7277340f30a76eba62c91c3957985ad469e79b72bc586ca27556  neoforge-26.1.2/build/libs/modjs-neoforge-mc26.1.2-2026.11.30.jar
+9a10712866c4822d9383a6663942b0ae593bb4135f524bf6c6f49c186a07a6fa  neoforge-26.2/build/libs/modjs-neoforge-mc26.2-2026.11.30.jar
+7d6e08a29fdc933d83035767d7a60790019eb9162b252bb8d3c457dbff0bfd95  neoforge-26.3/build/libs/modjs-neoforge-mc26.3-2026.11.30.jar

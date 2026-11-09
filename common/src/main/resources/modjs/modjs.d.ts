@@ -296,7 +296,24 @@ declare const LevelEvents: {
   afterExplosion(handler: Handler<GameEvent>): void;
 };
 
+/** One HUD frame; positions and sizes are scaled GUI pixels, colors are ARGB. */
+interface HudEvent extends EventBase {
+  readonly width: number;
+  readonly height: number;
+  text(text: string, x: number, y: number, color?: number): void;
+  fill(x: number, y: number, width: number, height: number, color: number): void;
+}
+
+interface KeyBindingEvent extends EventBase {
+  register(id: string, defaultKey: number, name?: string): void;
+}
+interface KeyBindingPressedEvent extends EventBase { readonly id: string; }
+
 declare const ClientEvents: {
+  keyBindings(handler: Handler<KeyBindingEvent>): void;
+  keyBindingPressed(handler: Handler<KeyBindingPressedEvent>): void;
+  keyBindingPressed(id: string, handler: Handler<KeyBindingPressedEvent>): void;
+  hud(handler: Handler<HudEvent>): void;
   lang(language: string, handler: Handler<LangEvent>): void;
   highPriorityAssets(handler: Handler<DataEvent>): void;
   generateAssets(handler: Handler<DataEvent>): void;

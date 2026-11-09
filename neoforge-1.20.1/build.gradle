@@ -40,6 +40,10 @@ runs {
     }
 
     client {
+        if (project.hasProperty('emiTour') || project.hasProperty('reiTour')) {
+            systemProperty 'mixin.env.remapRefMap', 'true'
+            systemProperty 'mixin.env.refMapRemappingFile', project.file('../forge-1.20.1/build/createSrgToMcp/output.srg').absolutePath
+        }
         // `-PquickWorld=<folder>` opens that saved world on launch, for the screenshot tour in docs/frames.
         if (project.hasProperty('quickWorld')) {
             programArgument '--quickPlaySingleplayer'
@@ -59,6 +63,9 @@ runs {
 }
 
 repositories {
+    maven { url = 'https://maven.shedaniel.me' }
+    maven { url = 'https://maven.architectury.dev' }
+    maven { url = 'https://repo.sleeping.town' }
     maven {
         name = 'Cursemaven (Jade API, compile only)'
         url = 'https://cursemaven.com'
@@ -72,7 +79,32 @@ repositories {
     }
 }
 
+
+// NeoGradle 7 does not remap optional Forge mod jars. These opt-in client profiles
+// reuse the Mojang-named jars produced by the Forge 1.20.1 tour on this machine.
+def tourMod = { String group, String artifact, String version ->
+    def mapped = "${version}_mapped_official_1.20.1"
+    def jar = new File(gradle.gradleUserHomeDir,
+        "caches/forge_gradle/deobf_dependencies/${group.replace('.', '/')}/${artifact}/${mapped}/${artifact}-${mapped}.jar")
+    if (!jar.isFile()) throw new GradleException("Run the Forge 1.20.1 viewer tour first: missing ${jar}")
+    files(jar)
+}
+
 dependencies {
+    if (project.hasProperty('jeiTour')) {
+        runtimeOnly tourMod('mezz.jei', 'jei-1.20.1-forge', jei_version)
+    }
+    if (project.hasProperty('emiTour')) {
+        runtimeOnly tourMod('dev.emi', 'emi-forge', '1.1.24+1.20.1')
+    }
+    if (project.hasProperty('reiTour')) {
+        runtimeOnly tourMod('me.shedaniel', 'RoughlyEnoughItems-forge', '12.1.785')
+        runtimeOnly tourMod('dev.architectury', 'architectury-forge', '9.2.14')
+        runtimeOnly tourMod('me.shedaniel.cloth', 'cloth-config-forge', '11.0.99')
+    }
+    compileOnly "dev.architectury:architectury-forge:9.2.14"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-forge:12.1.785"
+    compileOnly "dev.emi:emi-forge:1.1.24+1.20.1:api"
     // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
     compileOnly files('../libs/smwti-api-1.20.1.jar')
     compileOnly 'curse.maven:jade-324717:8479276'
@@ -89,6 +121,52 @@ dependencies {
     testImplementation platform("org.junit:junit-bom:5.11.4")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+
+// The optional viewer jars carry SRG access transformers. Remap their rules for
+// this Mojang-named development runtime; keep those dev-only rules out of shipped jars.
+if (['jeiTour', 'emiTour', 'reiTour'].any { project.hasProperty(it) }) {
+    def transformer = layout.buildDirectory.file('viewer-tour/resources/META-INF/accesstransformer.cfg').get().asFile
+    transformer.parentFile.mkdirs()
+    def rules = new StringBuilder()
+    [tourMod('mezz.jei', 'jei-1.20.1-forge', jei_version),
+     tourMod('dev.emi', 'emi-forge', '1.1.24+1.20.1'),
+     tourMod('me.shedaniel', 'RoughlyEnoughItems-forge', '12.1.785'),
+     tourMod('dev.architectury', 'architectury-forge', '9.2.14'),
+     tourMod('me.shedaniel.cloth', 'cloth-config-forge', '11.0.99')]
+        .collectMany { it.files as List }.each { jar ->
+        new java.util.zip.ZipFile(jar).withCloseable { zip ->
+            def entry = zip.getEntry('META-INF/accesstransformer.cfg')
+            if (entry != null) {
+                rules.append('# ').append(jar.name).append('\n')
+                rules.append(zip.getInputStream(entry).getText('UTF-8')).append('\n')
+            }
+        }
+    }
+    def members = [:]
+    file('../forge-1.20.1/build/createSrgToMcp/output.srg').eachLine { line ->
+        def parts = line.split(' ')
+        if (parts[0] == 'FD:' || parts[0] == 'MD:') {
+            def target = parts[parts[0] == 'FD:' ? 2 : 3]
+            members[parts[1]] = target.substring(target.lastIndexOf('/') + 1)
+        }
+    }
+    def mappedRules = rules.toString().readLines().collect { line ->
+        def parts = line.trim().split('\\s+')
+        if (parts.length >= 3 && !line.trim().startsWith('#')) {
+            def member = parts[2]
+            def descriptor = member.indexOf('(')
+            def name = descriptor < 0 ? member : member.substring(0, descriptor)
+            def mapped = members[parts[1].replace('.', '/') + '/' + name]
+            if (mapped != null) parts[2] = mapped + (descriptor < 0 ? '' : member.substring(descriptor))
+            return parts.join(' ')
+        }
+        line
+    }.join('\n')
+    transformer.setText(mappedRules + '\n', 'UTF-8')
+    tasks.named('processResources') { from(transformer.parentFile.parentFile) }
+
 }
 
 tasks.withType(Test).configureEach {
@@ -110,3 +188,30 @@ tasks.named('processResources', ProcessResources) {
         expand replaceProperties
     }
 }
+
+// Both 1.20.1 loaders use the Forge API. Keep their platform source copies in sync.
+tasks.register('checkLegacySourceParity') {
+    def forgeSources = fileTree('../forge-1.20.1/src/main/java') { include '**/*.java' }
+    def neoSources = fileTree('src/main/java') { include '**/*.java' }
+    inputs.files(forgeSources, neoSources)
+    doLast {
+        def readSources = { tree ->
+            def sources = [:]
+            tree.visit { entry ->
+                if (!entry.directory) sources[entry.relativePath.pathString] = entry.file.getText('UTF-8').replace('\r\n', '\n')
+            }
+            sources
+        }
+        def expected = readSources(forgeSources)
+        def actual = readSources(neoSources)
+        def differences = (expected.keySet() + actual.keySet()).findAll { expected[it] != actual[it] }
+        if (!differences.isEmpty()) throw new GradleException("Synchronize 1.20.1 platform sources: ${differences.join(', ')}")
+    }
+}
+tasks.named('check') { dependsOn 'checkLegacySourceParity' }
+
+tasks.named('processResources') {
+    inputs.property('viewerTour', ['jeiTour', 'emiTour', 'reiTour'].any { project.hasProperty(it) })
+    doFirst { delete layout.buildDirectory.file('resources/main/META-INF/accesstransformer.cfg') }
+}
+tasks.named('jar') { exclude 'META-INF/accesstransformer.cfg' }

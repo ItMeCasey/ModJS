@@ -4,7 +4,7 @@ KubeJS-style scripting for Forge and NeoForge, powered by Rhino. Supports Minecr
 
 ## Layout
 
-- `common/` - script engine, events, data generation (no Minecraft code). Shared by both modules and unit tested.
+- `common/` - script engine, events, data generation (no Minecraft code). Shared by all ten modules and unit tested.
 - `forge-26.3/`, `forge-26.2/`, `forge-26.1.2/` - Forge 26.x modules (ForgeGradle 7, Java 25, Gradle 9.3+).
 - `forge-1.21.1/` - Forge 1.21.1 module (ForgeGradle 6, Java 21, Gradle 8.14).
 - `forge-1.20.1/` - Forge 1.20.1 module (ForgeGradle 6, Java 17, Gradle 8.14).
@@ -25,6 +25,13 @@ Example: `examples/block-info`; screenshots from real clients: `docs/frames` (ma
 
 On first launch ModJS creates a `modjs/` folder in the game directory with `startup_scripts`, `server_scripts`,
 `client_scripts`, `assets`, `data`, and `probe/modjs.d.ts` for editor completion. Use `/modjs reload` to re-run server scripts.
+
+## Client scripting and recipe viewers
+
+Client scripts can draw HUD text and rectangles and register keys that players can rebind in Controls.
+Examples: `examples/client/client_scripts`. JEI, EMI and REI adapters support item hiding,
+information pages and category hiding where each viewer supports the target loader and version;
+see the [viewer matrix](docs/REFERENCE.md#recipe-viewers-jei-emi-and-rei).
 
 ## Docs
 

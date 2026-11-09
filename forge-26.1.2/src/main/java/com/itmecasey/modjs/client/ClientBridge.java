@@ -120,6 +120,7 @@ public final class ClientBridge {
         });
 
         TickEvent.ClientTickEvent.Post.BUS.addListener((TickEvent.ClientTickEvent.Post e) -> {
+            ScriptedKeys.tick();
             if (EventGroups.CLIENT.hasHandlers("tick")) {
                 EventGroups.CLIENT.post("tick", new ClientEventJS(0, 0));
             }

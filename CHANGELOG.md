@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026.11.30 (unreleased)
+
+All ten builds.
+
+- Added `ClientEvents.hud` for scripted text and filled rectangles, with scaled GUI coordinates, ARGB colors, and per-frame cancellation.
+- Removed obsolete global-loot-modifier list metadata on NeoForge 26.1.2 and 26.2; the loader now discovers modifiers directly and was trying to parse the old list as a modifier. Added a resource-manager registration check.
+- Added rebindable scripted keys in Minecraft Controls, stable saved binding ids, and `ClientEvents.keyBindingPressed`.
+- Added JEI bridges on NeoForge 26.1.2, 26.2 and 26.3, and legacy vanilla category aliases on JEI 1.20.1.
+- Added native EMI bridges on Forge/NeoForge 1.20.1 and NeoForge 1.21.1, and REI bridges on those builds plus NeoForge 26.x. All support item hiding, information pages and category hiding.
+- Test worlds now begin in Peaceful with natural and special mob spawning disabled before launch.
+- Added repeatable isolated client checks for dimension restoration across clean game restarts, saved blocks, and logout/unload events.
+
 ## 2026.11.29
 
 All ten builds.

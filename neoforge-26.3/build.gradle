@@ -58,6 +58,9 @@ neoForge {
 }
 
 repositories {
+    maven { url = 'https://maven.shedaniel.me' }
+    maven { url = 'https://maven.architectury.dev' }
+    maven { url = 'https://repo.sleeping.town' }
     maven {
         name = 'Cursemaven (Jade API, compile only)'
         url = 'https://cursemaven.com'
@@ -75,6 +78,14 @@ repositories {
 }
 
 dependencies {
+    compileOnly "mezz.jei:jei-26.3-common-api:31.17.0.109"
+    compileOnly "mezz.jei:jei-26.3-neoforge-api:31.17.0.109"
+    if (project.hasProperty('jeiTour')) { runtimeOnly "mezz.jei:jei-26.3-neoforge:31.17.0.109" }
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:26.3.824"
+    if (project.hasProperty('reiTour')) {
+        runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:26.3.824"
+        runtimeOnly "dev.architectury:architectury-neoforge:22.0.4"
+    }
     // The overlay mods the script info API (InfoEvents) talks to. Compile-only: the plugin classes load only when the mod is installed.
     compileOnly files('../libs/smwti-api-26.3.jar')
     compileOnly 'curse.maven:jade-324717:9042207'

@@ -30,6 +30,14 @@ import java.util.Set;
  */
 @JeiPlugin
 public final class ModJSJeiPlugin implements IModPlugin {
+    private static IJeiRuntime activeRuntime;
+
+    /** The active optional viewer, or null while JEI is stopped. */
+    public static IJeiRuntime runtime() { return activeRuntime; }
+
+    @Override
+    public void onRuntimeUnavailable() { activeRuntime = null; }
+
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
     private static final ResourceLocation UID = new ResourceLocation("modjs", "jei");
 
@@ -59,6 +67,7 @@ public final class ModJSJeiPlugin implements IModPlugin {
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime runtime) {
+        activeRuntime = runtime;
         com.itmecasey.modjs.unify.Unifier unifier = com.itmecasey.modjs.unify.Unifier.current();
         if (unifier.active()) {
             List<ItemStack> replaced = new ArrayList<>();
@@ -92,7 +101,13 @@ public final class ModJSJeiPlugin implements IModPlugin {
             RecipeViewerEventJS.HideCategories event = new RecipeViewerEventJS.HideCategories();
             EventGroups.RECIPE_VIEWER.post("hideCategories", event);
             IRecipeManager manager = runtime.getRecipeManager();
-            Set<String> wanted = new LinkedHashSet<>(event.ids());
+            Set<String> wanted = new LinkedHashSet<>();
+            for (String id : event.ids()) wanted.add(switch (id) {
+                case "minecraft:smelting" -> "minecraft:furnace";
+                case "minecraft:campfire_cooking" -> "minecraft:campfire";
+                case "minecraft:composting" -> "minecraft:compostable";
+                default -> id;
+            });
             List<IRecipeCategory<?>> categories = manager.createRecipeCategoryLookup().includeHidden().get().toList();
             for (IRecipeCategory<?> category : categories) {
                 if (wanted.remove(category.getRecipeType().getUid().toString())) {

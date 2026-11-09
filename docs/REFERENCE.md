@@ -173,6 +173,41 @@ On 26.1.2 blocks and block states reach scripts as stand-ins: `Blocks.STONE.id`,
 `ClientEvents.lang('en_us', event => event.add('key', 'Value'))`; rename existing things with `event.renameItem('minecraft:diamond', 'Shiny Rock')`, `renameBlock`, `renameEntity` (display names only; F3+T to apply), `ItemEvents.tooltip(event => event.add('minecraft:apple', 'Crunchy'))`,
 `ClientEvents.keyPressed(event => ...)`, `ItemEvents.dynamicTooltips('minecraft:apple', e => ...)` (per item id), `ClientEvents.leftDebugInfo` / `rightDebugInfo` (`event.add('text')` adds lines to F3), `ClientEvents.init`, `ClientEvents.tick`, `loggedIn`, `loggedOut`.
 
+### Rebindable keys
+
+Register keys in `client_scripts`; Minecraft lists them under Controls > Key Binds > Miscellaneous.
+The default is a GLFW key code (`71` is G; `-1` starts unbound). Players can change it in Controls.
+The namespaced id is stable across display-name edits, so saved bindings survive a label change.
+Restart the client after adding or removing registrations or changing their defaults.
+
+```js
+ClientEvents.keyBindings(event => {
+  event.register('pack:open_menu', 71, 'Open pack menu');
+});
+ClientEvents.keyBindingPressed('pack:open_menu', event => {
+  Client.openScreen('hub');
+});
+```
+
+`keyBindingPressed` fires once per queued press while a player is in a world; holding a key follows
+Minecraft's normal key mapping behavior. `ClientEvents.keyPressed` remains available for raw key codes.
+
+### Scripted HUD
+
+`ClientEvents.hud` draws once per HUD frame while a player is in a world and the HUD is visible.
+Coordinates and `event.width` / `event.height` use scaled GUI pixels. Colors are ARGB numbers
+(`0xAARRGGBB`). Filled rectangles draw behind text; `event.cancel()` skips the scripted HUD for that frame.
+
+```js
+ClientEvents.hud(event => {
+  event.fill(8, 8, 160, 22, 0xCC182432);
+  event.text('Welcome to the pack', 14, 15, 0xFFFFCC44);
+});
+```
+
+`event.text(text, x, y)` defaults to opaque white. `event.fill(x, y, width, height, color)` ignores
+rectangles with zero or negative dimensions. Keep handlers short: they run every rendered frame.
+
 ### Unifying items (Ore Dictionary style)
 
 One canonical item per material: every recipe, drop and inventory that holds another mod's version ends up with it.
@@ -286,7 +321,7 @@ Handlers in startup and server scripts run on the server for blocks with a block
 `Client.screenshot(name)` (client scripts) saves the current frame, overlays included, to `screenshots/<name>.png` in the game folder; `scripts/info_tour.py` uses it for docs/frames.
 Works with SMWTI on every build and Jade on NeoForge 26.x, NeoForge 1.21.1 and 1.20.1 (Jade has no Forge 26.x or Forge 1.21.1 build). Example: `examples/block-info`.
 
-### Recipe viewers (JEI)
+### Recipe viewers (JEI, EMI and REI)
 
 ```js
 // client_scripts/viewer.js
@@ -295,7 +330,22 @@ RecipeViewerEvents.addInformation(event => event.add('minecraft:diamond', 'Found
 RecipeViewerEvents.hideCategories(event => event.hide('minecraft:campfire_cooking'));
 RecipeViewerEvents.groupItems(event => event.group('Gems', ['minecraft:diamond', '#c:gems'], { icon: 'minecraft:diamond' }));   // viewers with grouping (Barely Enough Items)
 ```
-`groupItems` is read only by viewers that can group items (Barely Enough Items); JEI ignores it. Hiding and info pages work with JEI on Minecraft 1.21.1. See `docs/PARITY.md` for why EMI, REI and 26.1.2 are not covered. Barely Enough Items (Forge 26.1.2) reads all four events; its `hideCategories` can only hide plugin categories unless BEI is installed on the server too. These hide entries in the viewer; they do not remove items or recipes from the game (use `ServerEvents.recipes` for that).
+`groupItems` is read only by viewers that can group items (Barely Enough Items); JEI, EMI and REI ignore it.
+Native adapters provide item hiding, information pages and category hiding on the supported targets below.
+
+| Viewer | Supported ModJS targets |
+|---|---|
+| JEI | Forge and NeoForge 1.20.1 and 1.21.1; NeoForge 26.1.2, 26.2 and 26.3 |
+| EMI | Forge and NeoForge 1.20.1; NeoForge 1.21.1 |
+| REI | Forge and NeoForge 1.20.1; NeoForge 1.21.1, 26.1.2, 26.2 and 26.3 |
+
+Selectors accept an item id, `#tag`, or `@mod`. Category ids use the viewer's own ids; REI's vanilla
+`minecraft:plugins/` prefix and JEI 1.20.1's furnace/campfire/compostable names also accept their
+modern vanilla aliases. EMI category hiding removes that category's recipes from its viewer.
+Barely Enough Items reads all four events through its own optional bridge; its `hideCategories` can
+only hide plugin categories unless BEI is installed on the server too. Viewer hiding does not remove
+items or recipes from the game (use `ServerEvents.recipes` for that).
+
 
 ## Helpers
 
@@ -318,3 +368,7 @@ Each version is its own Gradle build: `cd forge-26.1.2 && ./gradlew build` (Grad
 `cd forge-1.21.1 && ./gradlew build` (Gradle 8.14, Java 21). `common/` is shared. `./gradlew runGameTestServer` starts a
 headless server with `-Dmodjs.selftest=true`, which posts real Forge events for a test player and prints
 `SELFTEST PASS/FAIL` lines (scripts in `smoke-test/server_scripts/selftest.js`).
+
+### Loop-local variables in Rhino
+
+ModJS currently embeds Rhino 1.7.15 in interpreted ES6 mode. In that engine, a `const` declared inside a repeated loop block retains its first value on later iterations. Use `let` for values initialized inside `for` and `while` bodies. Top-level constants and constants in separately invoked functions do not have this loop behavior.

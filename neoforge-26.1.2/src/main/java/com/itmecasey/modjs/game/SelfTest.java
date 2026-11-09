@@ -161,6 +161,11 @@ public final class SelfTest {
         check("Unify added a conversion recipe", unifier.conversionRecipes().containsKey("modjs:unify/modjs_tin_ingot_from_minecraft_iron_ingot")
             && server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().identifier().toString().equals("modjs:unify/modjs_tin_ingot_from_minecraft_iron_ingot")));
 
+        var lootModifiers = server.getServerResources().managers()
+            .getListener(net.neoforged.neoforge.resource.NeoForgeReloadListeners.LOOT_MODIFIERS_KEY);
+        check("Unify loot modifier loads through the resource manager", lootModifiers.getModifier(
+            net.minecraft.resources.Identifier.fromNamespaceAndPath("modjs", "unify")) != null);
+
         var modifier = new com.itmecasey.modjs.unify.UnifyLootModifier(new net.minecraft.world.level.storage.loot.predicates.LootItemCondition[0]);
         it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemStack> drops = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
         drops.add(new ItemStack(Items.IRON_INGOT, 3));

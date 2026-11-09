@@ -123,6 +123,8 @@ def prepare(module):
     if world.exists():
         shutil.rmtree(world)
     shutil.copytree(smwti_world(module), world)
+    from world_setup import peaceful_world
+    peaceful_world(world)
     mods = run / "mods"
     mods.mkdir(exist_ok=True)
     for old in mods.glob("smwti-*.jar"):

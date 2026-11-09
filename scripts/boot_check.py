@@ -84,6 +84,8 @@ def main():
         if target.exists():
             shutil.rmtree(target)
         shutil.copytree(world, target)
+        from world_setup import peaceful_world
+        peaceful_world(target)
     x, y, w, h = display6()
     log = []
     proc = subprocess.Popen(["cmd", "/c", str(folder / "gradlew.bat"), "runClient", "--no-daemon", "-q"] + (["-PquickWorld=modjs_info"] if world else []), cwd=folder,
