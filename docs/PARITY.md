@@ -69,7 +69,7 @@ See [PORTING.md](PORTING.md) for what a new Minecraft version or loader has to p
 | RecipeViewerEvents | hideItems, addInformation, hideCategories | native JEI, EMI and REI adapters; supported targets and exact client evidence in docs/testing/2026.11.30.md |
 | | groupItems (for viewers with grouping, such as Barely Enough Items) | event defined and unit tested; read by BEI, ignored by JEI |
 | | the other four (custom categories, recipe hiding, and so on) | no |
-| | Barely Enough Items (26.1.2) | reads hideItems, addInformation, hideCategories and groupItems by reflection; tested by the BEI session in a dev client for the first three, groupItems untested |
+| | Barely Enough Items (26.1.2) | reads hideItems, addInformation, hideCategories and groupItems by reflection; all four events, including grouping, spot-tested with BEI 2026.11.7 on Forge 26.1.2 and ModJS 2026.11.30; other targets were not rerun |
 
 ## Registry builders
 
