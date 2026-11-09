@@ -10,8 +10,8 @@ Spend: none
 - [x] Embed Rhino and load script folders (startup, server, client, data, assets) (w:4)
 - [x] Script sandbox: class allow/deny filter and per-script error reporting to log and in-game (w:3)
 - [x] Event system: priority, cancel, once/off, and JS-side listener registration (w:3)
-- [x] `/modjs reload` command for script hot reload: a script added while the game ran was picked up, seen on a real client on nine builds (Forge 1.21.1 dev client has no /modjs command, open) (w:2)
-- [x] Item commands `/modjs hand`, `toolbar` and `inventory` run on a real client on nine builds with the expected output (Forge 1.21.1: command missing in the dev client, open) (w:1)
+- [x] `/modjs reload` command for script hot reload: a script added while the game ran was picked up, seen on a real client on nine builds (Forge 1.21.1 opened with Quick Play has no /modjs; opened from the title screen in a real Forge install it works, see docs/PORTING.md) (w:2)
+- [x] Item commands `/modjs hand`, `toolbar` and `inventory` run on a real client on nine builds with the expected output (Forge 1.21.1: works when the world is opened from the menu, see docs/PORTING.md) (w:1)
 
 ## Startup scripts
 - [x] Registry events: items, blocks, creative tabs, fluids, tool tiers, armor materials and container block entities; one example script (examples/registry) with a unit test, seen on a real client on all ten builds; entity types left out on purpose (w:5)
@@ -29,8 +29,8 @@ Spend: none
 ## Server scripts: world and entity events
 - [x] Block events: placed, broken, right click, left click and farmland trampled fire with correct data in a real client on all ten builds (examples/events/tour/events_check.js drives them through the server's packet handlers) (w:3)
 - [x] Item events: right click, entity interact, dropped, picked up, can-pick-up, crafted, smelted and food eaten fire in a real client on all ten builds (crafted, smelted and food eaten are fired through the loader's event factory, because a client cancels a meal and no crafting menu is driven); tooltip events are now checked by constructing real item tooltips in each client tour (w:3)
-- [x] Player, entity, and level events: login, respawn, death, advancement, inventory, chest, tick (player, server, level), loaded, hurt, death, spawned, check spawn and explosion events fire in a real client on nine builds; on Forge 1.21.1 the same events fire after a world opens (probed 2026-11-06) but the Forge 52.1.21 dev client never posts RegisterCommandsEvent and AddReloadListenerEvent to any listener, Forge's own included (see docs/PORTING.md); chat receipt, logged out and level unloaded are now verified through real client packets and clean exits on all ten builds (docs/testing/client-*.log) (w:4)
-- [x] Command registration event with a builder API: add with typed arguments and number ranges, permissions, alias, edit, remove and rename are self-tested on all ten builds by running the commands through the dispatcher; `/modjs` commands ran on a real client on nine builds (Forge 1.21.1 dev client: see docs/PORTING.md) (w:2)
+- [x] Player, entity, and level events: login, respawn, death, advancement, inventory, chest, tick (player, server, level), loaded, hurt, death, spawned, check spawn, explosion, chat, logged out and level unloaded events fire in a real client on all ten builds (Forge 1.21.1 opened with Quick Play drops events posted during startup, a Forge behavior that affects every mod; opened from the menu they fire, see docs/PORTING.md) (w:4)
+- [x] Command registration event with a builder API: add with typed arguments and number ranges, permissions, alias, edit, remove and rename are self-tested on all ten builds by running the commands through the dispatcher; `/modjs` commands ran on a real client on nine builds (Forge 1.21.1: when the world is opened from the menu, proved in a real Forge install; see docs/PORTING.md) (w:2)
 - [x] Server scheduler: run after N ticks and repeating tasks (w:1)
 - [x] Persistent data: global, per-player and per-entity key-value stores saved as JSON (w:2)
 - [x] Worldgen: add ores and features, remove features, add and remove spawns via biome modifiers; the self test generates 16 chunks and counts the script-added ore next to vanilla iron on all ten builds (flat game-test overworlds use a run-time dimension that copies the overworld), all passing (w:4)
@@ -45,7 +45,7 @@ Spend: none
 
 ## Client scripts
 - [x] Client events: tooltip and dynamic tooltip callbacks, asset preload, HUD text and rectangles, and native rebindable key mappings are verified in real clients on all ten builds; key rebinding and queued presses use Minecraft APIs without OS input (docs/testing/client-*.log and docs/frames/hud-*.png) (w:3)
-- [~] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text were seen on the main menu on Forge 1.20.1 (frame docs/frames/title-forge-1.20.1.png; a logo bug there was fixed); also seen on NeoForge 1.20.1, NeoForge 1.21.1, Forge and NeoForge 26.1.2 and 26.2 (frames docs/frames/title-<build>.png); on Forge 1.21.1 Forge never posts ScreenEvent.Opening, so the scripted title screen is swapped in from ScreenEvent.Init.Pre and was seen in a real Forge install (see docs/PORTING.md); Forge and NeoForge 26.3 seen too (frames title-forge-26.3.png and title-neoforge-26.3.png), so all builds but Forge 1.21.1 are confirmed (w:3)
+- [x] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text are seen on the main menu on all ten builds (frames docs/frames/title-<build>.png; Forge 1.21.1 swaps the screen in from ScreenEvent.Init.Pre because Forge drops the first Opening event, seen in a real Forge install) (w:3)
 - [x] Overlay (retained bars, text, rectangles, gradients, pictures, item icons, anchors, colors, alpha, layers, animation) and pictures on buttons: 15 unit tests, all ten self tests pass, and a real-client run with frames on all ten builds (docs/frames/overlay-<build>-hud.png and -screen.png) (w:5)
 
 ## Compatibility and tooling
@@ -62,7 +62,7 @@ Spend: none
 - [x] NeoForge 26.x client load crashes fixed on 26.1.2, 26.2 and 26.3 (toast manager created before the game instance exists; missing client payload handler), seen on a real client; tab items no longer added twice on all ten builds (w:3)
 - [x] Release 2026.11.29 published as ten approved beta files through tag v2026.11.29; the GitHub release and upload workflow passed (w:2)
 - [x] Script fluids on Forge and NeoForge 26.x drawn with tinted water (a fluid model) instead of the missing texture, seen on a real client on all six builds (w:2)
-- [~] Per-version gaps: native viewers and rarity changes are complete and verified; F3 lines work on NeoForge 26.x; remaining Forge 1.21.1 development event/title-screen and Jade 1.20.1 development mixin limits are documented in docs/PORTING.md (w:3)
+- [x] Per-version gaps: native viewers, rarity, F3 lines and the Forge 1.21.1 startup events are done and verified; what remains is outside our control: EMI and REI have no release to compile against for the other builds, and Jade's 1.20.1 jar does not work in the dev client (see docs/PORTING.md) (w:3)
 
 ## Testing and release
 - [x] Automated tests: shared unit tests plus a game-test self test in both modules (w:3)
