@@ -79,4 +79,4 @@ Spend: none
 
 ## Planned
 - [ ] Images on buttons: an `icon` option on title-screen and screen buttons that draws a texture on the button (all ten builds) (w:2)
-- [ ] GUI overlay drawing API for `ClientEvents.hud` and screens: progress bars (current/max, fill direction, colors, borders, labels), text with size, shadow, outline and alignment, rectangles with gradients and borders, item icons, textures, and per-element color and alpha (all ten builds) (w:4)
+- [ ] GUI overlay drawing API for the HUD and screens, retained style (a script creates elements once and updates them, e.g. `bar.value = 40`): progress bars (current/max, fill direction, colors, borders, labels), text with size, shadow, outline and alignment, rectangles with gradients and borders, item icons, textures, per-element color and alpha, and animation effects (easing to a new value, pulse, fade); all ten builds (w:5)
