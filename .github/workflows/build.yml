@@ -47,7 +47,9 @@ jobs:
         run: |
           mkdir -p run/modjs
           cp -r ../smoke-test/startup_scripts ../smoke-test/server_scripts ../smoke-test/client_scripts run/modjs/
-          ./gradlew runGameTestServer --no-daemon 2>&1 | tee selftest.log
+          # Forge's game test server can keep the process alive after the tests finish; stop it after 8 minutes.
+          # Pass or fail is decided by the two grep checks below, not by the exit code.
+          timeout 480 ./gradlew runGameTestServer --no-daemon 2>&1 | tee selftest.log || true
           grep -q "SELFTEST DONE failures=0" selftest.log
           ! grep -q "SELFTEST FAIL" selftest.log
       - uses: actions/upload-artifact@v5
