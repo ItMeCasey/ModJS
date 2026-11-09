@@ -45,7 +45,7 @@ Spend: none
 
 ## Client scripts
 - [x] Client events: tooltip and dynamic tooltip callbacks, asset preload, HUD text and rectangles, and native rebindable key mappings are verified in real clients on all ten builds; key rebinding and queued presses use Minecraft APIs without OS input (docs/testing/client-*.log and docs/frames/hud-*.png) (w:3)
-- [~] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text were seen on the main menu on Forge 1.20.1 (frame docs/frames/title-forge-1.20.1.png; a logo bug there was fixed); also seen on NeoForge 1.20.1, NeoForge 1.21.1, Forge and NeoForge 26.1.2 and 26.2 (frames docs/frames/title-<build>.png); on Forge 1.21.1 the dev client shows the vanilla menu (see docs/PORTING.md); Forge and NeoForge 26.3 seen too (frames title-forge-26.3.png and title-neoforge-26.3.png), so all builds but Forge 1.21.1 are confirmed (w:3)
+- [~] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text were seen on the main menu on Forge 1.20.1 (frame docs/frames/title-forge-1.20.1.png; a logo bug there was fixed); also seen on NeoForge 1.20.1, NeoForge 1.21.1, Forge and NeoForge 26.1.2 and 26.2 (frames docs/frames/title-<build>.png); on Forge 1.21.1 Forge never posts ScreenEvent.Opening, so the scripted title screen is swapped in from ScreenEvent.Init.Pre and was seen in a real Forge install (see docs/PORTING.md); Forge and NeoForge 26.3 seen too (frames title-forge-26.3.png and title-neoforge-26.3.png), so all builds but Forge 1.21.1 are confirmed (w:3)
 
 ## Compatibility and tooling
 - [x] Recipe viewers: native JEI, EMI and REI adapters implement item hiding, information pages and category hiding; all sixteen supported version/loader/viewer combinations pass real-client checks with information-page frames (docs/testing/2026.11.30.md); missing upstream loader targets and intentionally omitted custom categories/Create schemas are documented (w:3)
@@ -76,3 +76,6 @@ Spend: none
 - [x] World types (StartupEvents.worldTypes): add, edit, duplicate, hide, rename, drop; 9 new self-test checks pass on all six builds (button not seen on a client) (w:3)
 - [x] Local 2026.11.30 validation: 87 unit tests per module, all ten headless self-tests, all ten HUD/key client checks, all ten two-launch dimension-restoration checks, and all sixteen supported native viewer checks pass; candidate remains unpublished pending approval (w:3)
 - [x] BEI spot check with 2026.11.30 on Forge 26.1.2: all four viewer events including grouping pass, live index and group checks recorded; release collector assembles all ten jars locally without upload (w:1)
+
+## Planned
+- [ ] Images on buttons: an `icon` option on title-screen and screen buttons that draws a texture on the button (all ten builds) (w:2)

@@ -86,6 +86,21 @@ public final class ClientBridge {
             }
         });
 
+        // Forge 52.1.21 never posts ScreenEvent.Opening (probed on 2026-11-09 with a listener on every event: the other screen
+        // events arrive, Opening does not), so the scripted title screen is swapped in when the vanilla one initializes.
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ScreenEvent.Init.Pre e) -> {
+            net.minecraft.client.gui.screens.Screen vanilla = e.getScreen();
+            com.itmecasey.modjs.client.TitleScreenConfig config = com.itmecasey.modjs.client.TitleScreenConfig.current();
+            if (config != null && vanilla.getClass() == net.minecraft.client.gui.screens.TitleScreen.class) {
+                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+                mc.tell(() -> {
+                    if (mc.screen == vanilla) {
+                        mc.setScreen(new ScriptedTitleScreen(config));
+                    }
+                });
+            }
+        });
+
         MinecraftForge.EVENT_BUS.addListener((ItemTooltipEvent e) -> {
             ItemStack stack = e.getItemStack();
             String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
