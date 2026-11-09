@@ -21,15 +21,20 @@ public final class ScriptedHud {
 
     private static void draw(GuiGraphicsExtractor graphics) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null || mc.options.hideGui || !EventGroups.CLIENT.hasHandlers("hud")) return;
+        if (mc.level == null || mc.player == null || mc.options.hideGui) return;
+        boolean immediate = EventGroups.CLIENT.hasHandlers("hud");
+        if (!immediate && !com.itmecasey.modjs.client.overlay.Overlay.any("hud")) return;
         HudEventJS event = new HudEventJS(graphics.guiWidth(), graphics.guiHeight());
-        EventGroups.CLIENT.post("hud", event);
-        if (event.isCancelled()) return;
+        if (immediate) {
+            EventGroups.CLIENT.post("hud", event);
+            if (event.isCancelled()) return;
+        }
         for (HudEventJS.Rectangle rectangle : event.rectangles()) {
             graphics.fill(rectangle.x(), rectangle.y(), rectangle.x() + rectangle.width(), rectangle.y() + rectangle.height(), rectangle.color());
         }
         for (HudEventJS.Label label : event.labels()) {
             graphics.text(mc.font, label.text(), label.x(), label.y(), label.color(), true);
         }
+        com.itmecasey.modjs.client.overlay.OverlayRenderer.draw(new GuiOverlayCanvas(graphics), "hud");
     }
 }

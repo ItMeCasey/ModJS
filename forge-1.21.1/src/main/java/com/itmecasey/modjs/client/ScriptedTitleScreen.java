@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 /** The main menu described by {@code ClientEvents.titleScreen}. */
 public final class ScriptedTitleScreen extends Screen implements ScriptedScreens.Context {
+    private final java.util.List<java.util.Map.Entry<Button, TitleScreenConfig.Button>> iconButtons = new java.util.ArrayList<>();
+
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
 
     private final TitleScreenConfig config;
@@ -123,7 +125,11 @@ public final class ScriptedTitleScreen extends Screen implements ScriptedScreens
                 y = stackY;
                 stackY += h + 4;
             }
-            addRenderableWidget(Button.builder(Component.literal(spec.label()), button -> run(spec)).bounds(x, y, w, h).build());
+            Button widget = Button.builder(Component.literal(spec.label()), button -> run(spec)).bounds(x, y, w, h).build();
+            addRenderableWidget(widget);
+            if (spec.icon() != null) {
+                iconButtons.add(java.util.Map.entry(widget, spec));
+            }
         }
     }
 
@@ -206,5 +212,29 @@ public final class ScriptedTitleScreen extends Screen implements ScriptedScreens
         if (config.versionShown()) {
             graphics.drawString(font, "Minecraft " + SharedConstants.getCurrentVersion().getName(), 2, height - 10, 0xFFFFFFFF);
         }
+        drawOverlays(graphics);
+    }
+
+    /** Draws button icons and the retained overlay elements made for screens. */
+    private void drawOverlays(GuiGraphics graphics) {
+        GuiOverlayCanvas canvas = new GuiOverlayCanvas(graphics);
+        for (java.util.Map.Entry<Button, TitleScreenConfig.Button> entry : iconButtons) {
+            Button widget = entry.getKey();
+            TitleScreenConfig.Button spec = entry.getValue();
+            int size = spec.iconSize();
+            int ix = switch (spec.iconSide()) {
+                case "right" -> widget.getX() + widget.getWidth() - 4 - size;
+                case "center" -> widget.getX() + (widget.getWidth() - size) / 2;
+                default -> widget.getX() + 4;
+            };
+            int iy = widget.getY() + (widget.getHeight() - size) / 2;
+            String icon = spec.icon();
+            if (icon.contains("/") || icon.endsWith(".png")) {
+                canvas.texture(icon, ix, iy, size, size, 0.0f, 0.0f, 1, 1, 1, 1, 0xFFFFFFFF);
+            } else {
+                canvas.item(icon.contains(":") ? icon : "minecraft:" + icon, ix, iy, size / 16.0f);
+            }
+        }
+        com.itmecasey.modjs.client.overlay.OverlayRenderer.draw(canvas, "screen");
     }
 }

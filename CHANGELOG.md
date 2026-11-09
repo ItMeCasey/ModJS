@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.11.31 (unreleased)
+
+All ten builds.
+
+- **New: the overlay.** `Overlay.bar`, `text`, `rect`, `image` and `item` create elements once in a client script; you change their fields afterwards (`bar.value = 40`) and the game draws them every frame. Progress bars have a value and a max, a color blend, a border, a label with `{value}`, `{max}` and `{percent}`, and a `smooth` option that eases the fill to a new value. Text has size, shadow, outline, alignment and a background box. Everything takes colors as numbers or `"#RRGGBB"` strings, an anchor (corners, edges, center), a layer and an alpha. Elements can `animate` any number field with an easing, `fadeIn`, `fadeOut` and `pulse`. See the new Overlay page on the wiki.
+- **New: pictures on buttons.** Buttons on the title screen and on your own screens take `icon` (an item id or a texture), `iconSize` and `iconSide`.
+- **Fix (Forge 1.21.1): the scripted title screen now shows.** Forge 52.1.21 never delivers its screen-opening event, so ModJS swaps the screen in when the vanilla one initializes. Seen in a real Forge install.
+
 ## 2026.11.30
 
 All ten builds.

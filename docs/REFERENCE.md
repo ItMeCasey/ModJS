@@ -208,6 +208,27 @@ ClientEvents.hud(event => {
 `event.text(text, x, y)` defaults to opaque white. `event.fill(x, y, width, height, color)` ignores
 rectangles with zero or negative dimensions. Keep handlers short: they run every rendered frame.
 
+### Overlay: bars, text, pictures and animation
+
+`Overlay` (client scripts) keeps elements that you create once and change later; the game draws them every frame.
+
+```js
+const hp = Overlay.bar('hp', { x: 10, y: 10, width: 120, height: 10, value: 80, max: 100, color: '#cc2222', color2: '#ff8844', label: '{value} / {max}', smooth: 300 });
+Overlay.text('score', { x: 10, y: 26, text: 'Score: 0', color: '#ffcc44', scale: 1.5, outline: '#000000' });
+Overlay.rect('panel', { anchor: 'left', x: 6, width: 90, height: 28, color: '#cc3a5ca8', color2: '#cc101840' });
+Overlay.image('logo', { anchor: 'topright', x: -10, y: 10, width: 32, height: 32, texture: 'mypack:textures/gui/logo.png' });
+Overlay.item('sword', { x: 10, y: 50, item: 'minecraft:diamond_sword', scale: 2 });
+hp.value = 35;                                       // the bar glides to the new value
+hp.animate({ x: 100, alpha: 0.5 }, 500, 'easeOut');  // linear, easeIn, easeOut, easeInOut, easeOutBack, bounce
+hp.fadeIn(300); hp.fadeOut(300); hp.pulse(900, 0.25, 1.0); hp.stop();
+```
+
+Common options: `x`, `y`, `anchor` (`topleft`, `top`, `topright`, `left`, `center`, `right`, `bottomleft`, `bottom`, `bottomright`), `visible`, `alpha`, `scale`, `layer`, `surface` (`hud` or `screen`). Colors are numbers (`0xAARRGGBB`, `0xRRGGBB` is opaque) or strings (`"#RRGGBB"`, `"#AARRGGBB"`).
+Bars: `width`, `height`, `value`, `min`, `max`, `smooth`, `direction`, `color`, `color2`, `background`, `border`, `borderSize`, `label` (`{value}`, `{max}`, `{percent}`), `labelColor`, `labelShadow`, `labelScale`.
+Text: `text`, `color`, `shadow`, `outline`, `background`, `padding`, `align`, `width`. Rectangles: `width`, `height`, `color`, `color2`, `horizontal`, `border`, `borderSize`. Images: `texture`, `width`, `height`, `tint`, and for a part of a sheet `texWidth`, `texHeight`, `u`, `v`, `regionWidth`, `regionHeight`.
+`Overlay.get(id)`, `has`, `remove`, `clear`. A mistyped option is an error. Client scripts clear the overlay when they reload. Elements with `surface: 'screen'` draw on your own screens and the title screen.
+Buttons there accept `icon` (an item id or a texture), `iconSize` and `iconSide` (`left`, `right`, `center`).
+
 ### Unifying items (Ore Dictionary style)
 
 One canonical item per material: every recipe, drop and inventory that holds another mod's version ends up with it.

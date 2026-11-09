@@ -15,7 +15,8 @@ public final class TitleScreenConfig extends EventJS {
     private static volatile TitleScreenConfig current;
 
     /** A button. {@code action} is a keyword or a {@code connect:host} / {@code url:https://...} string, or {@code callback} is set. */
-    public record Button(String label, String action, Function callback, Integer x, Integer y, int width, int height) {
+    public record Button(String label, String action, Function callback, Integer x, Integer y, int width, int height,
+                         String icon, int iconSize, String iconSide) {
     }
 
     public record Text(String text, int x, int y, int color, boolean centered) {
@@ -126,7 +127,9 @@ public final class TitleScreenConfig extends EventJS {
         Integer w = number(options, "width");
         Integer h = number(options, "height");
         buttons.add(new Button(label, action instanceof Function ? null : String.valueOf(action),
-            action instanceof Function f ? f : null, x, y, w != null ? w : 200, h != null ? h : 20));
+            action instanceof Function f ? f : null, x, y, w != null ? w : 200, h != null ? h : 20,
+            string(options, "icon"), number(options, "iconSize") != null ? Math.max(1, number(options, "iconSize")) : 16,
+            string(options, "iconSide") != null ? string(options, "iconSide") : "left"));
     }
 
     /** Adds text. Options: {@code x} (offset from center), {@code y} (from top), {@code color}, {@code left} (not centered). */
@@ -140,6 +143,11 @@ public final class TitleScreenConfig extends EventJS {
 
     public void text(String text) {
         text(text, null);
+    }
+
+    private static String string(Object options, String key) {
+        Object value = options == null ? null : JsonUtil.property(options, key);
+        return value == null || value instanceof org.mozilla.javascript.Undefined ? null : String.valueOf(value);
     }
 
     private static Integer number(Object options, String key) {

@@ -33,6 +33,9 @@ public final class ExtraBindings {
         ScriptableObject.putProperty(scope, "Persistent", Context.javaToJS(new PersistentBinding(), scope));
         ScriptableObject.putProperty(scope, "Unify", Context.javaToJS(new com.itmecasey.modjs.unify.UnifyConfig.Binding(), scope));
         ScriptableObject.putProperty(scope, "Client", Context.javaToJS(new com.itmecasey.modjs.client.ScriptedScreens.Binding(), scope));
+        if (type == ScriptType.CLIENT) {
+            ScriptableObject.putProperty(scope, "Overlay", Context.javaToJS(new com.itmecasey.modjs.client.overlay.Overlay.Binding(), scope));
+        }
         ClassGlobals.install(scope);
         for (BindingProvider provider : PROVIDERS) {
             provider.install(type, cx, scope);
