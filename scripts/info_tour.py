@@ -131,6 +131,8 @@ def prepare(module):
         old.unlink()
     for old in mods.glob("jade-*.jar"):
         old.unlink()
+    for old in mods.glob("bei-*.jar"):
+        old.unlink()
     if module not in FROM_GRADLE and not os.environ.get("INFO_TOUR_NO_SMWTI"):  # the variable runs ModJS alone, to isolate a stall
         shutil.copy2(smwti_jar(module), mods)
     jade = None if module in FROM_GRADLE else jade_jar(module)
@@ -151,6 +153,10 @@ def prepare(module):
     shutil.copy2(ROOT / "examples" / "registry" / "tour" / "registry_tour.js", server)
     shutil.copy2(ROOT / "examples" / "events" / "tour" / "events_check.js", server)
     shutil.copy2(ROOT / "examples" / "network" / "tour" / "net_check.js", server)
+    if os.environ.get("INFO_TOUR_VIEWER_JAR"):
+        # A recipe viewer (or a mod that provides one, such as BEI's JEI bridge) goes into mods, and the viewer events script runs.
+        shutil.copy2(os.environ["INFO_TOUR_VIEWER_JAR"], mods)
+        shutil.copy2(ROOT / "examples" / "recipe-viewer" / "tour" / "viewer_check.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "network" / "tour" / "net_check_client.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "client" / "tour" / "screens_check.js", run / "modjs" / "client_scripts")
     shutil.copy2(ROOT / "examples" / "block-info" / "tour" / "info_tour_client.js", run / "modjs" / "client_scripts")
@@ -162,7 +168,7 @@ def cleanup(run):
     for path in (run / "modjs" / "startup_scripts" / "block_info.js", run / "modjs" / "startup_scripts" / "tab_check.js", run / "modjs" / "server_scripts" / "info_tour.js",
                  run / "modjs" / "client_scripts" / "info_tour_client.js",
                  run / "modjs" / "startup_scripts" / "registry_example.js", run / "modjs" / "server_scripts" / "registry_tour.js", run / "modjs" / "server_scripts" / "events_check.js", run / "modjs" / "server_scripts" / "net_check.js",
-                 run / "modjs" / "client_scripts" / "net_check_client.js", run / "modjs" / "client_scripts" / "screens_check.js",
+                 run / "modjs" / "client_scripts" / "net_check_client.js", run / "modjs" / "client_scripts" / "screens_check.js", run / "modjs" / "client_scripts" / "viewer_check.js",
                  run / "modjs" / "server_scripts" / "zz_reload_probe.js"):
         path.unlink(missing_ok=True)
     for saved in (run / "modjs").glob("*/*.js.tourbak"):
@@ -198,6 +204,9 @@ CHECKS = [
     ("network: server got the client message", r"NET-CHECK server got ping 1"),
     ("network: client got the server message", r"NET-CHECK client got pong 2 back again"),
     ("screen: a scripted screen opened and closed", r"SCREEN-CHECK opened[\s\S]*SCREEN-CHECK closed"),
+    ("recipe viewer: info page added", r"RecipeViewerEvents\.addInformation: added a page"),
+    ("recipe viewer: items hidden", r"RecipeViewerEvents\.hideItems: hid"),
+    ("recipe viewer: category hidden", r"RecipeViewerEvents\.hideCategories: hid"),
     ("player death (loot roll) does not crash", r"Killed Dev|Dev died"),
 ]
 
@@ -220,7 +229,8 @@ EVENT_CHECKS = [
 
 def run_checks(log):
     text = "\n".join(log)
-    results = [(name, re.search(pattern, text) is not None) for name, pattern in CHECKS]
+    wanted = [(n, p) for n, p in CHECKS if os.environ.get("INFO_TOUR_VIEWER_JAR") or not n.startswith("recipe viewer")]
+    results = [(name, re.search(pattern, text) is not None) for name, pattern in wanted]
     for name in EVENT_CHECKS:
         results.append(("event " + name, "EVENTS-CHECK ok " + name in text))
     return results

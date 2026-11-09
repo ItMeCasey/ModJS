@@ -54,6 +54,7 @@ public final class ModJSJeiPlugin implements IModPlugin {
             Component[] text = entry.getValue().stream().map(Component::literal).toArray(Component[]::new);
             List<ItemStack> stacks = items.stream().map(ItemStack::new).toList();
             registration.addIngredientInfo(stacks, VanillaTypes.ITEM_STACK, text);
+            LOGGER.info("RecipeViewerEvents.addInformation: added a page for {} item(s) matching '{}'", stacks.size(), entry.getKey());
         }
     }
 
@@ -86,6 +87,7 @@ public final class ModJSJeiPlugin implements IModPlugin {
             if (!hidden.isEmpty()) {
                 List<ItemStack> stacks = hidden.stream().map(ItemStack::new).toList();
                 runtime.getIngredientManager().removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK, stacks);
+                LOGGER.info("RecipeViewerEvents.hideItems: hid {} item(s)", stacks.size());
             }
         }
         if (EventGroups.RECIPE_VIEWER.hasHandlers("hideCategories")) {
@@ -97,6 +99,7 @@ public final class ModJSJeiPlugin implements IModPlugin {
             for (IRecipeCategory<?> category : categories) {
                 if (wanted.remove(category.getRecipeType().getUid().toString())) {
                     manager.hideRecipeCategory(category.getRecipeType());
+                    LOGGER.info("RecipeViewerEvents.hideCategories: hid {}", category.getRecipeType().getUid());
                 }
             }
             wanted.forEach(id -> LOGGER.warn("RecipeViewerEvents.hideCategories: no recipe category '{}'", id));
