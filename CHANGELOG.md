@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026.11.30 (unreleased)
+## 2026.11.30
 
 All ten builds.
 

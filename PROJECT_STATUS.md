@@ -1,7 +1,7 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-08
+Updated: 2026-11-09
 Summary: Local 2026.11.30 candidate adds scripted HUDs, rebindable keys and native recipe-viewer adapters; all ten builds pass unit and headless tests, all sixteen supported viewer combinations pass real-client checks, and remaining development-environment limits are documented.
 Spend: none
 
@@ -67,7 +67,7 @@ Spend: none
 - [x] Automated tests: shared unit tests plus a game-test self test in both modules (w:3)
 - [x] Example scripts are written on first run; docs/REFERENCE.md covers every event family (w:2)
 - [x] Parity checklist against the KubeJS event list in docs/PARITY.md (w:1)
-- [x] Wiki at itmecasey.com/wiki/modjs: 38 pages with examples, written and checked locally in the site folder (w:3)
+- [x] Wiki at itmecasey.com/wiki/modjs: 40 pages (hud and key-bindings pages written for 2026.11.30; not yet deployed, the ssh deploy was blocked) with examples, written and checked locally in the site folder (w:3)
 - [x] Deploy the ModJS wiki to the droplet and check it live (w:1)
 - [x] Logo, banners, section headers and CurseForge description in branding/ and curseforge/ (not yet pushed or uploaded) (w:2)
 - [x] CurseForge project 1783874 uses a tag-triggered beta release workflow; v2026.11.29 built, self-tested and published all ten approved files (w:3)
