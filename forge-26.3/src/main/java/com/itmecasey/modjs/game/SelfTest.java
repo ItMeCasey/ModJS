@@ -295,6 +295,43 @@ public final class SelfTest {
         }
         level.setBlockAndUpdate(cratePos, Blocks.AIR.defaultBlockState());
 
+        BlockPos machinePos = new BlockPos(10, 100, 10);
+        net.minecraft.world.level.block.Block machineBlock = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("modjs:test_machine"));
+        level.setBlockAndUpdate(machinePos, machineBlock.defaultBlockState());
+        check("scripted block: orientable model gives it a facing property", machineBlock.defaultBlockState().getProperties().stream().anyMatch(property -> property.getName().equals("facing")));
+        check("scripted block: per-face textures leave a plain block without properties", net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("modjs:test_columns")).defaultBlockState().getProperties().isEmpty());
+        if (level.getBlockEntity(machinePos) instanceof com.itmecasey.modjs.registry.ScriptBlocks.ScriptEntity machine) {
+            check("scripted block: slots, stack limit and values come from the script", machine.getSize() == 3 && machine.getMaxStackSize() == 32 && machine.getValue("max") == 0);
+            check("scripted block: insert fills slots up to the stack limit and returns the rest", machine.insert("minecraft:iron_ingot", 70) == 0
+                && machine.getCount(0) == 32 && machine.getCount(1) == 32 && machine.getCount(2) == 6 && machine.insert("minecraft:iron_ingot", 70) == 44 && machine.getCount(2) == 32);
+            check("scripted block: shrink and clearSlot", machine.shrink(2, 30) == 30 && machine.getCount(2) == 2 && machine.shrink(2, 9) == 2 && machine.getItemId(2).equals("minecraft:air"));
+            machine.setData("mode", "fast");
+            machine.setValue("progress", 7);
+            machine.serverTick();
+            machine.serverTick();
+            machine.serverTick();
+            check("scripted block: onTick runs on the server each interval", machine.getData("ticks") instanceof Number n && n.intValue() >= 3);
+            net.minecraft.nbt.CompoundTag update = machine.getUpdateTag(level.registryAccess());
+            check("scripted block: the update packet carries data and values for clients", update.getStringOr("ModJSData", "").contains("\"mode\":\"fast\"") && update.getIntArray("ModJSValues").orElse(new int[] {-1})[0] == 7);
+            net.minecraft.nbt.CompoundTag saved = machine.saveWithFullMetadata(level.registryAccess());
+            net.minecraft.world.level.block.entity.BlockEntity rebuilt = net.minecraft.world.level.block.entity.BlockEntity.loadStatic(machinePos, machineBlock.defaultBlockState(), saved, level.registryAccess());
+            if (rebuilt instanceof com.itmecasey.modjs.registry.ScriptBlocks.ScriptEntity reloaded) {
+                check("scripted block: items, data and values survive saving and loading", reloaded.getCount(0) == 32 && reloaded.getItemId(1).equals("minecraft:iron_ingot")
+                    && "fast".equals(reloaded.getData("mode")) && reloaded.getValue("progress") == 7 && reloaded.getData("ticks") instanceof Number t && t.intValue() >= 3);
+                net.minecraft.world.inventory.AbstractContainerMenu menu = reloaded.createMenu(1, player.getInventory(), player);
+                check("scripted block: its menu has the block's slots and the player inventory", menu != null && menu.slots.size() == 3 + 36);
+                check("scripted block: a screen button runs onButton on the server", menu != null && menu.clickMenuButton(player, 0)
+                    && "go".equals(reloaded.getData("pressed")) && reloaded.getValue("progress") == 40);
+                check("scripted block: a button index without an id is refused", menu != null && !menu.clickMenuButton(player, 5));
+                check("scripted block: the menu syncs named values", menu instanceof com.itmecasey.modjs.registry.ScriptBlocks.ScriptMenu scriptMenu && scriptMenu.value("progress") == 40);
+            } else {
+                check("scripted block: a saved block entity loads again", false);
+            }
+        } else {
+            check("scripted block has a block entity", false);
+        }
+        level.setBlockAndUpdate(machinePos, Blocks.AIR.defaultBlockState());
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

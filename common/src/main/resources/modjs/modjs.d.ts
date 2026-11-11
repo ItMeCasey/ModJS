@@ -134,7 +134,108 @@ interface BlockBuilder {
   tab(tab: string): BlockBuilder;
   noItem(): BlockBuilder;
   dropsNothing(): BlockBuilder;
+  /** A texture per face; the most specific key wins (north over side over all). front is north, end is top and bottom. */
+  textures(faces: { all?: string; top?: string; bottom?: string; side?: string; north?: string; south?: string; east?: string; west?: string; front?: string; end?: string }): BlockBuilder;
+  /** cube_all, cube, cube_column, cube_bottom_top, orientable (turns to face the player), or a model id such as 'mymod:block/thing'. */
+  model(model: string): BlockBuilder;
+  /** A block entity with slots (a count, or positions from the top left of the screen), a stack limit and named synced numbers. */
+  inventory(options: { slots: number | { x: number; y: number }[]; stackLimit?: number; values?: string[] }): BlockBuilder;
+  /** A block entity with a data map and no slots. */
+  entity(): BlockBuilder;
+  /** Runs on the server every interval ticks (default 1). */
+  onTick(interval: number, handler: (be: ScriptBlockEntity) => void): BlockBuilder;
+  onTick(handler: (be: ScriptBlockEntity) => void): BlockBuilder;
+  /** Runs on the server when a screen button with an id is pressed. */
+  onButton(handler: (id: string, be: ScriptBlockEntity, player: MinecraftObject) => void): BlockBuilder;
+  /** Describes the screen: text, bar, button (with an id), background, size. Positions count from the panel's top left. */
+  screen(define: (screen: BlockScreen) => void): BlockBuilder;
 }
+
+/** The block entity a handler of a scripted block receives. */
+interface ScriptBlockEntity {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  readonly blockId: string;
+  readonly size: number;
+  readonly clientSide: boolean;
+  getItemId(slot: number): string;
+  getCount(slot: number): number;
+  setItem(slot: number, itemId: string, count: number): void;
+  clearSlot(slot: number): void;
+  /** Takes up to amount from a slot and returns how many were taken. */
+  shrink(slot: number, amount: number): number;
+  /** Puts items into the first slots that take them and returns how many did not fit. */
+  insert(itemId: string, count: number): number;
+  getData(key: string): number | string | boolean | null;
+  setData(key: string, value: number | string | boolean | null): void;
+  getValue(name: string): number;
+  setValue(name: string, value: number): void;
+  markChanged(): void;
+  sync(): void;
+}
+
+interface BlockScreen {
+  size(width: number, height: number): void;
+  background(colorOrTexture: number | string): void;
+  text(text: string, options?: { x?: number; y?: number; color?: number; left?: boolean }): void;
+  bar(options: { value: string | number; max?: string | number; x: number; y: number; width?: number; height?: number; color?: number; background?: number }): void;
+  button(label: string, options: { id?: string; x?: number; y?: number; width?: number; height?: number }): void;
+}
+
+/** One element of a world overlay: text, item, bar or texture. Sizes are in blocks. */
+interface WorldOverlayElement {
+  [option: string]: any;
+  animate(properties: Record<string, number>, milliseconds: number, easing?: string): WorldOverlayElement;
+  fadeIn(milliseconds: number): WorldOverlayElement;
+  fadeOut(milliseconds: number): WorldOverlayElement;
+  pulse(periodMs: number, minAlpha?: number, maxAlpha?: number): WorldOverlayElement;
+}
+
+interface WorldOverlayCommon {
+  x?: number;
+  y?: number;
+  z?: number;
+  /** billboard (default), up, down, north, south, east or west. */
+  face?: string;
+  scale?: number;
+  distance?: number;
+  layer?: number;
+  alpha?: number;
+  visible?: boolean;
+}
+
+/** The overlay of one block position. */
+interface WorldOverlayAt {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  readonly size: number;
+  /** The synced data of the scripted block here. */
+  readonly data: Record<string, any>;
+  text(id: string, options?: WorldOverlayCommon & { text?: string; color?: number | string; shadow?: boolean; background?: number | string }): WorldOverlayElement;
+  item(id: string, options?: WorldOverlayCommon & { item?: string }): WorldOverlayElement;
+  bar(id: string, options?: WorldOverlayCommon & { value?: number; max?: number; width?: number; height?: number; color?: number | string; backgroundColor?: number | string }): WorldOverlayElement;
+  texture(id: string, options?: WorldOverlayCommon & { texture?: string; width?: number; height?: number; color?: number | string }): WorldOverlayElement;
+  get(id: string): WorldOverlayElement | null;
+  has(id: string): boolean;
+  remove(id: string): void;
+  clear(): void;
+}
+
+declare const Overlay: {
+  /** The overlay of a block position. */
+  at(x: number, y: number, z: number): WorldOverlayAt;
+  at(pos: { x: number; y: number; z: number }): WorldOverlayAt;
+  /** The synced data of the scripted block at a position. */
+  data(x: number, y: number, z: number): Record<string, any>;
+  /** Runs when a block of this id comes near and again when its synced data changes; at is cleared before each run. */
+  forBlock(blockId: string, template: (at: WorldOverlayAt, data: Record<string, any>, pos: { x: number; y: number; z: number }) => void): void;
+  /** Limits for world overlays. */
+  world: { maxDistance: number; maxElements: number; readonly positions: number };
+  /** The screen overlay (bar, text, rect, image, item, get, has, remove, clear). */
+  [screenOverlay: string]: any;
+};
 
 interface RegistryEvent<B> extends EventBase {
   create(id: string): B;

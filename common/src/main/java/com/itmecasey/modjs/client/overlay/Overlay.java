@@ -29,6 +29,7 @@ public final class Overlay {
 
     public static synchronized void clear() {
         ELEMENTS.clear();
+        WorldOverlay.clear();
     }
 
     public static synchronized OverlayElement get(String id) {
@@ -102,6 +103,47 @@ public final class Overlay {
 
         public OverlayElement get(String id) {
             return Overlay.get(id);
+        }
+
+        private static int coordinate(Object value, String name) {
+            Object plain = com.itmecasey.modjs.json.JsonUtil.unwrap(value);
+            if (plain instanceof Number number) {
+                return (int) Math.floor(number.doubleValue());
+            }
+            throw Context.reportRuntimeError("Overlay.at: " + name + " must be a number");
+        }
+
+        /** The world overlay of a block position: {@code Overlay.at(x, y, z)} or {@code Overlay.at({x, y, z})}. */
+        public WorldOverlay.At at(Object x, Object y, Object z) {
+            return WorldOverlay.at(coordinate(x, "x"), coordinate(y, "y"), coordinate(z, "z"));
+        }
+
+        public WorldOverlay.At at(Object pos) {
+            Object px = com.itmecasey.modjs.json.JsonUtil.property(pos, "x");
+            Object py = com.itmecasey.modjs.json.JsonUtil.property(pos, "y");
+            Object pz = com.itmecasey.modjs.json.JsonUtil.property(pos, "z");
+            if (px == null || py == null || pz == null) {
+                throw Context.reportRuntimeError("Overlay.at needs x, y and z: Overlay.at(1, 64, 2) or Overlay.at({ x: 1, y: 64, z: 2 })");
+            }
+            return WorldOverlay.at(coordinate(px, "x"), coordinate(py, "y"), coordinate(pz, "z"));
+        }
+
+        /** The synced data of the scripted block at a position, as an object (empty when there is none). */
+        public Object data(Object x, Object y, Object z) {
+            return com.itmecasey.modjs.script.ScriptBlockCalls.toClientObject(WorldOverlay.data(coordinate(x, "x"), coordinate(y, "y"), coordinate(z, "z")));
+        }
+
+        /**
+         * Describes the overlay of every block of one id: {@code Overlay.forBlock('modjs:smelter', (at, data, pos) => {...})} runs when
+         * such a block comes near and again when its synced data changes. {@code at} is cleared before each run.
+         */
+        public void forBlock(String blockId, org.mozilla.javascript.Function template) {
+            WorldOverlay.forBlock(blockId, template);
+        }
+
+        /** Global limits of world overlays: {@code Overlay.world.maxDistance} and {@code maxElements}. */
+        public WorldOverlay.Limits getWorld() {
+            return new WorldOverlay.Limits();
         }
 
         public boolean has(String id) {

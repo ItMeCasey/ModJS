@@ -1,0 +1,9 @@
+[11Nov2026 10:11:49.776] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK waiting screen net.minecraft.client.gui.screens.BackupConfirmScreen@190a5f74
+[11Nov2026 10:11:53.442] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK overlay positions 1
+[11Nov2026 10:11:56.536] [Server thread/INFO] [modjs/]: [SERVER] WO-TOUR READY world
+[11Nov2026 10:12:06.944] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK ok world frame, positions=2
+[11Nov2026 10:12:12.531] [Server thread/INFO] [modjs/]: [SERVER] WO-TOUR OPENED screen
+[11Nov2026 10:12:15.935] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK screen is com.itmecasey.modjs.client.ScriptContainerScreen@6537c17c
+[11Nov2026 10:12:18.934] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK ok screen frame
+[11Nov2026 10:12:19.521] [Server thread/INFO] [modjs/]: [SERVER] WO-CHECK PASS smelter made ingots: 4
+[11Nov2026 10:12:23.934] [Render thread/INFO] [modjs/]: [CLIENT] WO-TOUR clean client exit

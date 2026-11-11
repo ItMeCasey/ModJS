@@ -32,6 +32,10 @@ public final class ContentRegistry {
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
 
+    private static final java.util.List<DeferredHolder<Block, ? extends Block>> SCRIPT_BLOCKS = new java.util.ArrayList<>();
+    private static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS =
+        DeferredRegister.create(Registries.MENU, RegistryManager.NAMESPACE);
+
     record TabEntry(String tab, DeferredHolder<Item, ? extends Item> item) {
     }
 
@@ -54,7 +58,13 @@ public final class ContentRegistry {
                     properties.requiresCorrectToolForDrops();
                 }
                 if (b.containerRows() > 0) {
+                    if (b.hasEntity() || b.isOrientable()) {
+                        throw new IllegalStateException("Block '" + b.id() + "' uses container(); use inventory({ slots: ... }) for entities, screens and orientable models");
+                    }
                     return new ContainerBlocks.ContainerBlock(properties, b.containerRows());
+                }
+                if (b.hasEntity() || b.isOrientable()) {
+                    return ScriptBlocks.createBlock(properties, b);
                 }
                 return switch (b.type()) {
                     case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
@@ -66,6 +76,18 @@ public final class ContentRegistry {
             });
             if (b.containerRows() > 0) {
                 CONTAINER_BLOCKS.add(block);
+            }
+            if (b.containerRows() == 0 && b.hasEntity()) {
+                SCRIPT_BLOCKS.add(block);
+            }
+            if (b.containerRows() == 0 && b.hasScriptInventory()) {
+                MENUS.register(b.id(), () -> {
+                    net.minecraft.world.inventory.MenuType<ScriptBlocks.ScriptMenu> menu =
+                        new net.minecraft.world.inventory.MenuType<>((id, inventory) -> ScriptBlocks.clientMenu(b, id, inventory),
+                            net.minecraft.world.flag.FeatureFlags.VANILLA_SET);
+                    ScriptBlocks.putMenu(b.id(), menu);
+                    return menu;
+                });
             }
             if (!b.isNoItem()) {
                 DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.id(), () ->
@@ -160,8 +182,20 @@ public final class ContentRegistry {
                 ContainerBlocks.setType(type);
                 return type;
             });
+        }
+        if (!SCRIPT_BLOCKS.isEmpty()) {
+            BLOCK_ENTITIES.register("script", () -> {
+                net.minecraft.world.level.block.entity.BlockEntityType<ScriptBlocks.ScriptEntity> type =
+                    new net.minecraft.world.level.block.entity.BlockEntityType<>(ScriptBlocks.ScriptEntity::new,
+                        SCRIPT_BLOCKS.stream().map(DeferredHolder::get).collect(java.util.stream.Collectors.toSet()));
+                ScriptBlocks.setType(type);
+                return type;
+            });
+        }
+        if (!CONTAINER_BLOCKS.isEmpty() || !SCRIPT_BLOCKS.isEmpty()) {
             BLOCK_ENTITIES.register(modIEventBus);
         }
+        MENUS.register(modIEventBus);
         TABS.register(modIEventBus);
         BLOCKS.register(modIEventBus);
         ITEMS.register(modIEventBus);

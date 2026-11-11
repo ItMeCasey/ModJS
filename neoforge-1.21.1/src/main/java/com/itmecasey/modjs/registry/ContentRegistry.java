@@ -34,7 +34,12 @@ public final class ContentRegistry {
     private static final java.util.Map<String, net.minecraft.world.item.Tier> CUSTOM_TIERS = new java.util.HashMap<>();
     private static final java.util.Map<String, DeferredHolder<net.minecraft.world.item.ArmorMaterial, ? extends net.minecraft.world.item.ArmorMaterial>> CUSTOM_ARMOR = new java.util.HashMap<>();
     private static final java.util.List<DeferredHolder<Block, ? extends Block>> CONTAINER_BLOCKS = new java.util.ArrayList<>();
+    private static final java.util.List<DeferredHolder<Block, ? extends Block>> SCRIPT_BLOCKS = new java.util.ArrayList<>();
+    private static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS =
+        DeferredRegister.create(Registries.MENU, RegistryManager.NAMESPACE);
     private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
+        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
+    private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES_SCRIPT =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
     private static final DeferredRegister<net.minecraft.world.item.ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, RegistryManager.NAMESPACE);
 
@@ -66,7 +71,13 @@ public final class ContentRegistry {
                     properties.requiresCorrectToolForDrops();
                 }
                 if (b.containerRows() > 0) {
+                    if (b.hasEntity() || b.isOrientable()) {
+                        throw new IllegalStateException("Block '" + b.id() + "' uses container(); use inventory({ slots: ... }) for entities, screens and orientable models");
+                    }
                     return new ContainerBlocks.ContainerBlock(properties, b.containerRows());
+                }
+                if (b.hasEntity() || b.isOrientable()) {
+                    return ScriptBlocks.createBlock(properties, b);
                 }
                 return switch (b.type()) {
                     case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
@@ -78,6 +89,18 @@ public final class ContentRegistry {
             });
             if (b.containerRows() > 0) {
                 CONTAINER_BLOCKS.add(block);
+            }
+            if (b.containerRows() == 0 && b.hasEntity()) {
+                SCRIPT_BLOCKS.add(block);
+            }
+            if (b.containerRows() == 0 && b.hasScriptInventory()) {
+                MENUS.register(b.id(), () -> {
+                    net.minecraft.world.inventory.MenuType<ScriptBlocks.ScriptMenu> menu =
+                        new net.minecraft.world.inventory.MenuType<>((id, inventory) -> ScriptBlocks.clientMenu(b, id, inventory),
+                            net.minecraft.world.flag.FeatureFlags.VANILLA_SET);
+                    ScriptBlocks.putMenu(b.id(), menu);
+                    return menu;
+                });
             }
             if (!b.isNoItem()) {
                 DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
@@ -137,6 +160,17 @@ public final class ContentRegistry {
             });
             BLOCK_ENTITIES.register(modBus);
         }
+        if (!SCRIPT_BLOCKS.isEmpty()) {
+            BLOCK_ENTITIES_SCRIPT.register("script", () -> {
+                net.minecraft.world.level.block.entity.BlockEntityType<ScriptBlocks.ScriptEntity> type =
+                    net.minecraft.world.level.block.entity.BlockEntityType.Builder.of(ScriptBlocks.ScriptEntity::new,
+                        SCRIPT_BLOCKS.stream().map(DeferredHolder::get).toArray(Block[]::new)).build(null);
+                ScriptBlocks.setType(type);
+                return type;
+            });
+            BLOCK_ENTITIES_SCRIPT.register(modBus);
+        }
+        MENUS.register(modBus);
         TABS.register(modBus);
         BLOCKS.register(modBus);
         ITEMS.register(modBus);

@@ -16,7 +16,7 @@ final class BlockShapes {
     static String itemModel(BlockBuilderJS block) {
         return switch (block.type()) {
             case "wall", "fence" -> NS + ":block/" + block.id() + "_inventory";
-            default -> NS + ":block/" + block.id();
+            default -> block.hasCustomModel() ? BlockModels.customModelId(block) : NS + ":block/" + block.id();
         };
     }
 

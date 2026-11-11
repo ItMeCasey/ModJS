@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026.11.32
+
+All ten builds.
+
+- **New: world overlays.** `Overlay.at(x, y, z)` in a client script draws text, item icons, bars and textures in the world over a block, with sizes in blocks, a `face` (`billboard`, or lying flat on any side of the block), alpha, layers, animation, a per-element `distance`, a global `Overlay.world.maxDistance` and an element cap (`Overlay.world.maxElements`, nearest blocks first). Elements in unloaded chunks and on faces that point away are skipped. `Overlay.forBlock('modjs:id', (at, data, pos) => {...})` describes the overlay of every block of that id from the data it syncs, and runs again when the data changes. On Forge and NeoForge 1.20.1 and 1.21.1 and on NeoForge 26.x the overlay draws over any block; Forge 26.x has no level-wide drawing hook, so there it draws over ModJS's own block entities (scripted and storage blocks).
+- **New: scripted blocks with real inventories and unique textures.** `.textures({ top, bottom, side, north, ... })` gives each face its own texture and `.model(...)` chooses cube, column, bottom and top, or `orientable` (the block turns to face the player and gets a `facing` property) or your own model file. `.inventory({ slots, stackLimit, values })` and `.entity()` give a block a block entity with slots (any positions on the screen), a saved data map that syncs to clients, and named numbers that reach an open screen; `.onTick(interval, be => ...)` runs on the server, `.onButton((id, be, player) => ...)` handles screen buttons, and `.screen(screen => ...)` describes the screen with the existing screen building blocks plus `size` and `bar`. The menu is a real container menu: Shift-click, hoppers and drops work, and the block's items are saved with it. `container(rows)` is unchanged.
+- Four new example files in `examples/world-overlay` (a smelter machine, its overlay, textures and the screenshot tour), two wiki pages and typings for all of it in `modjs.d.ts`.
+- ModJS now ships a small white texture (`modjs:textures/misc/white.png`) for the filled parts of world overlays, because 26.x no longer has the vanilla one.
+
 ## 2026.11.31
 
 All ten builds.

@@ -54,6 +54,8 @@ Change existing blocks from a startup script: `BlockEvents.modification(e => e.m
 
 Storage blocks: `event.create('crate').container(3)` makes a chest-like block with 3 rows of 9 slots (opens on right-click, drops its items, readable with `event.blockEntity`).
 
+Scripted blocks: `.textures({ top, bottom, side, north, south, east, west })` puts a different texture on each face (`all`, `front` = `north`, `end` = top and bottom; the most specific key wins), `.model('cube_all' | 'cube' | 'cube_column' | 'cube_bottom_top' | 'orientable' | 'mymod:block/thing')` picks the model (`orientable` turns the block to face the player), and `.inventory({ slots, stackLimit, values })` / `.entity()` give the block a block entity with slots, a saved and synced data map and synced numbers. `.onTick(interval, be => {...})` runs on the server, `.onButton((id, be, player) => {...})` when a screen button with an `id` is pressed, and `.screen(screen => {...})` describes the screen with `text`, `button`, `background`, `size(w, h)` and `bar({ value, max, x, y, width, height, color })`; all positions count from the panel's top left. `be` has `getItemId(slot)`, `getCount(slot)`, `setItem(slot, id, count)`, `clearSlot(slot)`, `shrink(slot, n)`, `insert(id, count)`, `getData(key)`, `setData(key, value)`, `getValue(name)`, `setValue(name, n)`, `markChanged()` and `sync()`. A full machine is in `examples/world-overlay`; the wiki page is "Scripted blocks: inventories and screens".
+
 Block shapes: `.type('slab' | 'stairs' | 'wall' | 'fence')` (the texture is used on every face). Tools: `.tool('pickaxe' | 'axe' | 'shovel' | 'hoe' | 'sword', 'wood' | 'stone' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla tier. Armor: `.armor('helmet' | 'chestplate' | 'leggings' | 'boots', 'leather' | 'chainmail' | 'iron' | 'gold' | 'diamond' | 'netherite')` uses a vanilla material. Add items to existing tabs: `StartupEvents.modifyCreativeTab('minecraft:tools_and_utilities', e => e.add('modjs:ruby'))`.
 
 One example script with every kind of registration is in `examples/registry` (tab, item, tool tier and tool, armor material and armor, blocks, slab, stairs, crate and a fluid).
@@ -228,6 +230,22 @@ Bars: `width`, `height`, `value`, `min`, `max`, `smooth`, `direction`, `color`, 
 Text: `text`, `color`, `shadow`, `outline`, `background`, `padding`, `align`, `width`. Rectangles: `width`, `height`, `color`, `color2`, `horizontal`, `border`, `borderSize`. Images: `texture`, `width`, `height`, `tint`, and for a part of a sheet `texWidth`, `texHeight`, `u`, `v`, `regionWidth`, `regionHeight`.
 `Overlay.get(id)`, `has`, `remove`, `clear`. A mistyped option is an error. Client scripts clear the overlay when they reload. Elements with `surface: 'screen'` draw on your own screens and the title screen.
 Buttons there accept `icon` (an item id or a texture), `iconSize` and `iconSide` (`left`, `right`, `center`).
+
+### World overlays
+
+`Overlay.at(x, y, z)` (client scripts) draws text, item icons, bars and textures in the world over a block position; sizes and offsets are in blocks.
+
+```js
+const at = Overlay.at(100, 64, -20);                 // also Overlay.at({ x, y, z })
+at.text('title', { text: 'Generator', y: 0.45, color: '#ffd27a', background: '#80000000' });
+at.bar('progress', { value: 40, max: 100, width: 1, height: 0.14, y: 0.2 });
+at.item('icon', { item: 'minecraft:diamond', y: 0.95 });
+at.texture('badge', { texture: 'mymod:textures/gui/badge.png', face: 'up', width: 0.5, height: 0.5 });
+Overlay.world.maxDistance = 16; Overlay.world.maxElements = 64;
+Overlay.forBlock('modjs:demo_smelter', (at, data, pos) => { /* describes the block from its synced data; runs again when it changes */ });
+```
+
+Every element takes `x`, `y`, `z`, `face` (`billboard`, `up`, `down`, `north`, `south`, `east`, `west`), `scale`, `visible`, `alpha`, `layer` and `distance`, and animates like the screen overlay. Elements farther than their distance, in unloaded chunks, facing away, or beyond the element cap (nearest blocks win) are not drawn. `Overlay.at(...).data` and `Overlay.data(x, y, z)` read the data a scripted block syncs. Forge 26.x has no level-wide drawing hook, so there overlays draw over ModJS's own block entities only. `examples/world-overlay`; wiki page "World overlays".
 
 ### Unifying items (Ore Dictionary style)
 

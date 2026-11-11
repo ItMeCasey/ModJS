@@ -31,7 +31,10 @@ On first launch ModJS creates a `modjs/` folder in the game directory with `star
 Client scripts can draw HUD text and rectangles, register keys that players can rebind in Controls, and keep an
 overlay of progress bars, text, rectangles, pictures and item icons that they create once and update later
 (`Overlay.bar('hp', { value: 80, max: 100 })`, with anchors, colors, alpha, smooth fills and animations). Buttons on the title
-screen and on your own screens can carry an icon (an item or a texture). On Forge 1.21.1 the scripted title screen is swapped in
+screen and on your own screens can carry an icon (an item or a texture). World overlays (`Overlay.at(x, y, z)`) draw text, item icons,
+bars and textures in the world over a block, with distance and visibility culling and an element cap. Startup scripts can make blocks
+with a different texture on every face, real slots, a tick handler, saved and synced data, and a screen with bars and buttons
+(`examples/world-overlay`). On Forge 1.21.1 the scripted title screen is swapped in
 by ModJS itself, because Forge 52.1.21 never delivers its screen-opening event.
 Examples: `examples/client/client_scripts`. JEI, EMI and REI adapters support item hiding,
 information pages and category hiding where each viewer supports the target loader and version;

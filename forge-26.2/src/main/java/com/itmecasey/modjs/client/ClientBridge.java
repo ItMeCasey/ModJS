@@ -114,6 +114,7 @@ public final class ClientBridge {
         });
 
         ClientPlayerNetworkEvent.LoggingOut.BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> {
+            com.itmecasey.modjs.client.overlay.WorldOverlay.forgetBlocks();
             if (EventGroups.CLIENT.hasHandlers("loggedOut")) {
                 EventGroups.CLIENT.post("loggedOut", new ClientEventJS(0, 0));
             }

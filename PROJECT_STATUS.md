@@ -1,8 +1,8 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-09
-Summary: 2026.11.31 candidate: all ten builds pass unit and headless tests; adds the overlay and button icons, fixes the 1.20.1 jars (they crashed in a normal game) and the Forge 1.21.1 title screen; scripts call Minecraft classes by their usual names on 1.20.1 through a name table.
+Updated: 2026-11-11
+Summary: 2026.11.32 local candidate (not pushed): adds world overlays (`Overlay.at`) and scripted blocks with real inventories, per-face textures, models, tick handlers and screens to all ten builds; reference build tests pass and frames were taken on five builds; the other five builds compile and wait for CI and a client tour.
 Spend: none
 
 ## Foundation
@@ -16,6 +16,7 @@ Spend: none
 ## Startup scripts
 - [x] Registry events: items, blocks, creative tabs, fluids, tool tiers, armor materials and container block entities; one example script (examples/registry) with a unit test, seen on a real client on all ten builds; entity types left out on purpose (w:5)
 - [x] Item and block builders: stack size, rarity, glow, food, unstackable, tooltip, tool, armor, light level, tool requirement, resistance, container and noItem blocks and the block types are self-tested on all ten builds (a new check set found and fixed a no-op glow and a noItem data error on 26.3) (w:4)
+- [x] Scripted blocks with real inventories and unique textures: `.textures({...})` per face, `.model(...)` (cube, column, bottom and top, orientable, your own model), `.inventory({ slots, stackLimit, values })` and `.entity()` with a block entity API (slots, tick handler, saved and synced data and numbers), `.onButton` and `.screen(...)` on the existing screen building blocks (plus `size` and `bar`); 4 unit tests, 12 headless checks (`SELFTEST DONE failures=0` on NeoForge 1.21.1) and screen frames on NeoForge 1.21.1, Forge 1.21.1, Forge 1.20.1, NeoForge 26.3 and Forge 26.3 (docs/frames/worldoverlay-*-screen.png) (w:5)
 - [x] Data generation: tags, loot tables, and recipes written as data pack output (w:3)
 - [x] Asset generation: lang, models, blockstates and textures via a generated resource pack: unit tests for each file kind, and the generated names, models and textures are visible in real-client frames on all ten builds (docs/frames/info-<build>-registry.png) (w:4)
 
@@ -47,6 +48,7 @@ Spend: none
 - [x] Client events: tooltip and dynamic tooltip callbacks, asset preload, HUD text and rectangles, and native rebindable key mappings are verified in real clients on all ten builds; key rebinding and queued presses use Minecraft APIs without OS input (docs/testing/client-*.log and docs/frames/hud-*.png) (w:3)
 - [x] Client screens: a scripted screen with text, buttons and a text box opens, draws and closes in a real client on all ten builds (frames info-<build>-screen.png); the scripted title screen and splash text are seen on the main menu on all ten builds (frames docs/frames/title-<build>.png; Forge 1.21.1 swaps the screen in from ScreenEvent.Init.Pre because Forge drops the first Opening event, seen in a real Forge install) (w:3)
 - [x] Overlay (retained bars, text, rectangles, gradients, pictures, item icons, anchors, colors, alpha, layers, animation) and pictures on buttons: 15 unit tests, all ten self tests pass, and a real-client run with frames on all ten builds (docs/frames/overlay-<build>-hud.png and -screen.png) (w:5)
+- [x] World overlays: `Overlay.at(x, y, z)` draws text, item icons, bars and textures in the world over a block (faces, alpha, layers, animation, distance and chunk and facing culling, an element cap, data synced from scripted blocks, `Overlay.forBlock` templates); 15 unit tests, and frames from real clients on NeoForge 1.21.1, Forge 1.21.1, Forge 1.20.1, NeoForge 26.3 and Forge 26.3, which covers all four drawing paths (docs/frames/worldoverlay-*-world.png). Forge 26.x has no level-wide render hook upstream, so there overlays draw over ModJS block entities only (docs/PORTING.md) (w:5)
 
 ## Compatibility and tooling
 - [x] Recipe viewers: native JEI, EMI and REI adapters implement item hiding, information pages and category hiding; all sixteen supported version/loader/viewer combinations pass real-client checks with information-page frames (docs/testing/2026.11.30.md); missing upstream loader targets and intentionally omitted custom categories/Create schemas are documented (w:3)
@@ -77,11 +79,10 @@ Spend: none
 - [x] World types (StartupEvents.worldTypes): add, edit, duplicate, hide, rename, drop; 9 new self-test checks pass on all six builds (button not seen on a client) (w:3)
 - [x] Local 2026.11.30 validation: 87 unit tests per module, all ten headless self-tests, all ten HUD/key client checks, all ten two-launch dimension-restoration checks, and all sixteen supported native viewer checks pass; candidate remains unpublished pending approval (w:3)
 - [x] BEI spot check with 2026.11.30 on Forge 26.1.2: all four viewer events including grouping pass, live index and group checks recorded; release collector assembles all ten jars locally without upload (w:1)
+- [ ] 2026.11.32 on the other five builds: client tours (`python scripts/world_overlay_tour.py <module>`) and the headless self test on NeoForge 1.20.1, NeoForge 26.1.2, NeoForge 26.2, Forge 26.1.2 and Forge 26.2; they compile and share code with builds that passed, CI runs the self tests (w:2)
+- [ ] Load the 2026.11.32 Forge 1.20.1 jar in a real Forge 47.4.28 / NeoForge 47.1.106 install (the SRG check passed: 861 names) (w:1)
+- [ ] Deploy the new wiki pages world-overlays and scripted-blocks (drafted in the site folder, not deployed) (w:1)
 
 ## Planned
 - [x] Name translation for scripts on Forge and NeoForge 1.20.1: a table made from the build mappings (scripts/gen_name_map.py, 6536 classes) lets scripts call Minecraft classes and methods by their usual names in a normal 1.20.1 game; 6 unit tests, and `Items.DIAMOND`, `server.getRecipeManager()`, `Commands.literal`, `player.health` ran in real Forge 47.4.28 and NeoForge 47.1.106 installs (examples/events/tour/names_check.js); all ten development-game self tests still pass (w:4)
 - [x] 1.20.1 jars load in a normal game: the Forge jar is reobfuscated to the names a real game uses and uploaded for both loaders; seen loading, firing events and applying recipe changes in real Forge 47.4.28 and NeoForge 47.1.106 installs (w:4)
-
-## Later (added 2026-11-09, not started)
-- [ ] World overlays: text, item icons, textures and bars attached to a block position or block entity in the world, like Skyblock Resources' generator overlays (new `Overlay.at(pos)` layer; per-version world-render hook for all ten builds, the 26.x submit-collector API differs from 1.20.1/1.21.1; block data synced to the client; distance and visibility culling and an element cap). Start with text, item and bar on NeoForge 1.21.1, then textures, then port (w:5)
-- [ ] Custom blocks with real inventories and unique textures: per-face textures and a model option, a block entity API for scripts (slots, tick handler, sync) and script-defined screens built on the existing screen API; today `block.container(rows)` gives only a chest-style storage with one texture on all faces (w:5)

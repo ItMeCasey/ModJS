@@ -39,6 +39,21 @@ StartupEvents.registry('item', event => {
   event.create('ruby_helmet').armor('helmet', 'ruby');
 });
 StartupEvents.registry('block', event => event.create('test_crate').container(2).hardness(2));
+// A scripted block with real slots, synced values, a tick handler, a button and a screen, and one that turns to face the player.
+StartupEvents.registry('block', event => {
+  event.create('test_machine').hardness(3)
+    .textures({ top: 'minecraft:block/furnace_top', bottom: 'minecraft:block/stone', side: 'minecraft:block/furnace_side', north: 'minecraft:block/furnace_front' })
+    .model('orientable')
+    .inventory({ slots: [{ x: 56, y: 17 }, { x: 56, y: 53 }, { x: 116, y: 35 }], stackLimit: 32, values: ['progress', 'max'] })
+    .onTick(1, be => { be.setData('ticks', (be.getData('ticks') || 0) + 1); })
+    .onButton((id, be, player) => { be.setData('pressed', id); be.setValue('progress', 40); })
+    .screen(s => {
+      s.text('Test Machine', { x: 8, y: 6, left: true, color: 0x404040 });
+      s.bar({ value: 'progress', max: 'max', x: 79, y: 35, width: 24, height: 6, color: 0x3fdc5a });
+      s.button('Go', { id: 'go', x: 70, y: 56, width: 36, height: 14 });
+    });
+  event.create('test_columns').textures({ top: 'minecraft:block/stone', bottom: 'minecraft:block/dirt', side: 'minecraft:block/oak_log' });
+});
 StartupEvents.worldTypes(event => {
   event.add('modjs:selftest_void', { name: 'Self Test Void', overworld: { generator: 'void' } });
   event.add('modjs:selftest_hidden', { visible: false, overworld: 'void' });

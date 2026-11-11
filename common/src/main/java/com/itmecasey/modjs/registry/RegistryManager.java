@@ -187,20 +187,7 @@ public final class RegistryManager {
                 BlockShapes.write(data, block);
                 continue;
             }
-            JsonObject variant = new JsonObject();
-            variant.addProperty("model", NAMESPACE + ":block/" + block.id());
-            JsonObject variants = new JsonObject();
-            variants.add("", variant);
-            JsonObject state = new JsonObject();
-            state.add("variants", variants);
-            data.putJson(NAMESPACE, "blockstates/" + block.id(), state);
-
-            JsonObject model = new JsonObject();
-            model.addProperty("parent", "minecraft:block/cube_all");
-            JsonObject textures = new JsonObject();
-            textures.addProperty("all", block.texture());
-            model.add("textures", textures);
-            data.putJson(NAMESPACE, "models/block/" + block.id(), model);
+            BlockModels.write(data, block);
         }
         for (ArmorMaterialBuilderJS material : ARMOR_MATERIALS.values()) {
             ArmorTextures.write(data, material, VersionFormat.current().usesItemDefinitions());
