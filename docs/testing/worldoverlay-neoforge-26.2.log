@@ -1,0 +1,8 @@
+[11Nov2026 10:41:12.650] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK overlay positions 1
+[11Nov2026 10:41:15.951] [Server thread/INFO] [modjs/]: [SERVER] WO-TOUR READY world
+[11Nov2026 10:41:26.130] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK ok world frame, positions=2
+[11Nov2026 10:41:31.939] [Server thread/INFO] [modjs/]: [SERVER] WO-TOUR OPENED screen
+[11Nov2026 10:41:35.133] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK screen is com.itmecasey.modjs.client.ScriptContainerScreen@3d607d35
+[11Nov2026 10:41:38.124] [Render thread/INFO] [modjs/]: [CLIENT] WO-CHECK ok screen frame
+[11Nov2026 10:41:38.926] [Server thread/INFO] [modjs/]: [SERVER] WO-CHECK PASS smelter made ingots: 4
+[11Nov2026 10:41:43.123] [Render thread/INFO] [modjs/]: [CLIENT] WO-TOUR clean client exit

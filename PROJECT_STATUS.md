@@ -2,7 +2,7 @@
 <!-- status-format: 1 -->
 
 Updated: 2026-11-11
-Summary: 2026.11.32 local candidate (not pushed): adds world overlays (`Overlay.at`) and scripted blocks with real inventories, per-face textures, models, tick handlers and screens to all ten builds; reference build tests pass and frames were taken on five builds; the other five builds compile and wait for CI and a client tour.
+Summary: 2026.11.32 local candidate (not pushed): adds world overlays (`Overlay.at`) and scripted blocks with real inventories, per-face textures, models, tick handlers and screens to all ten builds; tests, headless self tests and client frames pass on all ten builds, and the 1.20.1 jar was seen in real Forge and NeoForge installs.
 Spend: none
 
 ## Foundation
@@ -79,8 +79,8 @@ Spend: none
 - [x] World types (StartupEvents.worldTypes): add, edit, duplicate, hide, rename, drop; 9 new self-test checks pass on all six builds (button not seen on a client) (w:3)
 - [x] Local 2026.11.30 validation: 87 unit tests per module, all ten headless self-tests, all ten HUD/key client checks, all ten two-launch dimension-restoration checks, and all sixteen supported native viewer checks pass; candidate remains unpublished pending approval (w:3)
 - [x] BEI spot check with 2026.11.30 on Forge 26.1.2: all four viewer events including grouping pass, live index and group checks recorded; release collector assembles all ten jars locally without upload (w:1)
-- [ ] 2026.11.32 on the other five builds: client tours (`python scripts/world_overlay_tour.py <module>`) and the headless self test on NeoForge 1.20.1, NeoForge 26.1.2, NeoForge 26.2, Forge 26.1.2 and Forge 26.2; they compile and share code with builds that passed, CI runs the self tests (w:2)
-- [ ] Load the 2026.11.32 Forge 1.20.1 jar in a real Forge 47.4.28 / NeoForge 47.1.106 install (the SRG check passed: 861 names) (w:1)
+- [x] 2026.11.32 on the other five builds: client tours with world and screen frames and the headless self test (12 scripted-block checks, `SELFTEST DONE failures=0`) pass on NeoForge 1.20.1, NeoForge 26.1.2, NeoForge 26.2, Forge 26.1.2 and Forge 26.2 (docs/frames/worldoverlay-*, docs/testing/selftest-*.log) (w:2)
+- [x] The 2026.11.32 Forge 1.20.1 jar loads in a real Forge 47.4.28 install and a real NeoForge 47.1.106 install: world overlays and the scripted smelter with its screen seen in frames (docs/frames/worldoverlay-real-forge-1.20.1-*.png, worldoverlay-real-neo-1.20.1-*.png) (w:1)
 - [ ] Deploy the new wiki pages world-overlays and scripted-blocks (drafted in the site folder, not deployed) (w:1)
 
 ## Planned
