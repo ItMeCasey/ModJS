@@ -1,0 +1,9 @@
+[12Nov2026 14:52:21.786] [Server thread/INFO] [modjs/]: [SERVER] SN-TOUR READY world
+[12Nov2026 14:52:26.526] [Server thread/INFO] [modjs/]: [SERVER] SN-TOUR crouch on
+[12Nov2026 14:52:26.577] [Server thread/INFO] [modjs/]: [SERVER] SN-TOUR sneakStarted sneaking=true
+[12Nov2026 14:52:28.759] [Render thread/INFO] [modjs/]: [CLIENT] SN-CHECK ok frame
+[12Nov2026 14:52:29.531] [Server thread/INFO] [modjs/]: [SERVER] SN-TOUR crouch off
+[12Nov2026 14:52:29.576] [Server thread/INFO] [modjs/]: [SERVER] SN-TOUR sneakStopped sneaking=false
+[12Nov2026 14:52:32.523] [Server thread/INFO] [modjs/]: [SERVER] SN-CHECK PASS sneakStarted fired with sneaking true: started:true,stopped:false
+[12Nov2026 14:52:32.524] [Server thread/INFO] [modjs/]: [SERVER] SN-CHECK PASS sneakStopped fired with sneaking false: started:true,stopped:false
+[12Nov2026 14:52:37.754] [Render thread/INFO] [modjs/]: [CLIENT] SN-TOUR clean client exit

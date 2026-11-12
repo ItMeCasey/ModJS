@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 /** Draws overlay elements with the game's graphics object (one small adapter per Minecraft version). */
 final class GuiOverlayCanvas implements OverlayCanvas {
     private static final java.util.Map<Identifier, ItemStack> STACKS = new java.util.HashMap<>();
+    private static final Identifier NO_FLAT = Identifier.fromNamespaceAndPath("modjs", "none");
+    private static final java.util.Map<Identifier, Identifier> FLAT = new java.util.HashMap<>();
     private final GuiGraphicsExtractor graphics;
     private final Font font = Minecraft.getInstance().font;
 
@@ -84,6 +86,7 @@ final class GuiOverlayCanvas implements OverlayCanvas {
                     return;
                 }
             } catch (RuntimeException | LinkageError e) {
+                drawFlat(id, x, y, scale);
                 return;
             }
             STACKS.put(id, stack);
@@ -97,6 +100,26 @@ final class GuiOverlayCanvas implements OverlayCanvas {
             STACKS.remove(id);
         } finally {
             graphics.pose().popMatrix();
+        }
+    }
+
+    /**
+     * Draws the item's own texture file when no item stack can be built (the title screen has no bound item components, so 26.x cannot
+     * render the item model there). Looks for textures/item/NAME.png, then textures/block/NAME.png; items without a flat texture draw nothing.
+     */
+    private void drawFlat(Identifier id, int x, int y, float scale) {
+        Identifier flat = FLAT.computeIfAbsent(id, key -> {
+            for (String folder : new String[] {"item", "block"}) {
+                Identifier candidate = Identifier.fromNamespaceAndPath(key.getNamespace(), "textures/" + folder + "/" + key.getPath() + ".png");
+                if (Minecraft.getInstance().getResourceManager().getResource(candidate).isPresent()) {
+                    return candidate;
+                }
+            }
+            return NO_FLAT;
+        });
+        if (flat != NO_FLAT) {
+            int size = Math.round(16 * scale);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, flat, x, y, 0.0f, 0.0f, size, size, 16, 16, 16, 16, 0xFFFFFFFF);
         }
     }
 }
