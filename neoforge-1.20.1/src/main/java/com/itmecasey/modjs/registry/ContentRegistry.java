@@ -25,10 +25,10 @@ import java.util.List;
 
 /** Registers the items and blocks scripts declared, under the {@code modjs} namespace. */
 public final class ContentRegistry {
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, RegistryManager.NAMESPACE);
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, RegistryManager.NAMESPACE);
+    private static final NsRegisters<Item> ITEMS = new NsRegisters<>(ns -> DeferredRegister.create(ForgeRegistries.ITEMS, ns));
+    private static final NsRegisters<Block> BLOCKS = new NsRegisters<>(ns -> DeferredRegister.create(ForgeRegistries.BLOCKS, ns));
 
-    private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
+    private static final NsRegisters<CreativeModeTab> TABS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ns));
 
     private static final java.util.Map<String, net.minecraft.world.item.Tier> CUSTOM_TIERS = new java.util.HashMap<>();
     private static final java.util.Map<String, net.minecraft.world.item.ArmorMaterial> CUSTOM_ARMOR = new java.util.HashMap<>();
@@ -37,8 +37,7 @@ public final class ContentRegistry {
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
 
     private static final java.util.List<RegistryObject<Block>> SCRIPT_BLOCKS = new java.util.ArrayList<>();
-    private static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS =
-        DeferredRegister.create(ForgeRegistries.MENU_TYPES, RegistryManager.NAMESPACE);
+    private static final NsRegisters<net.minecraft.world.inventory.MenuType<?>> MENUS = new NsRegisters<>(ns -> DeferredRegister.create(ForgeRegistries.MENU_TYPES, ns));
 
     record TabEntry(String tab, RegistryObject<Item> item) {
     }
@@ -51,15 +50,15 @@ public final class ContentRegistry {
     /** Turns the collected builders into registry entries; call from the mod constructor after {@link RegistryManager#collect()}. */
     public static void register(IEventBus modBus) {
         for (ToolTierBuilderJS tier : RegistryManager.toolTiers()) {
-            CUSTOM_TIERS.put(RegistryManager.NAMESPACE + ":" + tier.id(), new CustomTier(tier));
+            CUSTOM_TIERS.put(tier.fullId(), new CustomTier(tier));
         }
         for (ArmorMaterialBuilderJS material : RegistryManager.armorMaterials()) {
-            CUSTOM_ARMOR.put(RegistryManager.NAMESPACE + ":" + material.id(), armorMaterial(material));
+            CUSTOM_ARMOR.put(material.fullId(), armorMaterial(material));
         }
         FluidRegistry.register(modBus, BLOCKS, ITEMS, TAB_ENTRIES);
         for (BlockBuilderJS builder : RegistryManager.blocks()) {
             BlockBuilderJS b = builder;
-            RegistryObject<Block> block = BLOCKS.register(b.id(), () -> {
+            RegistryObject<Block> block = BLOCKS.register(b.namespace(), b.id(), () -> {
                 BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
                     .strength(b.hardness(), b.resistance())
                     .lightLevel(state -> b.lightLevel());
@@ -90,21 +89,21 @@ public final class ContentRegistry {
                 SCRIPT_BLOCKS.add(block);
             }
             if (b.containerRows() == 0 && b.hasScriptInventory()) {
-                MENUS.register(b.id(), () -> {
+                MENUS.register(b.namespace(), b.id(), () -> {
                     net.minecraft.world.inventory.MenuType<ScriptBlocks.ScriptMenu> menu =
                         net.minecraftforge.common.extensions.IForgeMenuType.create((windowId, inventory, data) -> ScriptBlocks.clientMenu(b, windowId, inventory));
-                    ScriptBlocks.putMenu(b.id(), menu);
+                    ScriptBlocks.putMenu(b.fullId(), menu);
                     return menu;
                 });
             }
             if (!b.isNoItem()) {
-                RegistryObject<Item> item = ITEMS.register(b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
+                RegistryObject<Item> item = ITEMS.register(b.namespace(), b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
                 TAB_ENTRIES.add(new TabEntry(b.tab(), item));
             }
         }
         for (ItemBuilderJS builder : RegistryManager.items()) {
             ItemBuilderJS b = builder;
-            RegistryObject<Item> item = ITEMS.register(b.id(), () -> {
+            RegistryObject<Item> item = ITEMS.register(b.namespace(), b.id(), () -> {
                 Item.Properties properties = new Item.Properties().stacksTo(b.maxStackSize());
                 if (b.rarity() != null) {
                     properties.rarity(rarity(b.rarity()));
@@ -138,8 +137,8 @@ public final class ContentRegistry {
         }
         for (CreativeTabBuilderJS builder : RegistryManager.tabs()) {
             CreativeTabBuilderJS t = builder;
-            TABS.register(t.id(), () -> CreativeModeTab.builder()
-                .title(Component.translatable("itemGroup." + RegistryManager.NAMESPACE + "." + t.id()))
+            TABS.register(t.namespace(), t.id(), () -> CreativeModeTab.builder()
+                .title(Component.translatable("itemGroup." + t.namespace() + "." + t.id()))
                 .icon(() -> iconFor(t.icon()))
                 // The items of this tab are added by fillTabs, which also runs for ModJS tabs; adding them here too listed each twice.
                 .displayItems((parameters, output) -> { })
@@ -166,10 +165,10 @@ public final class ContentRegistry {
         if (!CONTAINER_BLOCKS.isEmpty() || !SCRIPT_BLOCKS.isEmpty()) {
             BLOCK_ENTITIES.register(modBus);
         }
-        MENUS.register(modBus);
-        TABS.register(modBus);
-        BLOCKS.register(modBus);
-        ITEMS.register(modBus);
+        MENUS.registerAll(r -> r.register(modBus));
+        TABS.registerAll(r -> r.register(modBus));
+        BLOCKS.registerAll(r -> r.register(modBus));
+        ITEMS.registerAll(r -> r.register(modBus));
         modBus.addListener(ContentRegistry::fillTabs);
     }
 
@@ -216,7 +215,7 @@ public final class ContentRegistry {
 
             @Override
             public String getName() {
-                return RegistryManager.NAMESPACE + ":" + m.id();
+                return m.fullId();
             }
 
             @Override

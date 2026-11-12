@@ -19,8 +19,8 @@ public final class ScriptScreens {
     public static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             for (BlockBuilderJS block : RegistryManager.blocks()) {
-                if (block.containerRows() == 0 && block.hasScriptInventory() && ScriptBlocks.menu(block.id()) != null) {
-                    MenuScreens.register(ScriptBlocks.menu(block.id()), ScriptContainerScreen::new);
+                if (block.containerRows() == 0 && block.hasScriptInventory() && ScriptBlocks.menu(block.fullId()) != null) {
+                    MenuScreens.register(ScriptBlocks.menu(block.fullId()), ScriptContainerScreen::new);
                 }
             }
         });

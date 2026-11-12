@@ -75,6 +75,7 @@ public class ModJS {
         modBus.addListener((FMLLoadCompleteEvent e) -> EventGroups.STARTUP.post("postInit", new EventJS()));
         ModJSNetwork.init(modBus);
         GameEvents.register();
+        com.itmecasey.modjs.worldcraft.WorldCraftHooks.register();
         modBus.addListener(GameEvents::modifyComponents);
         com.itmecasey.modjs.game.ExtraGameEvents.register();
         SelfTest.register();

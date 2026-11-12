@@ -62,7 +62,7 @@ One example script with every kind of registration is in `examples/registry` (ta
 
 Fluids: `StartupEvents.registry('fluid', e => e.create('goo').color(0x44FF44).luminosity(6).density(1500).noBucket())` registers `modjs:goo`, `modjs:goo_flowing`, a liquid block and `modjs:goo_bucket`; it uses the vanilla water textures tinted by `color`.
 
-Everything is registered as `modjs:<id>`. Put textures at `modjs/assets/modjs/textures/item/<id>.png` and
+Everything is registered as `modjs:<id>` unless the id has a namespace: `event.create('mypack:ruby')` registers `mypack:ruby` (assets and data go to `assets/mypack` and `data/mypack`; the namespace is lowercase letters, digits, `_ . -` and not `minecraft`), and `event.namespace('mypack')` sends the plain ids of one handler there. Put textures at `modjs/assets/modjs/textures/item/<id>.png` and
 `.../block/<id>.png`. Models, blockstates, lang entries and block loot tables are generated for you.
 `StartupEvents.init` and `StartupEvents.postInit` fire at common setup and load complete.
 
@@ -70,6 +70,23 @@ Change existing items from a startup script: `ItemEvents.modification(event => e
 The change applies on the server and in single player; a remote client does not receive it.
 
 ## Server scripts
+### In-world crafting
+
+`ServerEvents.worldRecipes(event => {...})` defines recipes that happen in the world (like the Lychee mod); see `examples/world-recipes`.
+
+| Method | Starts when |
+|---|---|
+| `itemOnBlock(block, item)` | a player right-clicks the block holding the item |
+| `leftClickBlock(block, item)` | a player left-clicks the block holding the item |
+| `itemsInBlock(block, [items])` | dropped items are inside the block (water, lava, a cauldron...) |
+| `itemsOnBlock(block, [items])` | dropped items rest on top of the block |
+| `anvil(block)` | a falling anvil lands on the block |
+| `lightning(block)` | lightning strikes the block (`.item(...)` also needs items within three blocks) |
+| `randomTick(block)` | random blocks near players (about 100 checks per player per tick); set `.chance()` low |
+| `blockBreak(block)` | a survival player breaks the block (`.tool(item)`) |
+
+Blocks and items are ids or `#tags`; a block may carry state values (`'minecraft:cauldron[level=3]'`); items may be `'minecraft:coal x2'` or `{ item, count }`. Options: `sneaking(bool)`, `hand('main'|'off'|'any')`, `consume(n)` (0 keeps), `damage(n)`, `chance(p)`, `id(name)`. Results: `turnInto(block)`, `breakBlock()`, `drop(item, n)`, `give(item, n)`, `command(text)`, and for `blockBreak` `replaceDrops()`. Dropped items are checked every 10 ticks; an anvil counts when it lands on a block; recipes are in effect on the server that runs the script, and the recipe viewer pages (JEI, EMI, REI, BEI) show them in single player.
+
 
 Recipes: `shaped(result, pattern, key)`, `shapeless`, `smelting`, `blasting`, `smoking`, `campfireCooking`,
 `stonecutting`, `smithing(result, template, base, addition)`, `custom(json)`. Builders accept `.id()`, `.group()`,

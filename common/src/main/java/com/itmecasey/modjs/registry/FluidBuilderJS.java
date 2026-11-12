@@ -3,6 +3,7 @@ package com.itmecasey.modjs.registry;
 /** Configuration for a fluid created by {@code StartupEvents.registry('fluid', ...)}. It registers a source, a flowing fluid, a liquid block and a bucket. */
 public final class FluidBuilderJS {
     private final String id;
+    private final String namespace;
     private String displayName;
     private int color = 0xFF3F76E4;
     private int luminosity;
@@ -12,12 +13,25 @@ public final class FluidBuilderJS {
     private boolean noBucket;
     private String unifyTag;
 
-    FluidBuilderJS(String id) {
-        this.id = id;
+    FluidBuilderJS(String rawId) {
+        RegistryNames.Id parsed = RegistryNames.parse(rawId);
+        this.namespace = parsed.namespace();
+        this.id = parsed.path();
     }
 
+    /** The path part of the id ({@code ruby} in {@code mypack:ruby}). */
     public String id() {
         return id;
+    }
+
+    /** The namespace it is registered in ({@code modjs} unless the script gave one). */
+    public String namespace() {
+        return namespace;
+    }
+
+    /** The full registry id, such as {@code mypack:ruby}. */
+    public String fullId() {
+        return namespace + ":" + id;
     }
 
     public String displayName() {

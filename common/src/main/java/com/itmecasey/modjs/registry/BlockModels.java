@@ -8,7 +8,6 @@ import com.itmecasey.modjs.pack.GeneratedData;
  * a texture per face, a column, an orientable block that turns to face the player, or a model file the script supplies.
  */
 final class BlockModels {
-    private static final String NS = RegistryManager.NAMESPACE;
     private static final String[][] FACING = {{"north", "0"}, {"east", "90"}, {"south", "180"}, {"west", "270"}};
 
     private BlockModels() {
@@ -17,10 +16,11 @@ final class BlockModels {
     /** The model id a block with a script-supplied model points at, with the default namespace filled in. */
     static String customModelId(BlockBuilderJS block) {
         String model = block.modelName();
-        return model.contains(":") ? model : NS + ":" + model;
+        return model.contains(":") ? model : block.namespace() + ":" + model;
     }
 
     static void write(GeneratedData data, BlockBuilderJS block) {
+        final String NS = block.namespace();
         String id = block.id();
         String target = block.hasCustomModel() ? customModelId(block) : NS + ":block/" + id;
         JsonObject variants = new JsonObject();

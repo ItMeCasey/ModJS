@@ -33,6 +33,11 @@ public final class RecipeViewerEventJS {
     public static final class AddInformation extends EventJS {
         private final Map<String, List<String>> info = new LinkedHashMap<>();
 
+        /** Starts with a page for every in-world recipe (see {@code ServerEvents.worldRecipes}) on the items it involves. */
+        public AddInformation() {
+            info.putAll(com.itmecasey.modjs.worldcraft.WorldRecipes.viewerInformation());
+        }
+
         /** Adds an info page for the items. Each extra argument is a paragraph. */
         public void add(String items, String... paragraphs) {
             info.computeIfAbsent(items, k -> new ArrayList<>()).addAll(List.of(paragraphs));

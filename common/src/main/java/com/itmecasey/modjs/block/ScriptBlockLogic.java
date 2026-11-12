@@ -11,10 +11,11 @@ public final class ScriptBlockLogic {
     private ScriptBlockLogic() {
     }
 
-    /** The builder of a ModJS block by path (the id without {@code modjs:}), or null. */
-    public static BlockBuilderJS definition(String path) {
+    /** The builder of a scripted block by full id such as {@code mypack:smelter} (a plain path means {@code modjs:}), or null. */
+    public static BlockBuilderJS definition(String id) {
+        String full = id.contains(":") ? id : "modjs:" + id;
         for (BlockBuilderJS block : RegistryManager.blocks()) {
-            if (block.id().equals(path)) {
+            if (block.fullId().equals(full)) {
                 return block;
             }
         }

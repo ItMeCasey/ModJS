@@ -17,8 +17,8 @@ public final class ScriptScreens {
     @SubscribeEvent
     public static void register(RegisterMenuScreensEvent event) {
         for (BlockBuilderJS block : RegistryManager.blocks()) {
-            if (block.containerRows() == 0 && block.hasScriptInventory() && ScriptBlocks.menu(block.id()) != null) {
-                event.register(ScriptBlocks.menu(block.id()), ScriptContainerScreen::new);
+            if (block.containerRows() == 0 && block.hasScriptInventory() && ScriptBlocks.menu(block.fullId()) != null) {
+                event.register(ScriptBlocks.menu(block.fullId()), ScriptContainerScreen::new);
             }
         }
     }

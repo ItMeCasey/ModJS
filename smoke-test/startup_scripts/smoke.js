@@ -72,3 +72,11 @@ StartupEvents.registry('block', event => {
   event.create('props_block').lightLevel(7).requiresTool(true).resistance(11).hardness(3);
   event.create('props_noitem').noItem();
 });
+// Registered in a namespace of their own: a full id, and event.namespace() for the plain ids of one handler.
+StartupEvents.registry('creative_tab', event => event.create('nsdemo:ns_tab').displayName('Namespaced Tab').icon('nsdemo:ns_gem'));
+StartupEvents.registry('item', event => {
+  event.create('nsdemo:ns_gem').displayName('Namespaced Gem').tab('nsdemo:ns_tab');
+  event.namespace('nsdemo').create('ns_plain').tab('nsdemo:ns_tab');
+});
+StartupEvents.registry('block', event => event.create('nsdemo:ns_block').hardness(2).tab('nsdemo:ns_tab'));
+StartupEvents.registry('fluid', event => event.create('nsdemo:ns_goo').noBucket());

@@ -24,17 +24,16 @@ import java.util.List;
 
 /** Registers the items and blocks scripts declared, under the {@code modjs} namespace. */
 public final class ContentRegistry {
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, RegistryManager.NAMESPACE);
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, RegistryManager.NAMESPACE);
+    private static final NsRegisters<Item> ITEMS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.ITEM, ns));
+    private static final NsRegisters<Block> BLOCKS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.BLOCK, ns));
 
     private static final java.util.List<DeferredHolder<Block, ? extends Block>> CONTAINER_BLOCKS = new java.util.ArrayList<>();
     private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
-    private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
+    private static final NsRegisters<CreativeModeTab> TABS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ns));
 
     private static final java.util.List<DeferredHolder<Block, ? extends Block>> SCRIPT_BLOCKS = new java.util.ArrayList<>();
-    private static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS =
-        DeferredRegister.create(Registries.MENU, RegistryManager.NAMESPACE);
+    private static final NsRegisters<net.minecraft.world.inventory.MenuType<?>> MENUS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.MENU, ns));
 
     record TabEntry(String tab, DeferredHolder<Item, ? extends Item> item) {
     }
@@ -49,9 +48,9 @@ public final class ContentRegistry {
         FluidRegistry.register(modIEventBus, BLOCKS, ITEMS, TAB_ENTRIES);
         for (BlockBuilderJS builder : RegistryManager.blocks()) {
             BlockBuilderJS b = builder;
-            DeferredHolder<Block, ? extends Block> block = BLOCKS.register(b.id(), () -> {
+            DeferredHolder<Block, ? extends Block> block = BLOCKS.register(b.namespace(), b.id(), () -> {
                 BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
-                    .setId(net.minecraft.resources.ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, b.id())))
+                    .setId(net.minecraft.resources.ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(b.namespace(), b.id())))
                     .strength(b.hardness(), b.resistance())
                     .lightLevel(state -> b.lightLevel());
                 if (b.requiresTool()) {
@@ -81,25 +80,25 @@ public final class ContentRegistry {
                 SCRIPT_BLOCKS.add(block);
             }
             if (b.containerRows() == 0 && b.hasScriptInventory()) {
-                MENUS.register(b.id(), () -> {
+                MENUS.register(b.namespace(), b.id(), () -> {
                     net.minecraft.world.inventory.MenuType<ScriptBlocks.ScriptMenu> menu =
                         new net.minecraft.world.inventory.MenuType<>((id, inventory) -> ScriptBlocks.clientMenu(b, id, inventory),
                             net.minecraft.world.flag.FeatureFlags.VANILLA_SET);
-                    ScriptBlocks.putMenu(b.id(), menu);
+                    ScriptBlocks.putMenu(b.fullId(), menu);
                     return menu;
                 });
             }
             if (!b.isNoItem()) {
-                DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.id(), () ->
-                    new BlockItem(block.get(), new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, b.id())))));
+                DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.namespace(), b.id(), () ->
+                    new BlockItem(block.get(), new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(b.namespace(), b.id())))));
                 TAB_ENTRIES.add(new TabEntry(b.tab(), item));
             }
         }
         for (ItemBuilderJS builder : RegistryManager.items()) {
             ItemBuilderJS b = builder;
-            DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.id(), () -> {
+            DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.namespace(), b.id(), () -> {
                 Item.Properties properties = new Item.Properties()
-                    .setId(net.minecraft.resources.ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, b.id())))
+                    .setId(net.minecraft.resources.ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(b.namespace(), b.id())))
                     .stacksTo(b.maxStackSize());
                 if (b.rarity() != null) {
                     properties.rarity(rarity(b.rarity()));
@@ -167,8 +166,8 @@ public final class ContentRegistry {
         }
         for (CreativeTabBuilderJS builder : RegistryManager.tabs()) {
             CreativeTabBuilderJS t = builder;
-            TABS.register(t.id(), () -> CreativeModeTab.builder()
-                .title(Component.translatable("itemGroup." + RegistryManager.NAMESPACE + "." + t.id()))
+            TABS.register(t.namespace(), t.id(), () -> CreativeModeTab.builder()
+                .title(Component.translatable("itemGroup." + t.namespace() + "." + t.id()))
                 .icon(() -> iconFor(t.icon()))
                 // The items of this tab are added by fillTabs, which also runs for ModJS tabs; adding them here too listed each twice.
                 .displayItems((parameters, output) -> { })
@@ -195,10 +194,10 @@ public final class ContentRegistry {
         if (!CONTAINER_BLOCKS.isEmpty() || !SCRIPT_BLOCKS.isEmpty()) {
             BLOCK_ENTITIES.register(modIEventBus);
         }
-        MENUS.register(modIEventBus);
-        TABS.register(modIEventBus);
-        BLOCKS.register(modIEventBus);
-        ITEMS.register(modIEventBus);
+        MENUS.registerAll(r -> r.register(modIEventBus));
+        TABS.registerAll(r -> r.register(modIEventBus));
+        BLOCKS.registerAll(r -> r.register(modIEventBus));
+        ITEMS.registerAll(r -> r.register(modIEventBus));
         modIEventBus.addListener(ContentRegistry::fillTabs);
     }
 
@@ -223,10 +222,10 @@ public final class ContentRegistry {
     private static net.minecraft.world.item.ToolMaterial customTool(String name) {
         String full = name.contains(":") ? name : RegistryManager.NAMESPACE + ":" + name;
         for (ToolTierBuilderJS tier : RegistryManager.toolTiers()) {
-            if ((RegistryManager.NAMESPACE + ":" + tier.id()).equals(full)) {
+            if ((tier.fullId()).equals(full)) {
                 return new net.minecraft.world.item.ToolMaterial(incorrectFor(tier.level()), tier.uses(), tier.speed(), tier.attackDamage(),
                     tier.enchantability(), net.minecraft.tags.TagKey.create(Registries.ITEM,
-                        Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, "repairs_tool_" + tier.id())));
+                        Identifier.fromNamespaceAndPath(tier.namespace(), "repairs_tool_" + tier.id())));
             }
         }
         if (!List.of("wood", "stone", "iron", "gold", "diamond", "netherite").contains(name)) {
@@ -239,7 +238,7 @@ public final class ContentRegistry {
     private static net.minecraft.world.item.equipment.ArmorMaterial customArmor(String name) {
         String full = name.contains(":") ? name : RegistryManager.NAMESPACE + ":" + name;
         for (ArmorMaterialBuilderJS m : RegistryManager.armorMaterials()) {
-            if ((RegistryManager.NAMESPACE + ":" + m.id()).equals(full)) {
+            if ((m.fullId()).equals(full)) {
                 java.util.Map<net.minecraft.world.item.equipment.ArmorType, Integer> defense = new java.util.EnumMap<>(net.minecraft.world.item.equipment.ArmorType.class);
                 defense.put(net.minecraft.world.item.equipment.ArmorType.HELMET, m.defense("helmet"));
                 defense.put(net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, m.defense("chestplate"));
@@ -247,8 +246,8 @@ public final class ContentRegistry {
                 defense.put(net.minecraft.world.item.equipment.ArmorType.BOOTS, m.defense("boots"));
                 return new net.minecraft.world.item.equipment.ArmorMaterial(m.durability(), defense, m.enchantability(),
                     net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_IRON, m.toughness(), m.knockbackResistance(),
-                    net.minecraft.tags.TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, "repairs_armor_" + m.id())),
-                    ResourceKey.create(net.minecraft.world.item.equipment.EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(RegistryManager.NAMESPACE, m.id())));
+                    net.minecraft.tags.TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(m.namespace(), "repairs_armor_" + m.id())),
+                    ResourceKey.create(net.minecraft.world.item.equipment.EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(m.namespace(), m.id())));
             }
         }
         if (!List.of("leather", "chainmail", "iron", "gold", "diamond", "netherite").contains(name)) {

@@ -31,7 +31,7 @@ On first launch ModJS creates a `modjs/` folder in the game directory with `star
 Client scripts can draw HUD text and rectangles, register keys that players can rebind in Controls, and keep an
 overlay of progress bars, text, rectangles, pictures and item icons that they create once and update later
 (`Overlay.bar('hp', { value: 80, max: 100 })`, with anchors, colors, alpha, smooth fills and animations). Buttons on the title
-screen and on your own screens can carry an icon (an item or a texture). World overlays (`Overlay.at(x, y, z)`) draw text, item icons,
+screen and on your own screens can carry an icon (an item or a texture). Startup scripts can register content in a namespace of their own (`event.create('mypack:ruby')`). In-world crafting (`ServerEvents.worldRecipes`) adds item-on-block, items in water, anvil, lightning, random tick and block break recipes, shown in the recipe viewers. World overlays (`Overlay.at(x, y, z)`) draw text, item icons,
 bars and textures in the world over a block, with distance and visibility culling and an element cap. Startup scripts can make blocks
 with a different texture on every face, real slots, a tick handler, saved and synced data, and a screen with bars and buttons
 (`examples/world-overlay`). On Forge 1.21.1 the scripted title screen is swapped in

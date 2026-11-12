@@ -1,0 +1,9 @@
+[11Nov2026 19:35:24.530] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK waiting screen net.minecraft.client.gui.screens.BackupConfirmScreen@58bbe78f
+[11Nov2026 19:35:31.556] [Server thread/INFO] [modjs/]: [SERVER] NS-TOUR READY world
+[11Nov2026 19:35:36.686] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang item.nsdemo.gem = Pack Gem
+[11Nov2026 19:35:36.686] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang item.modjs.gem = Modjs Gem
+[11Nov2026 19:35:36.686] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang block.nsdemo.crystal = Pack Crystal
+[11Nov2026 19:35:36.687] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang block.modjs.crystal = Modjs Crystal
+[11Nov2026 19:35:36.687] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang item.nsdemo.shard = Pack Shard
+[11Nov2026 19:35:36.705] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK ok frame
+[11Nov2026 19:35:40.677] [Render thread/INFO] [modjs/]: [CLIENT] NS-TOUR clean client exit

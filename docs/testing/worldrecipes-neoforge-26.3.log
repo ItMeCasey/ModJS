@@ -1,0 +1,19 @@
+[11Nov2026 19:34:02.314] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR READY world
+[11Nov2026 19:34:05.291] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR CLICKED stone
+[11Nov2026 19:34:07.297] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR DROPPED coal and sand
+[11Nov2026 19:34:08.782] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR at230 2 minecraft:gravel at -2.47 -59.00 13.37 inWater=false
+[11Nov2026 19:34:08.783] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR at230 2 minecraft:gravel at -2.47 -59.00 13.37 inWater=false
+[11Nov2026 19:34:08.784] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR recipes=2 bx=-2 by=-60 bz=13
+[11Nov2026 19:34:13.999] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK ok frame
+[11Nov2026 19:34:14.997] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK PASS viewer page on stone: [In the world: right-click Stone with Flint: the block becomes Gold Block, drops 2 Gravel.]
+[11Nov2026 19:34:14.997] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK PASS viewer pages on flint and diamond
+[11Nov2026 19:34:15.281] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at -2.47 -59.00 13.37
+[11Nov2026 19:34:15.281] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at -2.47 -59.00 13.37
+[11Nov2026 19:34:15.281] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at -2.47 -59.00 13.37
+[11Nov2026 19:34:15.282] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at -2.47 -59.00 13.37
+[11Nov2026 19:34:15.283] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR engine spawned [minecraft:gravel x2, minecraft:diamond x1]
+[11Nov2026 19:34:15.283] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR pool block is minecraft:water{level=0}
+[11Nov2026 19:34:15.283] [Server thread/INFO] [modjs/]: [SERVER] WR-CHECK PASS item on block: minecraft:gold_block{}
+[11Nov2026 19:34:15.283] [Server thread/INFO] [modjs/]: [SERVER] WR-CHECK PASS drops: 2 minecraft:gravel,2 minecraft:gravel
+[11Nov2026 19:34:15.284] [Server thread/INFO] [modjs/]: [SERVER] WR-CHECK PASS items in water: 2 minecraft:gravel,2 minecraft:gravel
+[11Nov2026 19:34:18.490] [Render thread/INFO] [modjs/]: [CLIENT] WR-TOUR clean client exit

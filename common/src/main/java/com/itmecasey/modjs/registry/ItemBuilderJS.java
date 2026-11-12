@@ -6,6 +6,7 @@ import java.util.List;
 /** Configuration for an item created by {@code StartupEvents.registry('item', ...)}. */
 public final class ItemBuilderJS {
     private final String id;
+    private final String namespace;
     private String displayName;
     private int maxStackSize = 64;
     private String texture;
@@ -23,12 +24,25 @@ public final class ItemBuilderJS {
     private String armorTier = "iron";
     private final List<String> tooltips = new ArrayList<>();
 
-    ItemBuilderJS(String id) {
-        this.id = id;
+    ItemBuilderJS(String rawId) {
+        RegistryNames.Id parsed = RegistryNames.parse(rawId);
+        this.namespace = parsed.namespace();
+        this.id = parsed.path();
     }
 
+    /** The path part of the id ({@code ruby} in {@code mypack:ruby}). */
     public String id() {
         return id;
+    }
+
+    /** The namespace it is registered in ({@code modjs} unless the script gave one). */
+    public String namespace() {
+        return namespace;
+    }
+
+    /** The full registry id, such as {@code mypack:ruby}. */
+    public String fullId() {
+        return namespace + ":" + id;
     }
 
     public String displayName() {
@@ -40,7 +54,7 @@ public final class ItemBuilderJS {
     }
 
     public String texture() {
-        return texture != null ? texture : RegistryManager.NAMESPACE + ":item/" + id;
+        return texture != null ? texture : namespace + ":item/" + id;
     }
 
     /** Tool kind: pickaxe, axe, shovel, hoe or sword; null for a plain item. */
@@ -154,7 +168,7 @@ public final class ItemBuilderJS {
         return maxStackSize(1);
     }
 
-    /** Texture id such as {@code "mymod:item/ruby"}; defaults to {@code modjs:item/<id>}. */
+    /** Texture id such as {@code "mymod:item/ruby"}; defaults to {@code <namespace>:item/<id>}. */
     public ItemBuilderJS texture(String texture) {
         this.texture = texture;
         return this;

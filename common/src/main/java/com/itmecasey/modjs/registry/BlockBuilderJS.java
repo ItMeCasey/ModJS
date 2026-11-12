@@ -12,6 +12,7 @@ import java.util.Map;
 /** Configuration for a block created by {@code StartupEvents.registry('block', ...)}. */
 public final class BlockBuilderJS {
     private final String id;
+    private final String namespace;
     private String displayName;
     private float hardness = 1.5f;
     private float resistance = 6.0f;
@@ -40,12 +41,25 @@ public final class BlockBuilderJS {
     private static final List<String> FACE_KEYS = List.of("all", "top", "bottom", "side", "north", "south", "east", "west", "front", "end");
     private static final List<String> MODELS = List.of("cube_all", "cube", "cube_column", "cube_bottom_top", "orientable");
 
-    BlockBuilderJS(String id) {
-        this.id = id;
+    BlockBuilderJS(String rawId) {
+        RegistryNames.Id parsed = RegistryNames.parse(rawId);
+        this.namespace = parsed.namespace();
+        this.id = parsed.path();
     }
 
+    /** The path part of the id ({@code ruby} in {@code mypack:ruby}). */
     public String id() {
         return id;
+    }
+
+    /** The namespace it is registered in ({@code modjs} unless the script gave one). */
+    public String namespace() {
+        return namespace;
+    }
+
+    /** The full registry id, such as {@code mypack:ruby}. */
+    public String fullId() {
+        return namespace + ":" + id;
     }
 
     public String displayName() {
@@ -69,7 +83,7 @@ public final class BlockBuilderJS {
     }
 
     public String texture() {
-        return texture != null ? texture : RegistryManager.NAMESPACE + ":block/" + id;
+        return texture != null ? texture : namespace + ":block/" + id;
     }
 
     public String tab() {

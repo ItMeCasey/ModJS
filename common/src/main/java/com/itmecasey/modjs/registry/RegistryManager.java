@@ -50,6 +50,12 @@ public final class RegistryManager {
         EventGroups.STARTUP.postExact("registry", "fluid", new RegistryEventJS<>("fluid", FLUIDS, FluidBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
+        for (BlockBuilderJS block : BLOCKS.values()) {
+            if (!block.isNoItem() && ITEMS.remove(block.fullId()) != null) {
+                com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.STARTUP)
+                    .addError("Item '" + block.fullId() + "' has the same id as a block with an item; the block item is kept and the item is dropped");
+            }
+        }
         if (!UNIFY_FILE_READ) {
             UNIFY_FILE_READ = true;
             com.itmecasey.modjs.unify.UnifyFile.applyStartup(com.itmecasey.modjs.script.ScriptManager.root());
@@ -57,17 +63,17 @@ public final class RegistryManager {
         addUnifiedMaterials();
         for (ItemBuilderJS item : ITEMS.values()) {
             if (item.unifyTag() != null) {
-                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(item.unifyTag(), NAMESPACE + ":" + item.id());
+                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(item.unifyTag(), item.fullId());
             }
         }
         for (BlockBuilderJS block : BLOCKS.values()) {
             if (block.unifyTag() != null) {
-                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(block.unifyTag(), NAMESPACE + ":" + block.id());
+                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalItem(block.unifyTag(), block.fullId());
             }
         }
         for (FluidBuilderJS fluid : FLUIDS.values()) {
             if (fluid.unifyTag() != null) {
-                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalFluid(fluid.unifyTag(), NAMESPACE + ":" + fluid.id());
+                com.itmecasey.modjs.unify.UnifyConfig.addCanonicalFluid(fluid.unifyTag(), fluid.fullId());
             }
         }
         if (!contributorsInstalled) {
@@ -81,7 +87,8 @@ public final class RegistryManager {
     private static void addUnifiedMaterials() {
         for (com.itmecasey.modjs.unify.UnifyMaterials.Spec spec : com.itmecasey.modjs.unify.UnifyConfig.materialSpecs()) {
             for (com.itmecasey.modjs.unify.UnifyMaterials.Entry entry : com.itmecasey.modjs.unify.UnifyMaterials.expand(spec)) {
-                if (ITEMS.containsKey(entry.id()) || BLOCKS.containsKey(entry.id())) {
+                String key = NAMESPACE + ":" + entry.id();
+                if (ITEMS.containsKey(key) || BLOCKS.containsKey(key)) {
                     continue;
                 }
                 if (entry.block()) {
@@ -89,15 +96,15 @@ public final class RegistryManager {
                     if (entry.dropId() != null) {
                         block.drops(entry.dropId()).requiresTool(true);
                     }
-                    BLOCKS.put(entry.id(), block);
+                    BLOCKS.put(key, block);
                 } else {
                     ItemBuilderJS item = new ItemBuilderJS(entry.id()).displayName(entry.displayName()).unify(entry.tag());
                     if (entry.kind().equals("rod")) {
                         item.parentModel("minecraft:item/handheld");
                     }
-                    ITEMS.put(entry.id(), item);
+                    ITEMS.put(key, item);
                 }
-                UNIFY_ENTRIES.put(entry.id(), entry);
+                UNIFY_ENTRIES.put(key, entry);
             }
         }
     }
@@ -126,61 +133,65 @@ public final class RegistryManager {
         return TABS.values();
     }
 
+    private static JsonObject lang(Map<String, JsonObject> langs, String namespace) {
+        return langs.computeIfAbsent(namespace, k -> new JsonObject());
+    }
+
     static void writeAssets(GeneratedData data) {
-        JsonObject lang = new JsonObject();
+        Map<String, JsonObject> langs = new LinkedHashMap<>();
         for (ItemBuilderJS item : ITEMS.values()) {
-            lang.addProperty("item." + NAMESPACE + "." + item.id(), item.displayName());
+            lang(langs, item.namespace()).addProperty("item." + item.namespace() + "." + item.id(), item.displayName());
             if (VersionFormat.current().usesItemDefinitions()) {
-                writeItemDefinition(data, item.id(), NAMESPACE + ":item/" + item.id());
+                writeItemDefinition(data, item.namespace(), item.id(), item.namespace() + ":item/" + item.id());
             }
             JsonObject model = new JsonObject();
             model.addProperty("parent", item.parentModel());
             JsonObject textures = new JsonObject();
             textures.addProperty("layer0", item.texture());
             model.add("textures", textures);
-            data.putJson(NAMESPACE, "models/item/" + item.id(), model);
+            data.putJson(item.namespace(), "models/item/" + item.id(), model);
         }
         for (CreativeTabBuilderJS tab : TABS.values()) {
-            lang.addProperty("itemGroup." + NAMESPACE + "." + tab.id(), tab.displayName());
+            lang(langs, tab.namespace()).addProperty("itemGroup." + tab.namespace() + "." + tab.id(), tab.displayName());
         }
         for (FluidBuilderJS fluid : FLUIDS.values()) {
-            lang.addProperty("block." + NAMESPACE + "." + fluid.id(), fluid.displayName());
-            lang.addProperty("fluid_type." + NAMESPACE + "." + fluid.id(), fluid.displayName());
+            lang(langs, fluid.namespace()).addProperty("block." + fluid.namespace() + "." + fluid.id(), fluid.displayName());
+            lang(langs, fluid.namespace()).addProperty("fluid_type." + fluid.namespace() + "." + fluid.id(), fluid.displayName());
             JsonObject particle = new JsonObject();
             JsonObject particleTextures = new JsonObject();
             particleTextures.addProperty("particle", "minecraft:block/water_still");
             particle.add("textures", particleTextures);
-            data.putJson(NAMESPACE, "models/block/" + fluid.id(), particle);
+            data.putJson(fluid.namespace(), "models/block/" + fluid.id(), particle);
             JsonObject variant = new JsonObject();
-            variant.addProperty("model", NAMESPACE + ":block/" + fluid.id());
+            variant.addProperty("model", fluid.namespace() + ":block/" + fluid.id());
             JsonObject variants = new JsonObject();
             variants.add("", variant);
             JsonObject state = new JsonObject();
             state.add("variants", variants);
-            data.putJson(NAMESPACE, "blockstates/" + fluid.id(), state);
+            data.putJson(fluid.namespace(), "blockstates/" + fluid.id(), state);
             if (!fluid.isNoBucket()) {
-                lang.addProperty("item." + NAMESPACE + "." + fluid.id() + "_bucket", fluid.displayName() + " Bucket");
+                lang(langs, fluid.namespace()).addProperty("item." + fluid.namespace() + "." + fluid.id() + "_bucket", fluid.displayName() + " Bucket");
                 if (VersionFormat.current().usesItemDefinitions()) {
-                    writeItemDefinition(data, fluid.id() + "_bucket", NAMESPACE + ":item/" + fluid.id() + "_bucket");
+                    writeItemDefinition(data, fluid.namespace(), fluid.id() + "_bucket", fluid.namespace() + ":item/" + fluid.id() + "_bucket");
                 }
                 JsonObject bucket = new JsonObject();
                 bucket.addProperty("parent", "minecraft:item/generated");
                 JsonObject bucketTextures = new JsonObject();
                 bucketTextures.addProperty("layer0", "minecraft:item/water_bucket");
                 bucket.add("textures", bucketTextures);
-                data.putJson(NAMESPACE, "models/item/" + fluid.id() + "_bucket", bucket);
+                data.putJson(fluid.namespace(), "models/item/" + fluid.id() + "_bucket", bucket);
             }
         }
         for (BlockBuilderJS block : BLOCKS.values()) {
-            lang.addProperty("block." + NAMESPACE + "." + block.id(), block.displayName());
+            lang(langs, block.namespace()).addProperty("block." + block.namespace() + "." + block.id(), block.displayName());
             if (!block.isNoItem()) {
-                lang.addProperty("item." + NAMESPACE + "." + block.id(), block.displayName());
+                lang(langs, block.namespace()).addProperty("item." + block.namespace() + "." + block.id(), block.displayName());
                 if (VersionFormat.current().usesItemDefinitions()) {
-                    writeItemDefinition(data, block.id(), BlockShapes.itemModel(block));
+                    writeItemDefinition(data, block.namespace(), block.id(), BlockShapes.itemModel(block));
                 } else {
                     JsonObject itemModel = new JsonObject();
                     itemModel.addProperty("parent", BlockShapes.itemModel(block));
-                    data.putJson(NAMESPACE, "models/item/" + block.id(), itemModel);
+                    data.putJson(block.namespace(), "models/item/" + block.id(), itemModel);
                 }
             }
             if (!block.type().equals("basic")) {
@@ -198,18 +209,20 @@ public final class RegistryManager {
                 data.putBytes(NAMESPACE, path, com.itmecasey.modjs.unify.UnifyMaterials.texture(entry.kind(), entry.color()));
             }
         }
-        if (lang.size() > 0) {
-            data.putJson(NAMESPACE, "lang/en_us", lang);
+        for (Map.Entry<String, JsonObject> entry : langs.entrySet()) {
+            if (entry.getValue().size() > 0) {
+                data.putJson(entry.getKey(), "lang/en_us", entry.getValue());
+            }
         }
     }
 
-    private static void writeItemDefinition(GeneratedData data, String id, String model) {
+    private static void writeItemDefinition(GeneratedData data, String namespace, String id, String model) {
         JsonObject inner = new JsonObject();
         inner.addProperty("type", "minecraft:model");
         inner.addProperty("model", model);
         JsonObject definition = new JsonObject();
         definition.add("model", inner);
-        data.putJson(NAMESPACE, "items/" + id, definition);
+        data.putJson(namespace, "items/" + id, definition);
     }
 
     static void writeData(GeneratedData data) {
@@ -217,39 +230,39 @@ public final class RegistryManager {
         Map<String, java.util.List<String>> blockTags = new LinkedHashMap<>();
         for (ItemBuilderJS item : ITEMS.values()) {
             if (item.unifyTag() != null) {
-                itemTags.computeIfAbsent(item.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + item.id());
+                itemTags.computeIfAbsent(item.unifyTag(), k -> new java.util.ArrayList<>()).add(item.fullId());
             }
         }
         for (BlockBuilderJS block : BLOCKS.values()) {
             if (block.unifyTag() != null) {
-                itemTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
-                blockTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+                itemTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(block.fullId());
+                blockTags.computeIfAbsent(block.unifyTag(), k -> new java.util.ArrayList<>()).add(block.fullId());
             }
         }
         for (BlockBuilderJS block : BLOCKS.values()) {
             if (block.requiresTool()) {
-                blockTags.computeIfAbsent("minecraft:mineable/pickaxe", k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+                blockTags.computeIfAbsent("minecraft:mineable/pickaxe", k -> new java.util.ArrayList<>()).add(block.fullId());
                 if (block.dropItem() != null) {
-                    blockTags.computeIfAbsent("minecraft:needs_stone_tool", k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + block.id());
+                    blockTags.computeIfAbsent("minecraft:needs_stone_tool", k -> new java.util.ArrayList<>()).add(block.fullId());
                 }
             }
         }
         Map<String, java.util.List<String>> fluidTags = new LinkedHashMap<>();
         for (FluidBuilderJS fluid : FLUIDS.values()) {
             if (fluid.unifyTag() != null) {
-                fluidTags.computeIfAbsent(fluid.unifyTag(), k -> new java.util.ArrayList<>()).add(NAMESPACE + ":" + fluid.id());
+                fluidTags.computeIfAbsent(fluid.unifyTag(), k -> new java.util.ArrayList<>()).add(fluid.fullId());
             }
         }
         writeTags(data, "fluid", fluidTags);
         Map<String, java.util.List<String>> repairTags = new LinkedHashMap<>();
         for (ArmorMaterialBuilderJS material : ARMOR_MATERIALS.values()) {
             if (material.repair() != null) {
-                repairTags.computeIfAbsent(NAMESPACE + ":repairs_armor_" + material.id(), k -> new java.util.ArrayList<>()).add(material.repair());
+                repairTags.computeIfAbsent(material.namespace() + ":repairs_armor_" + material.id(), k -> new java.util.ArrayList<>()).add(material.repair());
             }
         }
         for (ToolTierBuilderJS tier : TIERS.values()) {
             if (tier.repair() != null) {
-                repairTags.computeIfAbsent(NAMESPACE + ":repairs_tool_" + tier.id(), k -> new java.util.ArrayList<>()).add(tier.repair());
+                repairTags.computeIfAbsent(tier.namespace() + ":repairs_tool_" + tier.id(), k -> new java.util.ArrayList<>()).add(tier.repair());
             }
         }
         writeTags(data, "item", repairTags);
@@ -262,7 +275,7 @@ public final class RegistryManager {
             if (!block.isDropsNothing() && !(block.isNoItem() && block.dropItem() == null)) {
                 JsonObject entry = new JsonObject();
                 entry.addProperty("type", "minecraft:item");
-                entry.addProperty("name", block.dropItem() != null ? block.dropItem() : NAMESPACE + ":" + block.id());
+                entry.addProperty("name", block.dropItem() != null ? block.dropItem() : block.fullId());
                 if (block.type().equals("slab")) {
                     JsonObject setCount = new JsonObject();
                     setCount.addProperty("function", "minecraft:set_count");
@@ -271,7 +284,7 @@ public final class RegistryManager {
                     properties.addProperty("type", "double");
                     JsonObject isDouble = new JsonObject();
                     isDouble.addProperty("condition", "minecraft:block_state_property");
-                    isDouble.addProperty("block", NAMESPACE + ":" + block.id());
+                    isDouble.addProperty("block", block.fullId());
                     isDouble.add("properties", properties);
                     JsonArray fnConditions = new JsonArray();
                     fnConditions.add(isDouble);
@@ -293,7 +306,7 @@ public final class RegistryManager {
                 pools.add(pool);
             }
             table.add("pools", pools);
-            data.putJson(NAMESPACE, com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/" + block.id(), table);
+            data.putJson(block.namespace(), com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/" + block.id(), table);
         }
     }
 

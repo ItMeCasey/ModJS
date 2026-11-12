@@ -238,7 +238,49 @@ declare const Overlay: {
 };
 
 interface RegistryEvent<B> extends EventBase {
+  /** 'ruby' registers modjs:ruby; 'mypack:ruby' registers mypack:ruby (lowercase letters, digits, _ . - in the namespace; not 'minecraft'). */
   create(id: string): B;
+  /** Plain ids in this handler go to this namespace from now on. */
+  namespace(namespace: string): RegistryEvent<B>;
+}
+
+/** An in-world recipe from ServerEvents.worldRecipes; the methods chain. Blocks and items are ids, '#tags', and blocks may carry state values: 'minecraft:cauldron[level=3]'. */
+interface WorldRecipe {
+  id(id: string): WorldRecipe;
+  /** true: the player must sneak; false: must not. */
+  sneaking(sneaking: boolean): WorldRecipe;
+  /** Which hand holds the item for a click: main (default), off or any. */
+  hand(hand: 'main' | 'off' | 'any'): WorldRecipe;
+  /** How many of the held item (or the dropped items) are used up; 0 keeps them. */
+  consume(count: number): WorldRecipe;
+  /** Wears the held tool down. */
+  damage(amount: number): WorldRecipe;
+  /** Chance 0 to 1 that the results happen; the items are used up either way. */
+  chance(chance: number): WorldRecipe;
+  turnInto(block: string): WorldRecipe;
+  breakBlock(): WorldRecipe;
+  drop(itemId: string, count?: number): WorldRecipe;
+  give(itemId: string, count?: number): WorldRecipe;
+  command(command: string): WorldRecipe;
+  /** blockBreak: the tool the player must hold. */
+  tool(matcher: string): WorldRecipe;
+  /** blockBreak: only this recipe's drops. */
+  replaceDrops(): WorldRecipe;
+  /** lightning: dropped items needed within three blocks. */
+  item(matcher: string, count?: number): WorldRecipe;
+}
+
+type WorldRecipeItem = string | { item: string; count?: number };
+
+interface WorldRecipesEvent extends EventBase {
+  itemOnBlock(block: string, item?: WorldRecipeItem): WorldRecipe;
+  leftClickBlock(block: string, item?: WorldRecipeItem): WorldRecipe;
+  itemsInBlock(block: string, items: WorldRecipeItem[]): WorldRecipe;
+  itemsOnBlock(block: string, items: WorldRecipeItem[]): WorldRecipe;
+  anvil(block: string): WorldRecipe;
+  lightning(block: string): WorldRecipe;
+  randomTick(block: string): WorldRecipe;
+  blockBreak(block: string): WorldRecipe;
 }
 
 /** Minecraft objects are passed through as-is; see the Minecraft source for their methods. */
@@ -304,6 +346,8 @@ declare const StartupEvents: {
 
 declare const ServerEvents: {
   recipes(handler: Handler<RecipesEvent>): void;
+  /** In-world crafting: item on block, items in water, anvil, lightning, random tick, block break. */
+  worldRecipes(handler: Handler<WorldRecipesEvent>): void;
   tags(registry: string, handler: Handler<TagsEvent>): void;
   highPriorityData(handler: Handler<DataEvent>): void;
   generateData(handler: Handler<DataEvent>): void;

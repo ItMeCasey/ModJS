@@ -3,6 +3,7 @@ package com.itmecasey.modjs.registry;
 /** A custom armor material created by {@code StartupEvents.registry('armor_material', ...)}; use it with {@code item.armor('helmet', 'modjs:ruby')}. */
 public final class ArmorMaterialBuilderJS {
     private final String id;
+    private final String namespace;
     private int durability = 15;
     private int helmet = 2;
     private int chestplate = 6;
@@ -14,12 +15,25 @@ public final class ArmorMaterialBuilderJS {
     private String repair;
     private int color = 0xB4B4B4;
 
-    ArmorMaterialBuilderJS(String id) {
-        this.id = id;
+    ArmorMaterialBuilderJS(String rawId) {
+        RegistryNames.Id parsed = RegistryNames.parse(rawId);
+        this.namespace = parsed.namespace();
+        this.id = parsed.path();
     }
 
+    /** The path part of the id ({@code ruby} in {@code mypack:ruby}). */
     public String id() {
         return id;
+    }
+
+    /** The namespace it is registered in ({@code modjs} unless the script gave one). */
+    public String namespace() {
+        return namespace;
+    }
+
+    /** The full registry id, such as {@code mypack:ruby}. */
+    public String fullId() {
+        return namespace + ":" + id;
     }
 
     public int durability() {

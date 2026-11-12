@@ -127,6 +127,9 @@ public final class ScriptManager {
         } finally {
             LOADING.remove();
         }
+        if (type == ScriptType.SERVER) {
+            com.itmecasey.modjs.worldcraft.WorldRecipes.rebuild();
+        }
         LOGGER.info("[{}] loaded {} script(s), {} error(s)", type, loadedCount, errors.size());
     }
 

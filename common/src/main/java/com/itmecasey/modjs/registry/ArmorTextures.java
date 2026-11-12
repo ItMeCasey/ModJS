@@ -10,12 +10,11 @@ import java.io.IOException;
 
 /** Worn-armor art for custom materials: the vanilla iron armor, recolored, or a plain fill when the game assets are not on hand. */
 final class ArmorTextures {
-    private static final String NS = RegistryManager.NAMESPACE;
-
     private ArmorTextures() {
     }
 
     static void write(GeneratedData data, ArmorMaterialBuilderJS material, boolean modern) {
+        final String NS = material.namespace();
         String id = material.id();
         String outer = modern ? "textures/entity/equipment/humanoid/" + id + ".png" : "textures/models/armor/" + id + "_layer_1.png";
         String inner = modern ? "textures/entity/equipment/humanoid_leggings/" + id + ".png" : "textures/models/armor/" + id + "_layer_2.png";

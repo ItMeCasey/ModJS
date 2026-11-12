@@ -26,22 +26,21 @@ import java.util.List;
 
 /** Registers the items and blocks scripts declared, under the {@code modjs} namespace. */
 public final class ContentRegistry {
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, RegistryManager.NAMESPACE);
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, RegistryManager.NAMESPACE);
+    private static final NsRegisters<Item> ITEMS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.ITEM, ns));
+    private static final NsRegisters<Block> BLOCKS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.BLOCK, ns));
 
-    private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RegistryManager.NAMESPACE);
+    private static final NsRegisters<CreativeModeTab> TABS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ns));
 
     private static final java.util.Map<String, net.minecraft.world.item.Tier> CUSTOM_TIERS = new java.util.HashMap<>();
     private static final java.util.Map<String, DeferredHolder<net.minecraft.world.item.ArmorMaterial, ? extends net.minecraft.world.item.ArmorMaterial>> CUSTOM_ARMOR = new java.util.HashMap<>();
     private static final java.util.List<DeferredHolder<Block, ? extends Block>> CONTAINER_BLOCKS = new java.util.ArrayList<>();
     private static final java.util.List<DeferredHolder<Block, ? extends Block>> SCRIPT_BLOCKS = new java.util.ArrayList<>();
-    private static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS =
-        DeferredRegister.create(Registries.MENU, RegistryManager.NAMESPACE);
+    private static final NsRegisters<net.minecraft.world.inventory.MenuType<?>> MENUS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.MENU, ns));
     private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
     private static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES_SCRIPT =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RegistryManager.NAMESPACE);
-    private static final DeferredRegister<net.minecraft.world.item.ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, RegistryManager.NAMESPACE);
+    private static final NsRegisters<net.minecraft.world.item.ArmorMaterial> ARMOR_MATERIALS = new NsRegisters<>(ns -> DeferredRegister.create(Registries.ARMOR_MATERIAL, ns));
 
     record TabEntry(String tab, DeferredHolder<Item, ? extends Item> item) {
     }
@@ -54,16 +53,16 @@ public final class ContentRegistry {
     /** Turns the collected builders into registry entries; call from the mod constructor after {@link RegistryManager#collect()}. */
     public static void register(IEventBus modBus) {
         for (ToolTierBuilderJS tier : RegistryManager.toolTiers()) {
-            CUSTOM_TIERS.put(RegistryManager.NAMESPACE + ":" + tier.id(), new CustomTier(tier));
+            CUSTOM_TIERS.put(tier.fullId(), new CustomTier(tier));
         }
         for (ArmorMaterialBuilderJS material : RegistryManager.armorMaterials()) {
-            CUSTOM_ARMOR.put(RegistryManager.NAMESPACE + ":" + material.id(), ARMOR_MATERIALS.register(material.id(), () -> armorMaterial(material)));
+            CUSTOM_ARMOR.put(material.fullId(), ARMOR_MATERIALS.register(material.namespace(), material.id(), () -> armorMaterial(material)));
         }
-        ARMOR_MATERIALS.register(modBus);
+        ARMOR_MATERIALS.registerAll(r -> r.register(modBus));
         FluidRegistry.register(modBus, BLOCKS, ITEMS, TAB_ENTRIES);
         for (BlockBuilderJS builder : RegistryManager.blocks()) {
             BlockBuilderJS b = builder;
-            DeferredHolder<Block, ? extends Block> block = BLOCKS.register(b.id(), () -> {
+            DeferredHolder<Block, ? extends Block> block = BLOCKS.register(b.namespace(), b.id(), () -> {
                 BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
                     .strength(b.hardness(), b.resistance())
                     .lightLevel(state -> b.lightLevel());
@@ -94,22 +93,22 @@ public final class ContentRegistry {
                 SCRIPT_BLOCKS.add(block);
             }
             if (b.containerRows() == 0 && b.hasScriptInventory()) {
-                MENUS.register(b.id(), () -> {
+                MENUS.register(b.namespace(), b.id(), () -> {
                     net.minecraft.world.inventory.MenuType<ScriptBlocks.ScriptMenu> menu =
                         new net.minecraft.world.inventory.MenuType<>((id, inventory) -> ScriptBlocks.clientMenu(b, id, inventory),
                             net.minecraft.world.flag.FeatureFlags.VANILLA_SET);
-                    ScriptBlocks.putMenu(b.id(), menu);
+                    ScriptBlocks.putMenu(b.fullId(), menu);
                     return menu;
                 });
             }
             if (!b.isNoItem()) {
-                DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
+                DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.namespace(), b.id(), () -> new BlockItem(block.get(), new Item.Properties()));
                 TAB_ENTRIES.add(new TabEntry(b.tab(), item));
             }
         }
         for (ItemBuilderJS builder : RegistryManager.items()) {
             ItemBuilderJS b = builder;
-            DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.id(), () -> {
+            DeferredHolder<Item, ? extends Item> item = ITEMS.register(b.namespace(), b.id(), () -> {
                 Item.Properties properties = new Item.Properties().stacksTo(b.maxStackSize());
                 if (b.rarity() != null) {
                     properties.rarity(rarity(b.rarity()));
@@ -143,8 +142,8 @@ public final class ContentRegistry {
         }
         for (CreativeTabBuilderJS builder : RegistryManager.tabs()) {
             CreativeTabBuilderJS t = builder;
-            TABS.register(t.id(), () -> CreativeModeTab.builder()
-                .title(Component.translatable("itemGroup." + RegistryManager.NAMESPACE + "." + t.id()))
+            TABS.register(t.namespace(), t.id(), () -> CreativeModeTab.builder()
+                .title(Component.translatable("itemGroup." + t.namespace() + "." + t.id()))
                 .icon(() -> iconFor(t.icon()))
                 // The items of this tab are added by fillTabs, which also runs for ModJS tabs; adding them here too listed each twice.
                 .displayItems((parameters, output) -> { })
@@ -170,10 +169,10 @@ public final class ContentRegistry {
             });
             BLOCK_ENTITIES_SCRIPT.register(modBus);
         }
-        MENUS.register(modBus);
-        TABS.register(modBus);
-        BLOCKS.register(modBus);
-        ITEMS.register(modBus);
+        MENUS.registerAll(r -> r.register(modBus));
+        TABS.registerAll(r -> r.register(modBus));
+        BLOCKS.registerAll(r -> r.register(modBus));
+        ITEMS.registerAll(r -> r.register(modBus));
         modBus.addListener(ContentRegistry::fillTabs);
     }
 
@@ -192,7 +191,7 @@ public final class ContentRegistry {
         return new net.minecraft.world.item.ArmorMaterial(defense, m.enchantability(), net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_IRON,
             () -> m.repair() == null ? net.minecraft.world.item.crafting.Ingredient.EMPTY
                 : net.minecraft.world.item.crafting.Ingredient.of(BuiltInRegistries.ITEM.get(ResourceLocation.parse(m.repair()))),
-            java.util.List.of(new net.minecraft.world.item.ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(RegistryManager.NAMESPACE, m.id()))),
+            java.util.List.of(new net.minecraft.world.item.ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(m.namespace(), m.id()))),
             m.toughness(), m.knockbackResistance());
     }
 
@@ -253,7 +252,7 @@ public final class ContentRegistry {
                 case "boots" -> net.minecraft.world.item.ArmorItem.Type.BOOTS;
                 default -> net.minecraft.world.item.ArmorItem.Type.HELMET;
             };
-            int multiplier = RegistryManager.armorMaterials().stream().filter(m -> (RegistryManager.NAMESPACE + ":" + m.id()).equals(custom))
+            int multiplier = RegistryManager.armorMaterials().stream().filter(m -> (m.fullId()).equals(custom))
                 .findFirst().map(ArmorMaterialBuilderJS::durability).orElse(15);
             // the registry may not have the material yet when items register, so fall back to a direct holder
             net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial> holder = customMaterial;

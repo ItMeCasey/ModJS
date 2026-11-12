@@ -79,6 +79,7 @@ public class ModJS {
         ModJSNetwork.init(modBus);
         com.itmecasey.modjs.script.ModJSContextFactory.addWrapAdapter(com.itmecasey.modjs.game.BlockFacades::adapt);
         GameEvents.register();
+        com.itmecasey.modjs.worldcraft.WorldCraftHooks.register();
         modBus.addListener(GameEvents::modifyComponents);
         com.itmecasey.modjs.game.ExtraGameEvents.register();
         SelfTest.register();

@@ -91,12 +91,9 @@ public final class ClientBridge {
         MinecraftForge.EVENT_BUS.addListener((ItemTooltipEvent e) -> {
             ItemStack stack = e.getItemStack();
             String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
-            if (id.startsWith(RegistryManager.NAMESPACE + ":")) {
-                String path = id.substring(RegistryManager.NAMESPACE.length() + 1);
-                for (ItemBuilderJS builder : RegistryManager.items()) {
-                    if (builder.id().equals(path)) {
-                        builder.tooltips().forEach(line -> e.getToolTip().add(Component.literal(line)));
-                    }
+            for (ItemBuilderJS builder : RegistryManager.items()) {
+                if (builder.fullId().equals(id)) {
+                    builder.tooltips().forEach(line -> e.getToolTip().add(Component.literal(line)));
                 }
             }
             if (EventGroups.ITEM.hasHandlers("dynamicTooltips")) {

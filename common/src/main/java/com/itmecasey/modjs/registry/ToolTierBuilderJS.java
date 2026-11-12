@@ -3,6 +3,7 @@ package com.itmecasey.modjs.registry;
 /** A custom tool tier created by {@code StartupEvents.registry('tool_tier', ...)}; use it with {@code item.tool('pickaxe', 'modjs:ruby')}. */
 public final class ToolTierBuilderJS {
     private final String id;
+    private final String namespace;
     private int uses = 250;
     private float speed = 6.0f;
     private float attackDamage = 2.0f;
@@ -10,12 +11,25 @@ public final class ToolTierBuilderJS {
     private int enchantability = 14;
     private String repair;
 
-    ToolTierBuilderJS(String id) {
-        this.id = id;
+    ToolTierBuilderJS(String rawId) {
+        RegistryNames.Id parsed = RegistryNames.parse(rawId);
+        this.namespace = parsed.namespace();
+        this.id = parsed.path();
     }
 
+    /** The path part of the id ({@code ruby} in {@code mypack:ruby}). */
     public String id() {
         return id;
+    }
+
+    /** The namespace it is registered in ({@code modjs} unless the script gave one). */
+    public String namespace() {
+        return namespace;
+    }
+
+    /** The full registry id, such as {@code mypack:ruby}. */
+    public String fullId() {
+        return namespace + ":" + id;
     }
 
     public int uses() {

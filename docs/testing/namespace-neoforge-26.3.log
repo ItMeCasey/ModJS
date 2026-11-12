@@ -1,0 +1,8 @@
+[11Nov2026 19:36:36.103] [Server thread/INFO] [modjs/]: [SERVER] NS-TOUR READY world
+[11Nov2026 19:36:41.248] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang item.nsdemo.gem = Pack Gem
+[11Nov2026 19:36:41.248] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang item.modjs.gem = Modjs Gem
+[11Nov2026 19:36:41.248] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang block.nsdemo.crystal = Pack Crystal
+[11Nov2026 19:36:41.249] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang block.modjs.crystal = Modjs Crystal
+[11Nov2026 19:36:41.249] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK PASS lang item.nsdemo.shard = Pack Shard
+[11Nov2026 19:36:41.253] [Render thread/INFO] [modjs/]: [CLIENT] NS-CHECK ok frame
+[11Nov2026 19:36:45.242] [Render thread/INFO] [modjs/]: [CLIENT] NS-TOUR clean client exit

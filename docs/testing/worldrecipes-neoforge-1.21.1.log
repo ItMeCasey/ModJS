@@ -1,0 +1,19 @@
+[11Nov2026 19:32:25.378] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK waiting screen net.minecraft.client.gui.screens.BackupConfirmScreen@947782d
+[11Nov2026 19:32:31.987] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR READY world
+[11Nov2026 19:32:34.980] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR CLICKED stone
+[11Nov2026 19:32:36.985] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR DROPPED coal and sand
+[11Nov2026 19:32:38.468] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR at230 2 minecraft:gravel at 9.98 -60.00 4.57 inWater=false
+[11Nov2026 19:32:38.469] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR at230 2 minecraft:gravel at 9.98 -60.00 4.57 inWater=false
+[11Nov2026 19:32:38.469] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR recipes=2 bx=10 by=-60 bz=3
+[11Nov2026 19:32:44.540] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK ok frame
+[11Nov2026 19:32:44.968] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at 9.98 -60.00 4.57
+[11Nov2026 19:32:44.969] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at 9.98 -60.00 4.57
+[11Nov2026 19:32:44.969] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR item 2 minecraft:gravel at 9.98 -60.00 4.57
+[11Nov2026 19:32:44.970] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR engine spawned [minecraft:gravel x2, minecraft:diamond x1]
+[11Nov2026 19:32:44.971] [Server thread/INFO] [modjs/]: [SERVER] WR-TOUR pool block is Block{minecraft:water}[level=0]
+[11Nov2026 19:32:44.971] [Server thread/INFO] [modjs/]: [SERVER] WR-CHECK PASS item on block: Block{minecraft:gold_block}
+[11Nov2026 19:32:44.972] [Server thread/INFO] [modjs/]: [SERVER] WR-CHECK PASS drops: 2 minecraft:gravel
+[11Nov2026 19:32:44.972] [Server thread/INFO] [modjs/]: [SERVER] WR-CHECK PASS items in water: 2 minecraft:gravel,2 minecraft:gravel
+[11Nov2026 19:32:45.518] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK PASS viewer page on stone: [In the world: right-click Stone with Flint: the block becomes Gold Block, drops 2 Gravel.]
+[11Nov2026 19:32:45.518] [Render thread/INFO] [modjs/]: [CLIENT] WR-CHECK PASS viewer pages on flint and diamond
+[11Nov2026 19:32:49.012] [Render thread/INFO] [modjs/]: [CLIENT] WR-TOUR clean client exit

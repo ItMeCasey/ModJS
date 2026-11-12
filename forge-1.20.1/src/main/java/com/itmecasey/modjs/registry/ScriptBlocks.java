@@ -79,7 +79,7 @@ public final class ScriptBlocks {
 
     /** Menu factory used for the client side of every scripted block's menu type. */
     static ScriptMenu clientMenu(BlockBuilderJS def, int id, Inventory inventory) {
-        return new ScriptMenu(MENUS.get(def.id()), id, inventory, new SimpleContainer(def.slotCount()), new SimpleContainerData(Math.max(1, def.valueNames().size())), def, null);
+        return new ScriptMenu(MENUS.get(def.fullId()), id, inventory, new SimpleContainer(def.slotCount()), new SimpleContainerData(Math.max(1, def.valueNames().size())), def, null);
     }
 
     static ScriptBlock createBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties properties, BlockBuilderJS def) {
@@ -174,7 +174,7 @@ public final class ScriptBlocks {
 
         public ScriptEntity(BlockPos pos, BlockState state) {
             super(type, pos, state);
-            String path = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
+            String path = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
             this.def = ScriptBlockLogic.definition(path);
             this.items = NonNullList.withSize(def == null ? 0 : def.slotCount(), ItemStack.EMPTY);
             this.values = new int[def == null ? 0 : def.valueNames().size()];
@@ -339,7 +339,7 @@ public final class ScriptBlocks {
 
         @Override
         public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-            MenuType<ScriptMenu> menuType = def == null ? null : MENUS.get(def.id());
+            MenuType<ScriptMenu> menuType = def == null ? null : MENUS.get(def.fullId());
             if (menuType == null) {
                 return null;
             }

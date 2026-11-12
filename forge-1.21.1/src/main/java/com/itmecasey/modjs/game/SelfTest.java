@@ -332,6 +332,73 @@ public final class SelfTest {
         }
         level.setBlockAndUpdate(machinePos, Blocks.AIR.defaultBlockState());
 
+        check("namespaces: an item registers under its own namespace and a plain id stays in modjs", net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+            .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("nsdemo:ns_gem"))
+            && net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+            .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("nsdemo:ns_plain"))
+            && net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+            .noneMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("modjs:ns_gem"))
+            && net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+            .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("modjs:smoke_item")));
+        check("namespaces: a block with its block item and a fluid register under their own namespace", net.minecraft.core.registries.BuiltInRegistries.BLOCK.stream()
+            .anyMatch(b -> net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(b).toString().equals("nsdemo:ns_block"))
+            && net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+            .anyMatch(i -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i).toString().equals("nsdemo:ns_block"))
+            && net.minecraft.core.registries.BuiltInRegistries.FLUID.stream()
+            .anyMatch(f -> net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(f).toString().equals("nsdemo:ns_goo")));
+        check("namespaces: block data (loot table) is written under the namespace folder", com.itmecasey.modjs.pack.GeneratedData.SERVER.has("nsdemo",
+            com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/ns_block.json")
+            && !com.itmecasey.modjs.pack.GeneratedData.SERVER.has("modjs", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/ns_block.json"));
+
+        check("in-world recipes: the server script defined them", com.itmecasey.modjs.worldcraft.WorldRecipes.all().size() >= 6);
+        net.minecraft.core.BlockPos wcPos = new net.minecraft.core.BlockPos(20, 100, 20);
+        level.setBlockAndUpdate(wcPos, Blocks.STONE.defaultBlockState());
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.FLINT, 3));
+        boolean wcClicked = com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(player, wcPos, false, net.minecraft.world.InteractionHand.MAIN_HAND);
+        check("in-world recipes: an item on a block changes the block, drops items and uses the item", wcClicked && level.getBlockState(wcPos).is(Blocks.COBBLESTONE)
+            && player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).getCount() == 2
+            && com.itmecasey.modjs.worldcraft.WorldCraftAdapters.recentSpawns().contains("minecraft:gravel x2"));
+        check("in-world recipes: a click that matches no recipe is left alone", !com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(player, wcPos, false, net.minecraft.world.InteractionHand.MAIN_HAND));
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+
+        net.minecraft.core.BlockPos waterPos = new net.minecraft.core.BlockPos(22, 100, 20);
+        level.setBlockAndUpdate(waterPos, Blocks.WATER.defaultBlockState());
+        net.minecraft.world.entity.item.ItemEntity coal = new net.minecraft.world.entity.item.ItemEntity(level, 22.5, 100.3, 20.5, new ItemStack(Items.COAL, 2));
+        net.minecraft.world.entity.item.ItemEntity sand = new net.minecraft.world.entity.item.ItemEntity(level, 22.4, 100.3, 20.6, new ItemStack(Items.SAND, 1));
+        level.addFreshEntity(coal);
+        level.addFreshEntity(sand);
+        com.itmecasey.modjs.worldcraft.WorldRecipes.items(new com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Level(level),
+            java.util.List.of(new com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Drop(coal), new com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Drop(sand)));
+        check("in-world recipes: dropped items in water are used up and make the result", coal.isRemoved() && sand.isRemoved()
+            && com.itmecasey.modjs.worldcraft.WorldCraftAdapters.recentSpawns().contains("minecraft:diamond x1"));
+
+        net.minecraft.core.BlockPos dirtPos = new net.minecraft.core.BlockPos(24, 100, 20);
+        level.setBlockAndUpdate(dirtPos, Blocks.DIRT.defaultBlockState());
+        com.itmecasey.modjs.worldcraft.WorldCraftAdapters.crush(level, dirtPos);
+        check("in-world recipes: an anvil landing changes the block under it", level.getBlockState(dirtPos).is(Blocks.COARSE_DIRT));
+
+        net.minecraft.core.BlockPos sandPos = new net.minecraft.core.BlockPos(26, 100, 20);
+        level.setBlockAndUpdate(sandPos, Blocks.SAND.defaultBlockState());
+        com.itmecasey.modjs.worldcraft.WorldCraftAdapters.strike(level, sandPos.above());
+        check("in-world recipes: lightning changes the block it strikes", level.getBlockState(sandPos).is(Blocks.GLASS));
+
+        net.minecraft.core.BlockPos wcOrePos = new net.minecraft.core.BlockPos(28, 100, 20);
+        level.setBlockAndUpdate(wcOrePos, Blocks.COAL_ORE.defaultBlockState());
+        boolean oreCancelled = com.itmecasey.modjs.worldcraft.WorldCraftAdapters.breakBlock(player, wcOrePos);
+        check("in-world recipes: breaking a block can replace its drops", oreCancelled && level.getBlockState(wcOrePos).isAir()
+            && com.itmecasey.modjs.worldcraft.WorldCraftAdapters.recentSpawns().contains("minecraft:emerald x2"));
+
+        net.minecraft.core.BlockPos obsidianPos = new net.minecraft.core.BlockPos(30, 100, 20);
+        level.setBlockAndUpdate(obsidianPos, Blocks.OBSIDIAN.defaultBlockState());
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.FLINT_AND_STEEL));
+        check("in-world recipes: a left click recipe keeps the tool when consume is 0", com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(player, obsidianPos, true, net.minecraft.world.InteractionHand.MAIN_HAND)
+            && level.getBlockState(obsidianPos).is(Blocks.CRYING_OBSIDIAN) && !player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty());
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        for (net.minecraft.core.BlockPos cleanup : new net.minecraft.core.BlockPos[] {wcPos, waterPos, dirtPos, sandPos, wcOrePos, obsidianPos}) {
+            level.setBlockAndUpdate(cleanup, Blocks.AIR.defaultBlockState());
+        }
+        check("in-world recipes: recipe viewers get a page for the items they involve", new com.itmecasey.modjs.client.RecipeViewerEventJS.AddInformation().info().containsKey("minecraft:flint"));
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

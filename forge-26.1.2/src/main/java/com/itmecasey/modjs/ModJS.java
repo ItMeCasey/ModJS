@@ -77,6 +77,7 @@ public class ModJS {
         ModJSNetwork.init();
         com.itmecasey.modjs.script.ModJSContextFactory.addWrapAdapter(com.itmecasey.modjs.game.BlockFacades::adapt);
         GameEvents.register();
+        com.itmecasey.modjs.worldcraft.WorldCraftHooks.register();
         com.itmecasey.modjs.game.ExtraGameEvents.register();
         SelfTest.register();
         if (FMLEnvironment.dist == Dist.CLIENT) {

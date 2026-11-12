@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.11.33
+
+All ten builds.
+
+- **New: your own namespace.** `event.create('mypack:ruby')` in `StartupEvents.registry` registers `mypack:ruby`; a plain `ruby` still goes to `modjs:ruby`, so existing scripts do not change. It works for items, blocks (including scripted blocks and their menus), fluids, creative tabs, tool tiers and armor materials. Models, blockstates, language entries, loot tables, tags, repair tags and the default textures (`mypack:item/ruby`) are written under `assets/mypack` and `data/mypack`, and a mod-ids check refuses a namespace that is not lowercase letters, digits, `_ . -` or is `minecraft`. A duplicate is checked per full id (`modjs:ruby` and `mypack:ruby` can both exist), and an item and a block with an item that share a full id are reported. `event.namespace('mypack')` makes the plain ids of one handler go to that namespace. Unify, tooltips and the recipe viewer pages use the full id.
+- **New: in-world crafting** (like the Lychee mod): `ServerEvents.worldRecipes(event => {...})` with right-click an item on a block (`itemOnBlock`), left-click (`leftClickBlock`), dropped items in a block such as water or a cauldron (`itemsInBlock`) or on top of one (`itemsOnBlock`), an anvil landing on a block (`anvil`), lightning (`lightning`, optionally with items lying nearby), random block changes near players (`randomTick`) and breaking blocks with extra or replaced drops (`blockBreak`). Recipes can need sneaking, a hand, a tag, a block state, can use up or keep the item, wear the tool, roll a chance, turn or remove the block, drop or give items and run a command. Every recipe shows up as an information page in JEI, EMI, REI and Barely Enough Items on the items it involves. Script only; `/modjs reload` applies changes.
+- Examples in `examples/namespaces` and `examples/world-recipes`, wiki pages, typings.
+
 ## 2026.11.32
 
 All ten builds.

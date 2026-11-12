@@ -36,3 +36,13 @@ ServerEvents.loaded(event => {
   const Items = Java.loadClass('net.minecraft.world.item.Items');
   console.log('ender pearl max stack: ' + Items.ENDER_PEARL.getDefaultInstance().getMaxStackSize());
 });
+
+// In-world crafting, checked by the self test.
+ServerEvents.worldRecipes(event => {
+  event.itemOnBlock('minecraft:stone', 'minecraft:flint').turnInto('minecraft:cobblestone').drop('minecraft:gravel', 2).id('selftest:flint');
+  event.itemsInBlock('minecraft:water', ['minecraft:coal x2', 'minecraft:sand']).drop('minecraft:diamond').id('selftest:water');
+  event.anvil('minecraft:dirt').turnInto('minecraft:coarse_dirt');
+  event.lightning('minecraft:sand').turnInto('minecraft:glass');
+  event.blockBreak('minecraft:coal_ore').replaceDrops().drop('minecraft:emerald', 2);
+  event.leftClickBlock('minecraft:obsidian', 'minecraft:flint_and_steel').turnInto('minecraft:crying_obsidian').consume(0);
+});

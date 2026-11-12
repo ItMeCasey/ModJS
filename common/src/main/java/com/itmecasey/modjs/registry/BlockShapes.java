@@ -7,13 +7,12 @@ import com.itmecasey.modjs.pack.GeneratedData;
 
 /** Writes the blockstate and model JSON for the shaped block types (slab, stairs, wall, fence). */
 final class BlockShapes {
-    private static final String NS = RegistryManager.NAMESPACE;
-
     private BlockShapes() {
     }
 
     /** The model the block item uses. */
     static String itemModel(BlockBuilderJS block) {
+        final String NS = block.namespace();
         return switch (block.type()) {
             case "wall", "fence" -> NS + ":block/" + block.id() + "_inventory";
             default -> block.hasCustomModel() ? BlockModels.customModelId(block) : NS + ":block/" + block.id();
@@ -21,23 +20,24 @@ final class BlockShapes {
     }
 
     static void write(GeneratedData data, BlockBuilderJS block) {
+        final String NS = block.namespace();
         String id = block.id();
         String tex = block.texture();
         switch (block.type()) {
             case "slab" -> {
-                model(data, id, "minecraft:block/slab", tex, "bottom", "top", "side");
-                model(data, id + "_top", "minecraft:block/slab_top", tex, "bottom", "top", "side");
-                model(data, id + "_double", "minecraft:block/cube_all", tex, "all");
+                model(data, NS, id, "minecraft:block/slab", tex, "bottom", "top", "side");
+                model(data, NS, id + "_top", "minecraft:block/slab_top", tex, "bottom", "top", "side");
+                model(data, NS, id + "_double", "minecraft:block/cube_all", tex, "all");
                 JsonObject variants = new JsonObject();
                 variants.add("type=bottom", variant(NS + ":block/" + id, 0, 0, false));
                 variants.add("type=top", variant(NS + ":block/" + id + "_top", 0, 0, false));
                 variants.add("type=double", variant(NS + ":block/" + id + "_double", 0, 0, false));
-                state(data, id, "variants", variants);
+                state(data, NS, id, "variants", variants);
             }
             case "stairs" -> {
-                model(data, id, "minecraft:block/stairs", tex, "bottom", "top", "side");
-                model(data, id + "_inner", "minecraft:block/inner_stairs", tex, "bottom", "top", "side");
-                model(data, id + "_outer", "minecraft:block/outer_stairs", tex, "bottom", "top", "side");
+                model(data, NS, id, "minecraft:block/stairs", tex, "bottom", "top", "side");
+                model(data, NS, id + "_inner", "minecraft:block/inner_stairs", tex, "bottom", "top", "side");
+                model(data, NS, id + "_outer", "minecraft:block/outer_stairs", tex, "bottom", "top", "side");
                 JsonObject variants = new JsonObject();
                 String[] facings = {"east", "south", "west", "north"};
                 String[] shapes = {"straight", "outer_right", "outer_left", "inner_right", "inner_left"};
@@ -58,13 +58,13 @@ final class BlockShapes {
                         }
                     }
                 }
-                state(data, id, "variants", variants);
+                state(data, NS, id, "variants", variants);
             }
             case "wall" -> {
-                model(data, id + "_post", "minecraft:block/template_wall_post", tex, "wall");
-                model(data, id + "_side", "minecraft:block/template_wall_side", tex, "wall");
-                model(data, id + "_side_tall", "minecraft:block/template_wall_side_tall", tex, "wall");
-                model(data, id + "_inventory", "minecraft:block/wall_inventory", tex, "wall");
+                model(data, NS, id + "_post", "minecraft:block/template_wall_post", tex, "wall");
+                model(data, NS, id + "_side", "minecraft:block/template_wall_side", tex, "wall");
+                model(data, NS, id + "_side_tall", "minecraft:block/template_wall_side_tall", tex, "wall");
+                model(data, NS, id + "_inventory", "minecraft:block/wall_inventory", tex, "wall");
                 JsonArray parts = new JsonArray();
                 JsonObject up = new JsonObject();
                 up.addProperty("up", "true");
@@ -78,12 +78,12 @@ final class BlockShapes {
                         parts.add(part(when, variant(NS + ":block/" + id + side, 0, i * 90, true)));
                     }
                 }
-                state(data, id, "multipart", parts);
+                state(data, NS, id, "multipart", parts);
             }
             case "fence" -> {
-                model(data, id + "_post", "minecraft:block/fence_post", tex, "texture");
-                model(data, id + "_side", "minecraft:block/fence_side", tex, "texture");
-                model(data, id + "_inventory", "minecraft:block/fence_inventory", tex, "texture");
+                model(data, NS, id + "_post", "minecraft:block/fence_post", tex, "texture");
+                model(data, NS, id + "_side", "minecraft:block/fence_side", tex, "texture");
+                model(data, NS, id + "_inventory", "minecraft:block/fence_inventory", tex, "texture");
                 JsonArray parts = new JsonArray();
                 parts.add(part(null, variant(NS + ":block/" + id + "_post", 0, 0, false)));
                 String[] dirs = {"north", "east", "south", "west"};
@@ -92,13 +92,13 @@ final class BlockShapes {
                     when.addProperty(dirs[i], "true");
                     parts.add(part(when, variant(NS + ":block/" + id + "_side", 0, i * 90, true)));
                 }
-                state(data, id, "multipart", parts);
+                state(data, NS, id, "multipart", parts);
             }
             default -> throw new IllegalStateException(block.type());
         }
     }
 
-    private static void model(GeneratedData data, String name, String parent, String texture, String... keys) {
+    private static void model(GeneratedData data, String NS, String name, String parent, String texture, String... keys) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parent);
         JsonObject textures = new JsonObject();
@@ -133,7 +133,7 @@ final class BlockShapes {
         return out;
     }
 
-    private static void state(GeneratedData data, String id, String key, JsonElement value) {
+    private static void state(GeneratedData data, String NS, String id, String key, JsonElement value) {
         JsonObject state = new JsonObject();
         state.add(key, value);
         data.putJson(NS, "blockstates/" + id, state);
