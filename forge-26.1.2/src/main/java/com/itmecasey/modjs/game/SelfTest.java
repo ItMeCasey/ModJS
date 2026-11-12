@@ -427,6 +427,31 @@ public final class SelfTest {
             level.setBlockAndUpdate(waClean, Blocks.AIR.defaultBlockState());
         }
 
+        // player-rules block break (breakBlock): tool wear, no BlockEvents.broken recursion, reach limit
+        net.minecraft.world.phys.Vec3 sbOrigin = player.position();
+        net.minecraft.world.item.ItemStack sbAxe = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_AXE);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sbAxe);
+        player.setPos(52.5, 100.0, 40.5);
+        net.minecraft.core.BlockPos sbBase = new net.minecraft.core.BlockPos(50, 100, 40);
+        for (int i = 0; i < 4; i++) {
+            level.setBlockAndUpdate(sbBase.above(i), Blocks.OAK_LOG.defaultBlockState());
+        }
+        GameEventJS sbEvent = new GameEventJS().player(player).level(level);
+        boolean sbChained = false;
+        try {
+            sbChained = sbEvent.breakBlock(50, 100, 40, true);
+        } catch (NullPointerException cancelledForFakePlayer) {
+            // the script cancelled the break and the game then tried to resync the client of this connectionless test player
+        }
+        check("breakBlock runs BlockEvents.broken handlers only when asked (the self test script cancels log breaks)", !sbChained && level.getBlockState(sbBase).is(Blocks.OAK_LOG));
+        boolean sbBroke = sbEvent.breakBlock(50, 100, 40);
+        check("breakBlock skips BlockEvents.broken (no recursion) and breaks the block with the player's tool", sbBroke && level.getBlockState(sbBase).isAir() && sbAxe.getDamageValue() == 1);
+        check("breakBlock refuses air and blocks out of reach", !sbEvent.breakBlock(50, 100, 40) && !sbEvent.breakBlock(500, 100, 40));
+        int sbMany = sbEvent.breakBlocks(java.util.List.of(java.util.List.of(50, 101, 40), java.util.List.of(50, 102, 40), java.util.List.of(50, 103, 40)));
+        check("breakBlocks breaks a whole list and wears the tool once per block", sbMany == 3 && level.getBlockState(sbBase.above(3)).isAir() && sbAxe.getDamageValue() == 4);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+        player.setPos(sbOrigin.x, sbOrigin.y, sbOrigin.z);
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

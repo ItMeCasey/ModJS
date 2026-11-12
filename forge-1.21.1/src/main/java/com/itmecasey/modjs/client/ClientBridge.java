@@ -40,6 +40,7 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        ClientQueriesImpl.install();
         net.minecraft.client.Minecraft toastHost = net.minecraft.client.Minecraft.getInstance();
         toastHost.execute(() -> ClientTweaks.installToastComponent(new ScriptedToasts(toastHost)));
 

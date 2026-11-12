@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class LevelJSTest {
+public class LevelJSTest {
     /** A level made of a map of block ids with a loaded area from 0 to 50 on every axis. */
-    static final class Fake implements WorldHandles.LevelHandle {
-        final Map<String, String> blocks = new HashMap<>();
+    public static final class Fake implements WorldHandles.LevelHandle {
+        public final Map<String, String> blocks = new HashMap<>();
         final List<String> destroyed = new ArrayList<>();
         final List<String> grown = new ArrayList<>();
 

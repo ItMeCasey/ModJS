@@ -114,6 +114,60 @@ public final class GameEventJS extends EventJS {
 
     // -- script API ----------------------------------------------------------------------------------------------
 
+    /** True while a block break that a script started with {@code breakBlock} is running (those do not call {@code BlockEvents.broken} again). */
+    public boolean isFromScript() {
+        return com.itmecasey.modjs.event.ScriptBreak.active();
+    }
+
+    /**
+     * Breaks the block as the event's player would: the player's tool is used (durability, enchantments, the right drops), hunger goes down,
+     * game mode and protection mods can refuse, and the block's drops appear. Returns whether the block broke. The block must be loaded, not
+     * air and within {@value com.itmecasey.modjs.event.ScriptBreak#MAX_DISTANCE} blocks of the player. {@code BlockEvents.broken} handlers do not run
+     * for this block (no recursion); pass {@code true} as the last argument to run them anyway.
+     */
+    public boolean breakBlock(int x, int y, int z) {
+        return breakBlock(x, y, z, false);
+    }
+
+    public boolean breakBlock(int x, int y, int z, boolean fireEvents) {
+        if (!(player instanceof ServerPlayer serverPlayer) || !(serverPlayer.level() instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
+            return false;
+        }
+        BlockPos target = new BlockPos(x, y, z);
+        double max = com.itmecasey.modjs.event.ScriptBreak.MAX_DISTANCE;
+        if (serverPlayer.distanceToSqr(x + 0.5, y + 0.5, z + 0.5) > max * max || !serverLevel.hasChunkAt(target) || serverLevel.getBlockState(target).isAir()) {
+            return false;
+        }
+        return com.itmecasey.modjs.event.ScriptBreak.run(fireEvents, () -> serverPlayer.gameMode.destroyBlock(target));
+    }
+
+    /**
+     * Breaks every position of a list (such as {@code e.world.connected(...)}) with {@link #breakBlock}, nearest the player first, and stops when
+     * the tool in hand breaks. Returns how many blocks broke.
+     */
+    public int breakBlocks(Object positions) {
+        return breakBlocks(positions, false);
+    }
+
+    public int breakBlocks(Object positions, boolean fireEvents) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
+            return 0;
+        }
+        java.util.List<int[]> list = new java.util.ArrayList<>(com.itmecasey.modjs.worldcraft.Positions.parse(positions, com.itmecasey.modjs.worldcraft.LevelJS.MAX_RESULTS, "breakBlocks"));
+        list.sort(java.util.Comparator.comparingDouble(p -> serverPlayer.distanceToSqr(p[0] + 0.5, p[1] + 0.5, p[2] + 0.5)));
+        boolean hadTool = !serverPlayer.getMainHandItem().isEmpty();
+        int broken = 0;
+        for (int[] p : list) {
+            if (breakBlock(p[0], p[1], p[2], fireEvents)) {
+                broken++;
+            }
+            if (hadTool && serverPlayer.getMainHandItem().isEmpty()) {
+                break;
+            }
+        }
+        return broken;
+    }
+
     public Player getPlayer() {
         return player;
     }

@@ -65,6 +65,9 @@ public final class GameEvents {
 
     /** Block events reach handlers by block id and by block tag: {@code BlockEvents.broken('#minecraft:logs', ...)}. */
     private static boolean fireBlock(String name, BlockState state, GameEventJS event) {
+        if ("broken".equals(name) && com.itmecasey.modjs.event.ScriptBreak.suppressesEvents()) {
+            return false;
+        }
         if (!EventGroups.BLOCK.hasHandlers(name)) {
             return false;
         }

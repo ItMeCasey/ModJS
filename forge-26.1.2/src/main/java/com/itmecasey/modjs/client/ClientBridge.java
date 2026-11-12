@@ -45,6 +45,8 @@ public final class ClientBridge {
     }
 
     public static void register() {
+        ClientQueriesImpl.install();
+        OutlineHook.register();
         com.itmecasey.modjs.client.ScriptedScreens.setScreenshotHook(name -> {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
             mc.execute(() -> net.minecraft.client.Screenshot.grab(mc.gameDirectory, name, mc.getMainRenderTarget(), 1, message -> {

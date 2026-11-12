@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.11.35
+
+All ten builds (the new calls are in the shared code and every build has its own drawing and game hooks).
+
+- **New: `Overlay.outline(id, positions, { color, width, fill, throughWalls })`.** Outlines, and optionally tints, any block in the world; `positions` is what `world.connected` or `world.findBlocks` return (or `[x, y, z]` arrays). Sets hold up to 4096 blocks; calling it again with the same id replaces them; `Overlay.getOutline` and `Overlay.removeOutline` find and remove them. `throughWalls` draws over blocks in front on 1.20.1 and 1.21.1; `width` is honored on 26.x. **Forge 26.1.2, 26.2 and 26.3 draw outlines only while the crosshair is on a block** (Forge has no level-wide render event there; the block highlight callback is used); every other build draws always. (GitHub issue 3)
+- **New: reading the client's world.** `Client.lookingAt()` answers `{x, y, z, id, face, distance}` for the block under the crosshair (or null), `Client.world` has the read calls of `event.world` (`getBlock`, `matches`, `findBlocks`, `connected`, ...) for loaded blocks, and `Client.getBlock(x, y, z)` is a shortcut. Changing calls are errors on the client. (GitHub issue 3)
+- **New: `Client.isKeyHeld(id)`** for keys registered with `ClientEvents.keyBindings`, so a tick handler can follow a held key. An unregistered id is an error. (GitHub issue 3)
+- **New: `event.breakBlock(x, y, z)` and `event.breakBlocks(positions)`** break blocks as the event's player: the tool in hand is used (durability, enchantments, drops), hunger goes down, game mode and protection mods can refuse. They must be loaded, not air and within 64 blocks. Breaks started this way skip `BlockEvents.broken` handlers (no recursion); pass `true` as the last argument to run them (nesting stops at 3 levels), and `event.fromScript` tells a handler where the break came from. `breakBlocks` goes nearest first and stops when the tool breaks. (GitHub issue 3)
+- Example `examples/vein-miner` (hold a key to outline a tree, break one log to fell it with your tool), wiki page "Vein miner", typings and wiki sections for all of it.
+
 ## 2026.11.34
 
 All ten builds.

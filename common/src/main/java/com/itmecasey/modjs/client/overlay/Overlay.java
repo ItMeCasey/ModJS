@@ -30,6 +30,7 @@ public final class Overlay {
     public static synchronized void clear() {
         ELEMENTS.clear();
         WorldOverlay.clear();
+        WorldOutlines.clear();
     }
 
     public static synchronized OverlayElement get(String id) {
@@ -139,6 +140,29 @@ public final class Overlay {
          */
         public void forBlock(String blockId, org.mozilla.javascript.Function template) {
             WorldOverlay.forBlock(blockId, template);
+        }
+
+        /**
+         * Outlines (and optionally tints) whole blocks, any block in the world: {@code Overlay.outline('veins', positions, { color: '#ffd24a', width: 2, fill: '#33ffd24a' })}.
+         * {@code positions} is an array of {x, y, z} objects or [x, y, z] arrays, such as the result of {@code world.connected(...)}. Calling it again with the
+         * same id replaces the blocks; the returned set has {@code setPositions}, {@code add}, {@code clear} and {@code remove}.
+         */
+        public WorldOutlines.Outline outline(String id, Object positions, Object options) {
+            return WorldOutlines.put(id, positions, options);
+        }
+
+        public WorldOutlines.Outline outline(String id, Object positions) {
+            return WorldOutlines.put(id, positions, null);
+        }
+
+        /** The outline set with this id, or null. */
+        public WorldOutlines.Outline getOutline(String id) {
+            return WorldOutlines.get(id);
+        }
+
+        /** Removes one outline set; returns whether it existed. */
+        public boolean removeOutline(String id) {
+            return WorldOutlines.remove(id);
         }
 
         /** Global limits of world overlays: {@code Overlay.world.maxDistance} and {@code maxElements}. */

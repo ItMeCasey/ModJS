@@ -187,10 +187,18 @@ public final class WorldCraftAdapters {
     }
 
     public static final class Level implements LevelHandle {
-        private final ServerLevel level;
+        private final net.minecraft.world.level.Level level;
 
-        public Level(ServerLevel level) {
+        /** A server level, or a client level for read-only queries (matching, reading and describing blocks). */
+        public Level(net.minecraft.world.level.Level level) {
             this.level = level;
+        }
+
+        private ServerLevel server() {
+            if (level instanceof ServerLevel serverLevel) {
+                return serverLevel;
+            }
+            throw new IllegalStateException("this world access needs the server");
         }
 
         @Override
@@ -276,7 +284,7 @@ public final class WorldCraftAdapters {
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof net.minecraft.world.level.block.BonemealableBlock growable && growable.isValidBonemealTarget(level, pos, state)
                 && growable.isBonemealSuccess(level, level.random, pos, state)) {
-                growable.performBonemeal(level, level.random, pos, state);
+                growable.performBonemeal(server(), level.random, pos, state);
                 return true;
             }
             return false;
@@ -324,7 +332,7 @@ public final class WorldCraftAdapters {
         public void runCommand(int x, int y, int z, String command) {
             var server = level.getServer();
             if (server != null) {
-                server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withLevel(level).withPosition(Vec3.atCenterOf(new BlockPos(x, y, z))), command);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withLevel(server()).withPosition(Vec3.atCenterOf(new BlockPos(x, y, z))), command);
             }
         }
 

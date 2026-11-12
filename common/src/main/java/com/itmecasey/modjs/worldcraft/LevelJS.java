@@ -32,9 +32,24 @@ public final class LevelJS {
     public static final int MAX_VOLUME = 262_144;
 
     private final LevelHandle level;
+    private final ScriptType scriptType;
+    private final boolean readOnly;
 
     public LevelJS(LevelHandle level) {
+        this(level, ScriptType.SERVER, false);
+    }
+
+    /** A view for scripts of one side; a read-only view (the client's world) refuses to break, place or grow blocks. */
+    public LevelJS(LevelHandle level, ScriptType scriptType, boolean readOnly) {
         this.level = level;
+        this.scriptType = scriptType;
+        this.readOnly = readOnly;
+    }
+
+    private void writable(String what) {
+        if (readOnly) {
+            throw org.mozilla.javascript.Context.reportRuntimeError(what + " changes the world, so it needs the server: use it from a server script (client scripts can only read blocks)");
+        }
     }
 
     /** The dimension id, such as {@code minecraft:overworld}. */
@@ -154,11 +169,13 @@ public final class LevelJS {
      * Returns false when the position is not loaded or already air.
      */
     public boolean destroyBlock(int x, int y, int z, boolean drop) {
+        writable("destroyBlock");
         return level.destroyBlock(x, y, z, drop);
     }
 
     /** Replaces the block with another (id and optional state values in brackets); false for an unknown block. */
     public boolean setBlock(int x, int y, int z, String block) {
+        writable("setBlock");
         return level.setBlock(x, y, z, block);
     }
 
@@ -167,10 +184,11 @@ public final class LevelJS {
      * whether anything grew. No item is used up.
      */
     public boolean bonemeal(int x, int y, int z) {
+        writable("bonemeal");
         return level.bonemeal(x, y, z);
     }
 
-    private static NativeObject position(int x, int y, int z) {
+    private NativeObject position(int x, int y, int z) {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("x", x);
         out.put("y", y);
@@ -178,15 +196,15 @@ public final class LevelJS {
         return ScriptBlockCalls.toObject(out, scope());
     }
 
-    private static Scriptable scope() {
+    private Scriptable scope() {
         try {
-            return ScriptManager.of(ScriptType.SERVER).scope();
+            return ScriptManager.of(scriptType).scope();
         } catch (RuntimeException e) {
             return null; // no script engine (unit tests): bare objects are enough to read fields
         }
     }
 
-    private static NativeArray array(List<Object> items) {
+    private NativeArray array(List<Object> items) {
         NativeArray array = new NativeArray(items.toArray());
         Scriptable scope = scope();
         if (scope != null) {

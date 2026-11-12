@@ -77,6 +77,30 @@ public final class ScriptedScreens {
 
     /** The {@code Client} global in scripts. */
     public static final class Binding {
+        /**
+         * The block under the crosshair as {@code {x, y, z, id, face, distance}} ({@code face} is the side you look at: up, down, north, south,
+         * east or west), or null when you look at no block or are not in a world.
+         */
+        public org.mozilla.javascript.NativeObject lookingAt() {
+            return ClientQueries.lookingAt();
+        }
+
+        /** The client's world for reading: {@code getBlock}, {@code getBlockId}, {@code matches}, {@code findBlocks}, {@code connected}. Null outside a world. */
+        public com.itmecasey.modjs.worldcraft.LevelJS getWorld() {
+            return ClientQueries.world();
+        }
+
+        /** The block at a position as {@code {id, properties, x, y, z}}, or null when that part of the world is not loaded. */
+        public org.mozilla.javascript.NativeObject getBlock(int x, int y, int z) {
+            com.itmecasey.modjs.worldcraft.LevelJS world = ClientQueries.world();
+            return world == null ? null : world.getBlock(x, y, z);
+        }
+
+        /** Whether the key registered with {@code ClientEvents.keyBindings} under this id is held down right now. */
+        public boolean isKeyHeld(String id) {
+            return ClientQueries.keyHeld(id);
+        }
+
         /** Opens a screen defined with {@code ClientEvents.screens}. */
         public void openScreen(String name) {
             if (get(name) == null) {

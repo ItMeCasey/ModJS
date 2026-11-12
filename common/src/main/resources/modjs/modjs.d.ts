@@ -205,6 +205,30 @@ interface WorldOverlayCommon {
   visible?: boolean;
 }
 
+/** A list of block positions: {x, y, z} objects (what findBlocks and connected return) or [x, y, z] arrays. */
+type BlockPositions = Array<BlockPosition | [number, number, number]>;
+
+/** A set of outlined blocks made by Overlay.outline. */
+interface BlockOutline {
+  readonly id: string;
+  /** Edge color, '#ffd24a' or 0xAARRGGBB. An alpha of 0 draws no edges. */
+  color: number | string;
+  /** Edge width in pixels (26.x builds; older builds use the standard line width). */
+  width: number;
+  /** Draw over blocks in front (1.20.1 and 1.21.1 builds; the 26.x builds draw with depth). */
+  throughWalls: boolean;
+  /** Tint for the faces of every block, or null for none. */
+  fill: number | string | null;
+  visible: boolean;
+  alpha: number;
+  /** Number of outlined blocks. */
+  readonly count: number;
+  setPositions(positions: BlockPositions): void;
+  add(positions: BlockPositions): void;
+  clear(): void;
+  remove(): void;
+}
+
 /** The overlay of one block position. */
 interface WorldOverlayAt {
   readonly x: number;
@@ -231,6 +255,13 @@ declare const Overlay: {
   data(x: number, y: number, z: number): Record<string, any>;
   /** Runs when a block of this id comes near and again when its synced data changes; at is cleared before each run. */
   forBlock(blockId: string, template: (at: WorldOverlayAt, data: Record<string, any>, pos: { x: number; y: number; z: number }) => void): void;
+  /**
+   * Outlines (and optionally tints) whole blocks, any block in the world, up to 4096 per set. Calling it again with the same id replaces the blocks.
+   * Forge 26.x draws only while the crosshair is on a block (Forge has no level-wide render event there); every other build draws always.
+   */
+  outline(id: string, positions: BlockPositions, options?: { color?: number | string; width?: number; fill?: number | string; throughWalls?: boolean; alpha?: number; visible?: boolean }): BlockOutline;
+  getOutline(id: string): BlockOutline | null;
+  removeOutline(id: string): boolean;
   /** Limits for world overlays. */
   world: { maxDistance: number; maxElements: number; readonly positions: number };
   /** The screen overlay (bar, text, rect, image, item, get, has, remove, clear). */
@@ -318,6 +349,15 @@ interface LevelAccess {
   bonemeal(x: number, y: number, z: number): boolean;
 }
 
+/** The block under the crosshair (Client.lookingAt). */
+interface LookingAt extends BlockPosition {
+  id: string;
+  /** The side you look at: up, down, north, south, east or west. */
+  face: string;
+  /** Distance from your eyes to the point you look at, in blocks. */
+  distance: number;
+}
+
 interface GameEvent extends EventBase {
   /** The dimension of the event, such as 'minecraft:overworld'. */
   dimension: string;
@@ -325,6 +365,16 @@ interface GameEvent extends EventBase {
   world: LevelAccess | null;
   /** Whether the event's player is crouching right now. */
   sneaking: boolean;
+  /** True inside handlers for a break that a script started with breakBlock (see the fireEvents argument). */
+  fromScript: boolean;
+  /**
+   * Breaks the block as the event's player: their tool is used (durability, enchantments, the right drops), hunger goes down, game mode and
+   * protection mods can refuse. The block must be loaded, not air and within 64 blocks. BlockEvents.broken handlers do not run for it
+   * unless fireEvents is true (nesting stops at 3). Returns whether it broke.
+   */
+  breakBlock(x: number, y: number, z: number, fireEvents?: boolean): boolean;
+  /** breakBlock for a list (such as world.connected(...)), nearest the player first; stops when the tool breaks. Returns how many broke. */
+  breakBlocks(positions: BlockPositions, fireEvents?: boolean): number;
   player: MinecraftObject;
   playerName: string;
   level: MinecraftObject;
@@ -495,6 +545,19 @@ interface KeyBindingEvent extends EventBase {
   register(id: string, defaultKey: number, name?: string): void;
 }
 interface KeyBindingPressedEvent extends EventBase { readonly id: string; }
+
+/** The Client global (client scripts). */
+declare const Client: {
+  /** The block under the crosshair, or null. */
+  lookingAt(): LookingAt | null;
+  /** The client's world for reading (getBlock, matches, findBlocks, connected); destroyBlock, setBlock and bonemeal are errors here. Null outside a world. */
+  readonly world: LevelAccess | null;
+  /** The block at a position, or null when not loaded. */
+  getBlock(x: number, y: number, z: number): BlockInfo | null;
+  /** Whether the key registered with ClientEvents.keyBindings under this id is held down right now. */
+  isKeyHeld(id: string): boolean;
+  [other: string]: any;
+};
 
 declare const ClientEvents: {
   keyBindings(handler: Handler<KeyBindingEvent>): void;
