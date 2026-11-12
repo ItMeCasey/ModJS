@@ -135,9 +135,20 @@ public final class WorldCraftAdapters {
 
     public static final class Player implements PlayerHandle {
         private final ServerPlayer player;
+        private final boolean forceSurvival;
 
         public Player(ServerPlayer player) {
+            this(player, false);
+        }
+
+        /** {@code forceSurvival} treats the player as a survival player whatever their game mode (the self test's fake player). */
+        public Player(ServerPlayer player, boolean forceSurvival) {
             this.player = player;
+            this.forceSurvival = forceSurvival;
+        }
+
+        ServerPlayer player() {
+            return player;
         }
 
         @Override
@@ -147,7 +158,7 @@ public final class WorldCraftAdapters {
 
         @Override
         public boolean creative() {
-            return player.isCreative();
+            return !forceSurvival && player.isCreative();
         }
 
         @Override
@@ -313,18 +324,26 @@ public final class WorldCraftAdapters {
 
     /** A player clicked a block on the server. Returns true when an in-world recipe happened and the click should be cancelled. */
     public static boolean click(ServerPlayer player, BlockPos pos, boolean left, InteractionHand hand) {
-        if (WorldRecipes.all().isEmpty() || !(player.level() instanceof ServerLevel level)) {
+        return click(new Player(player), pos, left, hand);
+    }
+
+    public static boolean click(Player player, BlockPos pos, boolean left, InteractionHand hand) {
+        if (WorldRecipes.all().isEmpty() || !(player.player().level() instanceof ServerLevel level)) {
             return false;
         }
-        return WorldRecipes.click(new Level(level), new Player(player), pos.getX(), pos.getY(), pos.getZ(), left, hand == InteractionHand.OFF_HAND);
+        return WorldRecipes.click(new Level(level), player, pos.getX(), pos.getY(), pos.getZ(), left, hand == InteractionHand.OFF_HAND);
     }
 
     /** A player is breaking a block. Returns true when the normal break must be cancelled. */
     public static boolean breakBlock(ServerPlayer player, BlockPos pos) {
-        if (WorldRecipes.all().isEmpty() || !(player.level() instanceof ServerLevel level)) {
+        return breakBlock(new Player(player), pos);
+    }
+
+    public static boolean breakBlock(Player player, BlockPos pos) {
+        if (WorldRecipes.all().isEmpty() || !(player.player().level() instanceof ServerLevel level)) {
             return false;
         }
-        return WorldRecipes.breakBlock(new Level(level), new Player(player), pos.getX(), pos.getY(), pos.getZ());
+        return WorldRecipes.breakBlock(new Level(level), player, pos.getX(), pos.getY(), pos.getZ());
     }
 
     /** An entity is leaving the level: an anvil that landed crushes the block under it. */

@@ -360,14 +360,16 @@ public final class SelfTest {
             && !com.itmecasey.modjs.pack.GeneratedData.SERVER.has("modjs", com.itmecasey.modjs.format.DataFolders.lootTable() + "/blocks/ns_block.json"));
 
         check("in-world recipes: the server script defined them", com.itmecasey.modjs.worldcraft.WorldRecipes.all().size() >= 6);
+        // a fresh game test world can start players in creative, where recipes keep items and skip block drops
+        com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Player survivor = new com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Player(player, true);
         net.minecraft.core.BlockPos wcPos = new net.minecraft.core.BlockPos(20, 100, 20);
         level.setBlockAndUpdate(wcPos, Blocks.STONE.defaultBlockState());
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.FLINT, 3));
-        boolean wcClicked = com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(player, wcPos, false, net.minecraft.world.InteractionHand.MAIN_HAND);
+        boolean wcClicked = com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(survivor, wcPos, false, net.minecraft.world.InteractionHand.MAIN_HAND);
         check("in-world recipes: an item on a block changes the block, drops items and uses the item", wcClicked && level.getBlockState(wcPos).is(Blocks.COBBLESTONE)
             && player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).getCount() == 2
             && com.itmecasey.modjs.worldcraft.WorldCraftAdapters.recentSpawns().contains("minecraft:gravel x2"));
-        check("in-world recipes: a click that matches no recipe is left alone", !com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(player, wcPos, false, net.minecraft.world.InteractionHand.MAIN_HAND));
+        check("in-world recipes: a click that matches no recipe is left alone", !com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(survivor, wcPos, false, net.minecraft.world.InteractionHand.MAIN_HAND));
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 
         net.minecraft.core.BlockPos waterPos = new net.minecraft.core.BlockPos(22, 100, 20);
@@ -393,14 +395,14 @@ public final class SelfTest {
 
         net.minecraft.core.BlockPos wcOrePos = new net.minecraft.core.BlockPos(28, 100, 20);
         level.setBlockAndUpdate(wcOrePos, Blocks.COAL_ORE.defaultBlockState());
-        boolean oreCancelled = com.itmecasey.modjs.worldcraft.WorldCraftAdapters.breakBlock(player, wcOrePos);
+        boolean oreCancelled = com.itmecasey.modjs.worldcraft.WorldCraftAdapters.breakBlock(survivor, wcOrePos);
         check("in-world recipes: breaking a block can replace its drops", oreCancelled && level.getBlockState(wcOrePos).isAir()
             && com.itmecasey.modjs.worldcraft.WorldCraftAdapters.recentSpawns().contains("minecraft:emerald x2"));
 
         net.minecraft.core.BlockPos obsidianPos = new net.minecraft.core.BlockPos(30, 100, 20);
         level.setBlockAndUpdate(obsidianPos, Blocks.OBSIDIAN.defaultBlockState());
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.FLINT_AND_STEEL));
-        check("in-world recipes: a left click recipe keeps the tool when consume is 0", com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(player, obsidianPos, true, net.minecraft.world.InteractionHand.MAIN_HAND)
+        check("in-world recipes: a left click recipe keeps the tool when consume is 0", com.itmecasey.modjs.worldcraft.WorldCraftAdapters.click(survivor, obsidianPos, true, net.minecraft.world.InteractionHand.MAIN_HAND)
             && level.getBlockState(obsidianPos).is(Blocks.CRYING_OBSIDIAN) && !player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty());
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         for (net.minecraft.core.BlockPos cleanup : new net.minecraft.core.BlockPos[] {wcPos, waterPos, dirtPos, sandPos, wcOrePos, obsidianPos}) {
