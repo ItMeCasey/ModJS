@@ -26,7 +26,7 @@ public final class ScriptedKeys {
         KeyBindingEventJS.rebuild();
         for (KeyBindingEventJS.Spec spec : KeyBindingEventJS.current()) {
             KeyMapping mapping = new KeyMapping(spec.translationKey(), KeyConflictContext.IN_GAME, KeyModifier.NONE,
-                InputConstants.Type.KEYBOARD, spec.defaultKey(), KeyMapping.Category.MISC);
+                InputConstants.Type.KEYBOARD, KeyCodes.glfwToScancode(spec.defaultKey()), KeyMapping.Category.MISC);
             KEYS.put(spec.id(), mapping);
             event.register(mapping);
         }

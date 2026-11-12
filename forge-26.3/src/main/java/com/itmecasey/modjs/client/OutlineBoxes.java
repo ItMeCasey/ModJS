@@ -58,4 +58,32 @@ final class OutlineBoxes {
             });
         }
     }
+
+    /** One line of a merged outline, in absolute coordinates. */
+    static void segment(PoseStack stack, SubmitNodeCollector collector, Vec3 cam, double ax, double ay, double az, double bx, double by, double bz, int line, float width) {
+        if ((line >>> 24) == 0) {
+            return;
+        }
+        float x0 = (float) (ax - cam.x);
+        float y0 = (float) (ay - cam.y);
+        float z0 = (float) (az - cam.z);
+        float x1 = (float) (bx - cam.x);
+        float y1 = (float) (by - cam.y);
+        float z1 = (float) (bz - cam.z);
+        int a = (line >>> 24) & 0xFF;
+        int r = (line >> 16) & 0xFF;
+        int g = (line >> 8) & 0xFF;
+        int b = line & 0xFF;
+        float nx = x1 - x0;
+        float ny = y1 - y0;
+        float nz = z1 - z0;
+        float length = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
+        float fx = nx / length;
+        float fy = ny / length;
+        float fz = nz / length;
+        collector.submitCustomGeometry(stack, RenderTypes.lines(), (pose, consumer) -> {
+            consumer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a).setNormal(pose, fx, fy, fz).setLineWidth(width);
+            consumer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a).setNormal(pose, fx, fy, fz).setLineWidth(width);
+        });
+    }
 }

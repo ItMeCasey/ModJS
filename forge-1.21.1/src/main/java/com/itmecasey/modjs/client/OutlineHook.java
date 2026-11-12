@@ -40,9 +40,16 @@ public final class OutlineHook {
         Vec3 cam = camera.getPosition();
         List<double[]> seen = new ArrayList<>();
         List<double[]> front = new ArrayList<>();
-        WorldOutlines.draw((x0, y0, z0, x1, y1, z1, line, width, fill, through) -> {
-            double[] box = {x0 - cam.x, y0 - cam.y, z0 - cam.z, x1 - cam.x, y1 - cam.y, z1 - cam.z, line, fill};
-            (through ? seen : front).add(box);
+        WorldOutlines.draw(new WorldOutlines.Canvas() {
+            @Override
+            public void box(double x0, double y0, double z0, double x1, double y1, double z1, int line, float width, int fill, boolean through) {
+                (through ? seen : front).add(new double[] {0, x0 - cam.x, y0 - cam.y, z0 - cam.z, x1 - cam.x, y1 - cam.y, z1 - cam.z, line, fill});
+            }
+
+            @Override
+            public void segment(double x0, double y0, double z0, double x1, double y1, double z1, int line, float width, boolean through) {
+                (through ? seen : front).add(new double[] {1, x0 - cam.x, y0 - cam.y, z0 - cam.z, x1 - cam.x, y1 - cam.y, z1 - cam.z, line, 0});
+            }
         }, cam.x, cam.y, cam.z);
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         PoseStack stack = new PoseStack();
@@ -60,18 +67,19 @@ public final class OutlineHook {
         }
         VertexConsumer fills = buffers.getBuffer(RenderType.debugFilledBox());
         for (double[] b : boxes) {
-            int fill = (int) b[7];
-            if ((fill >>> 24) != 0) {
-                LevelRenderer.addChainedFilledBoxVertices(stack, fills, b[0], b[1], b[2], b[3], b[4], b[5],
+            int fill = (int) b[8];
+            if (b[0] == 0 && (fill >>> 24) != 0) {
+                LevelRenderer.addChainedFilledBoxVertices(stack, fills, b[1], b[2], b[3], b[4], b[5], b[6],
                     ((fill >> 16) & 0xFF) / 255.0f, ((fill >> 8) & 0xFF) / 255.0f, (fill & 0xFF) / 255.0f, ((fill >>> 24) & 0xFF) / 255.0f);
             }
         }
         buffers.endBatch(RenderType.debugFilledBox());
         VertexConsumer lines = buffers.getBuffer(RenderType.lines());
         for (double[] b : boxes) {
-            int line = (int) b[6];
+            int line = (int) b[7];
             if ((line >>> 24) != 0) {
-                LevelRenderer.renderLineBox(stack, lines, b[0], b[1], b[2], b[3], b[4], b[5],
+                // a merged-outline edge is a box with no thickness: the game draws its twelve (overlapping) edges
+                LevelRenderer.renderLineBox(stack, lines, b[1], b[2], b[3], b[4], b[5], b[6],
                     ((line >> 16) & 0xFF) / 255.0f, ((line >> 8) & 0xFF) / 255.0f, (line & 0xFF) / 255.0f, ((line >>> 24) & 0xFF) / 255.0f);
             }
         }

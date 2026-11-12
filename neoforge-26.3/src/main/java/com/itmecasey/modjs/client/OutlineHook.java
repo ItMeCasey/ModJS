@@ -21,7 +21,18 @@ public final class OutlineHook {
             return;
         }
         Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
-        WorldOutlines.draw((x0, y0, z0, x1, y1, z1, line, width, fill, through) ->
-            OutlineBoxes.box(event.getPoseStack(), event.getSubmitNodeCollector(), cam, x0, y0, z0, x1, y1, z1, line, width, fill), cam.x, cam.y, cam.z);
+        var stack = event.getPoseStack();
+        var collector = event.getSubmitNodeCollector();
+        WorldOutlines.draw(new WorldOutlines.Canvas() {
+            @Override
+            public void box(double x0, double y0, double z0, double x1, double y1, double z1, int line, float width, int fill, boolean through) {
+                OutlineBoxes.box(stack, collector, cam, x0, y0, z0, x1, y1, z1, line, width, fill);
+            }
+
+            @Override
+            public void segment(double x0, double y0, double z0, double x1, double y1, double z1, int line, float width, boolean through) {
+                OutlineBoxes.segment(stack, collector, cam, x0, y0, z0, x1, y1, z1, line, width);
+            }
+        }, cam.x, cam.y, cam.z);
     }
 }

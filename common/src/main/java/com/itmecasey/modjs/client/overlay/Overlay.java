@@ -151,8 +151,16 @@ public final class Overlay {
             return WorldOutlines.put(id, positions, options);
         }
 
-        public WorldOutlines.Outline outline(String id, Object positions) {
-            return WorldOutlines.put(id, positions, null);
+        /**
+         * {@code Overlay.outline(id, positions)} or, without an id, {@code Overlay.outline(positions, options)}: the set then gets an id of its own
+         * (its {@code id} field) that {@code remove()} and {@code Overlay.removeOutline} accept.
+         */
+        public WorldOutlines.Outline outline(Object first, Object second) {
+            Object plain = com.itmecasey.modjs.json.JsonUtil.unwrap(first);
+            if (plain instanceof CharSequence id) {
+                return WorldOutlines.put(id.toString(), second, null);
+            }
+            return WorldOutlines.put(WorldOutlines.nextId(), first, second);
         }
 
         /** The outline set with this id, or null. */

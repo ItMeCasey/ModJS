@@ -27,5 +27,5 @@ ClientEvents.tick(() => {
   }
   outlinedFor = key;
   const logs = Client.world.connected(hit.x, hit.y, hit.z, '#minecraft:logs', true, 64);
-  Overlay.outline('vein', logs, { color: '#ffd24a', width: 2, fill: '#30ffd24a', throughWalls: true });
+  Overlay.outline('vein', logs, { color: '#ffd27a', fill: '#ffd27a33', connected: true, width: 2, throughWalls: true });
 });

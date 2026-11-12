@@ -1,0 +1,8 @@
+[12Nov2026 17:24:44.799] [Render thread/INFO] [modjs/]: [CLIENT] OL-TOUR READY
+[12Nov2026 17:24:48.212] [Render thread/INFO] [modjs/]: [CLIENT] OL-CHECK PASS lookingAt: {"x":-9,"y":94,"z":10,"id":"minecraft:grass_block","face":"up","distance":2.520496603626125}
+[12Nov2026 17:24:48.215] [Render thread/INFO] [modjs/]: [CLIENT] OL-CHECK PASS getBlock: minecraft:grass_block
+[12Nov2026 17:24:48.219] [Render thread/INFO] [modjs/]: [CLIENT] OL-CHECK PASS isKeyHeld: false/true
+[12Nov2026 17:24:48.221] [Render thread/INFO] [modjs/]: [CLIENT] OL-CHECK PASS read-only client world refuses destroyBlock
+[12Nov2026 17:24:48.226] [Render thread/INFO] [modjs/]: [CLIENT] OL-CHECK PASS outline: 6/6 outline#1
+[12Nov2026 17:24:50.207] [Render thread/INFO] [modjs/]: [CLIENT] OL-CHECK ok frame
+[12Nov2026 17:24:57.696] [Render thread/INFO] [modjs/]: [CLIENT] OL-TOUR clean client exit

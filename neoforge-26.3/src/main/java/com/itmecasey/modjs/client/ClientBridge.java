@@ -119,7 +119,7 @@ public final class ClientBridge {
 
         NeoForge.EVENT_BUS.addListener((InputEvent.Key e) -> {
             if (EventGroups.CLIENT.hasHandlers("keyPressed")) {
-                EventGroups.CLIENT.post("keyPressed", String.valueOf(e.getKey()), new ClientEventJS(e.getKey(), e.getAction()));
+                EventGroups.CLIENT.post("keyPressed", String.valueOf(KeyCodes.scancodeToGlfw(e.getKey())), new ClientEventJS(KeyCodes.scancodeToGlfw(e.getKey()), e.getAction()));
             }
         });
     }

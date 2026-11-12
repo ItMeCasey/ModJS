@@ -208,6 +208,22 @@ interface WorldOverlayCommon {
 /** A list of block positions: {x, y, z} objects (what findBlocks and connected return) or [x, y, z] arrays. */
 type BlockPositions = Array<BlockPosition | [number, number, number]>;
 
+/** Options of Overlay.outline. */
+interface BlockOutlineOptions {
+  /** Border color, '#ffd27a' or 0xAARRGGBB; an alpha of 0 draws no border. Default white. */
+  color?: number | string;
+  /** Optional fill for the faces of every block, with alpha ('#ffd27a33'); none by default. */
+  fill?: number | string;
+  /** true: one merged outline around the group; false (default): every block on its own. */
+  connected?: boolean;
+  /** Border width in pixels (26.x builds). */
+  width?: number;
+  /** Draw over blocks in front (1.20.1 and 1.21.1 builds). */
+  throughWalls?: boolean;
+  alpha?: number;
+  visible?: boolean;
+}
+
 /** A set of outlined blocks made by Overlay.outline. */
 interface BlockOutline {
   readonly id: string;
@@ -217,6 +233,8 @@ interface BlockOutline {
   width: number;
   /** Draw over blocks in front (1.20.1 and 1.21.1 builds; the 26.x builds draw with depth). */
   throughWalls: boolean;
+  /** true: one merged outline around the whole group (only the outer edges, none between touching blocks); false (default): every block on its own. */
+  connected: boolean;
   /** Tint for the faces of every block, or null for none. */
   fill: number | string | null;
   visible: boolean;
@@ -259,7 +277,9 @@ declare const Overlay: {
    * Outlines (and optionally tints) whole blocks, any block in the world, up to 4096 per set. Calling it again with the same id replaces the blocks.
    * Forge 26.x draws only while the crosshair is on a block (Forge has no level-wide render event there); every other build draws always.
    */
-  outline(id: string, positions: BlockPositions, options?: { color?: number | string; width?: number; fill?: number | string; throughWalls?: boolean; alpha?: number; visible?: boolean }): BlockOutline;
+  outline(id: string, positions: BlockPositions, options?: BlockOutlineOptions): BlockOutline;
+  /** Without an id the set gets one of its own (its id field), which remove() and removeOutline accept. */
+  outline(positions: BlockPositions, options?: BlockOutlineOptions): BlockOutline;
   getOutline(id: string): BlockOutline | null;
   removeOutline(id: string): boolean;
   /** Limits for world overlays. */

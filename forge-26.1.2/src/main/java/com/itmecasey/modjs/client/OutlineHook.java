@@ -22,9 +22,19 @@ public final class OutlineHook {
             Vec3 cam = event.getCamera().position();
             net.minecraft.core.BlockPos target = event.getTarget().getBlockPos();
             event.setCustomRenderer((buffers, stack, flag, state) -> {
-                WorldOutlines.draw((x0, y0, z0, x1, y1, z1, line, width, fill, through) ->
-                    OutlineBoxes.box(stack, buffers, cam, x0, y0, z0, x1, y1, z1, line, width, fill), cam.x, cam.y, cam.z);
-                OutlineBoxes.box(stack, buffers, cam, target.getX(), target.getY(), target.getZ(), target.getX() + 1.0, target.getY() + 1.0, target.getZ() + 1.0,
+                Vec3 camera = state.cameraRenderState.pos;
+                WorldOutlines.draw(new WorldOutlines.Canvas() {
+                    @Override
+                    public void box(double x0, double y0, double z0, double x1, double y1, double z1, int line, float width, int fill, boolean through) {
+                        OutlineBoxes.box(stack, buffers, camera, x0, y0, z0, x1, y1, z1, line, width, fill);
+                    }
+
+                    @Override
+                    public void segment(double x0, double y0, double z0, double x1, double y1, double z1, int line, float width, boolean through) {
+                        OutlineBoxes.segment(stack, buffers, camera, x0, y0, z0, x1, y1, z1, line, width);
+                    }
+                }, camera.x, camera.y, camera.z);
+                OutlineBoxes.box(stack, buffers, camera, target.getX(), target.getY(), target.getZ(), target.getX() + 1.0, target.getY() + 1.0, target.getZ() + 1.0,
                     0x66000000, 2.0f, 0);
             });
             return false;

@@ -267,7 +267,7 @@ Overlay.forBlock('modjs:demo_smelter', (at, data, pos) => { /* describes the blo
 ```
 
 Every element takes `x`, `y`, `z`, `face` (`billboard`, `up`, `down`, `north`, `south`, `east`, `west`), `scale`, `visible`, `alpha`, `layer` and `distance`, and animates like the screen overlay. Elements farther than their distance, in unloaded chunks, facing away, or beyond the element cap (nearest blocks win) are not drawn. `Overlay.at(...).data` and `Overlay.data(x, y, z)` read the data a scripted block syncs. Forge 26.x has no level-wide drawing hook, so there overlays draw over ModJS's own block entities only. `examples/world-overlay`; wiki page "World overlays".
-`Overlay.outline(id, positions, { color, width, fill, throughWalls, alpha, visible })` outlines (and with `fill` tints) any block, up to 4096 blocks per set and 8192 boxes per frame, farther than 128 blocks skipped; `Overlay.getOutline(id)` and `Overlay.removeOutline(id)`. `throughWalls` works on 1.20.1 and 1.21.1, `width` on 26.x. Forge 26.x draws outlines only while the crosshair is on a block (the block highlight callback), every other build always.
+`Overlay.outline(id, positions, { color, fill, connected, width, throughWalls, alpha, visible })` (the id is optional) outlines (and with `fill` tints) any block; `connected: true` draws one merged silhouette around the group instead of a box per block, up to 4096 blocks per set and 8192 boxes per frame, farther than 128 blocks skipped; `Overlay.getOutline(id)` and `Overlay.removeOutline(id)`. `throughWalls` works on 1.20.1 and 1.21.1, `width` on 26.x. Forge 26.x draws outlines only while the crosshair is on a block (the block highlight callback), every other build always.
 
 ### Unifying items (Ore Dictionary style)
 

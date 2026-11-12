@@ -50,6 +50,7 @@ def tour(module):
                 original.rename(backup)
                 backups.append((original, backup))
         installs = [
+            (EXAMPLE / 'tour/outline_tour.js', run / 'modjs/server_scripts/outline_tour.js'),
             (EXAMPLE / 'tour/outline_tour_client.js', run / 'modjs/client_scripts/outline_tour_client.js'),
         ]
         for source, target in installs:

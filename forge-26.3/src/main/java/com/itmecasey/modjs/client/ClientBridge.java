@@ -128,7 +128,7 @@ public final class ClientBridge {
 
         InputEvent.Key.BUS.addListener((InputEvent.Key e) -> {
             if (EventGroups.CLIENT.hasHandlers("keyPressed")) {
-                EventGroups.CLIENT.post("keyPressed", String.valueOf(e.getInfo().key()), new ClientEventJS(e.getInfo().key(), e.getAction()));
+                EventGroups.CLIENT.post("keyPressed", String.valueOf(KeyCodes.scancodeToGlfw(e.getInfo().key())), new ClientEventJS(KeyCodes.scancodeToGlfw(e.getInfo().key()), e.getAction()));
             }
         });
     }

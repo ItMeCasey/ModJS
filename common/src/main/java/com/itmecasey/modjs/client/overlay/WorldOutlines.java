@@ -33,6 +33,16 @@ public final class WorldOutlines {
     public interface Canvas {
         /** A box with line edges ({@code lineArgb}, skipped when its alpha is 0), an optional translucent fill and a line width in pixels. */
         void box(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, int lineArgb, float width, int fillArgb, boolean throughWalls);
+
+        /** One straight line in absolute world coordinates (an edge of a merged outline). */
+        void segment(double x0, double y0, double z0, double x1, double y1, double z1, int lineArgb, float width, boolean throughWalls);
+    }
+
+    private static int counter;
+
+    /** An id for an outline that scripts created without one. */
+    static synchronized String nextId() {
+        return "outline#" + (++counter);
     }
 
     public static synchronized Outline put(String id, Object positions, Object options) {
@@ -94,8 +104,24 @@ public final class WorldOutlines {
                 if (dx * dx + dy * dy + dz * dz > limit) {
                     continue;
                 }
-                canvas.box(x - 0.002, y - 0.002, z - 0.002, x + 1.002, y + 1.002, z + 1.002, line, width, fill, set.throughWalls);
+                // a connected set draws only the tint per block; its edges come from the merged silhouette below
+                canvas.box(x - 0.002, y - 0.002, z - 0.002, x + 1.002, y + 1.002, z + 1.002, set.connected ? 0 : line, width, fill, set.throughWalls);
                 drawn++;
+            }
+            if (set.connected && (line >>> 24) != 0) {
+                for (BlockEdges.Edge e : set.silhouette()) {
+                    if (drawn >= MAX_DRAWN) {
+                        return;
+                    }
+                    double mx = (e.x0() + e.x1()) / 2.0 - cx;
+                    double my = (e.y0() + e.y1()) / 2.0 - cy;
+                    double mz = (e.z0() + e.z1()) / 2.0 - cz;
+                    if (mx * mx + my * my + mz * mz > limit) {
+                        continue;
+                    }
+                    canvas.segment(e.x0(), e.y0(), e.z0(), e.x1(), e.y1(), e.z1(), line, width, set.throughWalls);
+                    drawn++;
+                }
             }
         }
     }
@@ -109,6 +135,8 @@ public final class WorldOutlines {
         public double width = 2.0;
         /** Draw over blocks in front (built for 1.20.1 and 1.21.1; the 26.x builds draw with the game's depth bias instead). */
         public boolean throughWalls;
+        /** True: one merged outline around the whole group (only the outer edges, none between touching blocks); false: every block on its own. */
+        public boolean connected;
         /** Tint color for the faces of every block, or null for none. */
         public Object fill;
         public boolean visible = true;
@@ -116,9 +144,22 @@ public final class WorldOutlines {
         public double alpha = 1.0;
 
         private Set<Long> positions = new LinkedHashSet<>();
+        private List<BlockEdges.Edge> edges;
 
         Outline(String id) {
             this.id = id;
+        }
+
+        /** The merged outer edges of the current blocks (computed once per change of the blocks). */
+        private synchronized List<BlockEdges.Edge> silhouette() {
+            if (edges == null) {
+                List<int[]> blocks = new ArrayList<>();
+                for (long key : positions) {
+                    blocks.add(new int[] {WorldOverlay.keyX(key), WorldOverlay.keyY(key), WorldOverlay.keyZ(key)});
+                }
+                edges = BlockEdges.silhouette(blocks);
+            }
+            return edges;
         }
 
         private synchronized long[] snapshot() {
@@ -140,6 +181,7 @@ public final class WorldOutlines {
             Set<Long> next = parse(list);
             synchronized (this) {
                 positions = next;
+                edges = null;
             }
         }
 
@@ -153,12 +195,14 @@ public final class WorldOutlines {
                     }
                     positions.add(key);
                 }
+                edges = null;
             }
         }
 
         /** Removes every outlined block but keeps the set. */
         public synchronized void clear() {
             positions.clear();
+            edges = null;
         }
 
         /** Removes this set from the world. */
@@ -181,6 +225,10 @@ public final class WorldOutlines {
             Object t = JsonUtil.unwrap(JsonUtil.property(options, "throughWalls"));
             if (t instanceof Boolean b) {
                 throughWalls = b;
+            }
+            Object cn = JsonUtil.unwrap(JsonUtil.property(options, "connected"));
+            if (cn instanceof Boolean b) {
+                connected = b;
             }
             Object f = JsonUtil.property(options, "fill");
             if (f != null) {
