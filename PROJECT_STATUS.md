@@ -81,7 +81,7 @@ Spend: none
 - [x] BEI spot check with 2026.11.30 on Forge 26.1.2: all four viewer events including grouping pass, live index and group checks recorded; release collector assembles all ten jars locally without upload (w:1)
 - [x] 2026.11.32 on the other five builds: client tours with world and screen frames and the headless self test (12 scripted-block checks, `SELFTEST DONE failures=0`) pass on NeoForge 1.20.1, NeoForge 26.1.2, NeoForge 26.2, Forge 26.1.2 and Forge 26.2 (docs/frames/worldoverlay-*, docs/testing/selftest-*.log) (w:2)
 - [x] The 2026.11.32 Forge 1.20.1 jar loads in a real Forge 47.4.28 install and a real NeoForge 47.1.106 install: world overlays and the scripted smelter with its screen seen in frames (docs/frames/worldoverlay-real-forge-1.20.1-*.png, worldoverlay-real-neo-1.20.1-*.png) (w:1)
-- [ ] Deploy the new wiki pages world-overlays and scripted-blocks (drafted in the site folder, not deployed) (w:1)
+- [x] Deploy the new wiki pages world-overlays and scripted-blocks (deployed with the 2026.11.32 release, 2026-11-11) (w:1)
 
 ## Planned
 - [x] Name translation for scripts on Forge and NeoForge 1.20.1: a table made from the build mappings (scripts/gen_name_map.py, 6536 classes) lets scripts call Minecraft classes and methods by their usual names in a normal 1.20.1 game; 6 unit tests, and `Items.DIAMOND`, `server.getRecipeManager()`, `Commands.literal`, `player.health` ran in real Forge 47.4.28 and NeoForge 47.1.106 installs (examples/events/tour/names_check.js); all ten development-game self tests still pass (w:4)
