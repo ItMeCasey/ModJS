@@ -155,6 +155,9 @@ def main():
     plan = []
     for module in selected(args.version):
         minecraft, loader, java = BUILDS[module]
+        if module == "neoforge-1.20.1":
+            # CurseForge rejects an identical jar as a duplicate, so the one Forge 1.20.1 file is tagged for both loaders instead.
+            continue
         folder = args.artifacts / f"jar-{module}"
         if not folder.is_dir():
             sys.exit(f"Missing build folder {folder}")
@@ -165,7 +168,11 @@ def main():
             ids.append(resolve(versions, java))
         except SystemExit:
             print(f"note: CurseForge has no '{java}', uploading {module} without a Java version")
-        plan.append((module, jar, ids, f"ModJS {args.version} ({loader} {minecraft})", clean_name(module, args.version)))
+        title = f"ModJS {args.version} ({loader} {minecraft})"
+        if module == "forge-1.20.1" and "neoforge-1.20.1" in selected(args.version):
+            ids.insert(2, resolve(versions, "NeoForge"))
+            title = f"ModJS {args.version} (Forge and NeoForge {minecraft})"
+        plan.append((module, jar, ids, title, clean_name(module, args.version)))
 
     for module, jar, ids, title, name in plan:
         print(f"{title}: {name} ({jar.stat().st_size // 1024} KiB) game version ids {ids}, {args.release_type}")
