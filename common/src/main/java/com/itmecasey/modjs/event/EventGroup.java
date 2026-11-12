@@ -127,7 +127,7 @@ public final class EventGroup extends ScriptableObject {
 
     /** Posts an event with no id filter. Returns true if a handler cancelled it. */
     public boolean post(String event, EventJS eventObject) {
-        return post(event, null, eventObject);
+        return post(event, (String) null, eventObject);
     }
 
     /**
@@ -135,14 +135,22 @@ public final class EventGroup extends ScriptableObject {
      * Returns true if the event was cancelled.
      */
     public boolean post(String event, String extraId, EventJS eventObject) {
-        EventTrace.log(name, event, extraId, eventObject);
+        return post(event, extraId == null ? java.util.List.<String>of() : java.util.List.of(extraId), eventObject);
+    }
+
+    /**
+     * Runs every handler registered for {@code event} once, then those registered for {@code event:id} for each of the ids (a block id
+     * and the tags it belongs to, for example). Returns true if the event was cancelled.
+     */
+    public boolean post(String event, java.util.Collection<String> extraIds, EventJS eventObject) {
+        EventTrace.log(name, event, extraIds.isEmpty() ? null : extraIds.iterator().next(), eventObject);
         List<Handler> toRun = new ArrayList<>();
         synchronized (this) {
             List<Handler> general = handlers.get(event);
             if (general != null) {
                 toRun.addAll(general);
             }
-            if (extraId != null) {
+            for (String extraId : extraIds) {
                 List<Handler> specific = handlers.get(key(event, extraId));
                 if (specific != null) {
                     toRun.addAll(specific);
@@ -151,6 +159,16 @@ public final class EventGroup extends ScriptableObject {
         }
         run(event, toRun, eventObject);
         return eventObject.isCancelled();
+    }
+
+    /** True when some handler is registered for {@code event:#tag}, so callers can skip listing a block's tags when nobody asked. */
+    public synchronized boolean hasTagHandlers(String event) {
+        for (Map.Entry<String, List<Handler>> entry : handlers.entrySet()) {
+            if (entry.getKey().startsWith(event + ":#") && !entry.getValue().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

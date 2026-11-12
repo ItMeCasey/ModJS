@@ -21,14 +21,14 @@ public final class OverlayRenderer {
         }
     }
 
-    static double anchorX(String anchor, int screen, int size) {
+    public static double anchorX(String anchor, int screen, int size) {
         String a = anchor == null ? "topleft" : anchor;
         if (a.endsWith("right")) return screen - size;
         if (a.equals("top") || a.equals("center") || a.equals("bottom")) return (screen - size) / 2.0;
         return 0.0;
     }
 
-    static double anchorY(String anchor, int screen, int size) {
+    public static double anchorY(String anchor, int screen, int size) {
         String a = anchor == null ? "topleft" : anchor;
         if (a.startsWith("bottom")) return screen - size;
         if (a.equals("left") || a.equals("center") || a.equals("right")) return (screen - size) / 2.0;

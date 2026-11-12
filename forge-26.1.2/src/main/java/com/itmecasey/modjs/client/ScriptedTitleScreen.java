@@ -103,8 +103,8 @@ public final class ScriptedTitleScreen extends Screen implements ScriptedScreens
         boxes.forEach((id, box) -> kept.put(id, box.getValue()));
         boxes.clear();
         for (TitleScreenConfig.Input input : config.inputs()) {
-            net.minecraft.client.gui.components.EditBox box = new net.minecraft.client.gui.components.EditBox(font,
-                width / 2 - input.width() / 2 + input.x(), input.y(), input.width(), input.height(), Component.literal(input.id()));
+            int[] inputAt = input.place(width, height);
+            net.minecraft.client.gui.components.EditBox box = new net.minecraft.client.gui.components.EditBox(font, inputAt[0], inputAt[1], input.width(), input.height(), Component.literal(input.id()));
             box.setMaxLength(input.maxLength());
             box.setHint(Component.literal(input.placeholder()));
             box.setValue(kept.getOrDefault(input.id(), input.initial()));
@@ -115,10 +115,11 @@ public final class ScriptedTitleScreen extends Screen implements ScriptedScreens
         for (TitleScreenConfig.Button spec : config.buttons()) {
             int w = spec.width();
             int h = spec.height();
-            int x = width / 2 - w / 2 + (spec.x() != null ? spec.x() : 0);
+            int[] at = spec.place(width, height);
+            int x = at[0];
             int y;
-            if (spec.y() != null) {
-                y = spec.y();
+            if (at[1] != TitleScreenConfig.Spot.STACK) {
+                y = at[1];
             } else {
                 y = stackY;
                 stackY += h + 4;
@@ -199,11 +200,8 @@ public final class ScriptedTitleScreen extends Screen implements ScriptedScreens
             splash.extractRenderState(graphics, width, font, 0xFFFFFFFF);
         }
         for (TitleScreenConfig.Text text : config.texts()) {
-            if (text.centered()) {
-                graphics.centeredText(font, text.text(), width / 2 + text.x(), text.y(), text.color());
-            } else {
-                graphics.text(font, text.text(), width / 2 + text.x(), text.y(), text.color());
-            }
+            int[] at = text.place(width, height, font.width(text.text()), font.lineHeight);
+            graphics.text(font, text.text(), at[0], at[1], text.color());
         }
         if (config.versionShown()) {
             graphics.text(font, "Minecraft " + SharedConstants.getCurrentVersion().name(), 2, height - 10, 0xFFFFFFFF);

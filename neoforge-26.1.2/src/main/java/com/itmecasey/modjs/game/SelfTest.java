@@ -409,6 +409,34 @@ public final class SelfTest {
         }
         check("in-world recipes: recipe viewers get a page for the items they involve", new com.itmecasey.modjs.client.RecipeViewerEventJS.AddInformation().info().containsKey("minecraft:flint"));
 
+        com.itmecasey.modjs.worldcraft.LevelJS waLevel = new com.itmecasey.modjs.worldcraft.LevelJS(new com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Level(level));
+        for (int i = 0; i < 4; i++) {
+            level.setBlockAndUpdate(new net.minecraft.core.BlockPos(40, 100 + i, 40), Blocks.OAK_LOG.defaultBlockState());
+        }
+        level.setBlockAndUpdate(new net.minecraft.core.BlockPos(41, 104, 41), Blocks.OAK_LOG.defaultBlockState());
+        level.setBlockAndUpdate(new net.minecraft.core.BlockPos(43, 100, 40), Blocks.OAK_LOG.defaultBlockState());
+        check("world access: reads the block id and the dimension", "minecraft:oak_log".equals(waLevel.getBlockId(40, 100, 40)) && waLevel.getDimension().equals("minecraft:overworld")
+            && waLevel.matches(40, 100, 40, "#minecraft:logs") && !waLevel.matches(40, 100, 40, "minecraft:stone"));
+        check("world access: searches a box for a tag", waLevel.findBlocks(38, 99, 38, 45, 106, 45, "#minecraft:logs").getLength() == 6);
+        check("world access: flood fill follows faces, diagonals and the limit", waLevel.connected(40, 100, 40, "minecraft:oak_log", false, 0).getLength() == 4
+            && waLevel.connected(40, 100, 40, "minecraft:oak_log", true, 0).getLength() == 5 && waLevel.connectedSame(40, 103, 40, true, 3).getLength() == 3);
+        check("world access: destroys a block with drops", waLevel.destroyBlock(43, 100, 40, true) && level.getBlockState(new net.minecraft.core.BlockPos(43, 100, 40)).isAir()
+            && !waLevel.destroyBlock(43, 100, 40, true));
+        net.minecraft.core.BlockPos waFarm = new net.minecraft.core.BlockPos(46, 99, 40);
+        level.setBlockAndUpdate(waFarm, Blocks.FARMLAND.defaultBlockState());
+        level.setBlockAndUpdate(waFarm.above(), Blocks.WHEAT.defaultBlockState());
+        org.mozilla.javascript.NativeObject waBefore = waLevel.getBlock(46, 100, 40);
+        boolean waGrew = waLevel.bonemeal(46, 100, 40);
+        org.mozilla.javascript.NativeObject waProps = (org.mozilla.javascript.NativeObject) ((org.mozilla.javascript.NativeObject) waLevel.getBlock(46, 100, 40)).get("properties", waBefore);
+        check("world access: bone meal grows a crop and the new state reads back", waGrew && Integer.parseInt(String.valueOf(waProps.get("age", waProps))) > 0);
+        BreakBlockEvent waBroken = new BreakBlockEvent(level, new net.minecraft.core.BlockPos(40, 100, 40), Blocks.OAK_LOG.defaultBlockState(), player);
+        NeoForge.EVENT_BUS.post(waBroken);
+        check("BlockEvents.broken takes block tags", waBroken.isCanceled());
+        for (net.minecraft.core.BlockPos waClean : new net.minecraft.core.BlockPos[] {new net.minecraft.core.BlockPos(40, 100, 40), new net.minecraft.core.BlockPos(40, 101, 40), new net.minecraft.core.BlockPos(40, 102, 40),
+            new net.minecraft.core.BlockPos(40, 103, 40), new net.minecraft.core.BlockPos(41, 104, 41), waFarm, waFarm.above()}) {
+            level.setBlockAndUpdate(waClean, Blocks.AIR.defaultBlockState());
+        }
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

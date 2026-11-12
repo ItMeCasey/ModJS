@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 
 /** Draws overlay elements with the game's graphics object (one small adapter per Minecraft version). */
 final class GuiOverlayCanvas implements OverlayCanvas {
+    private static final java.util.Map<Identifier, ItemStack> STACKS = new java.util.HashMap<>();
     private final GuiGraphicsExtractor graphics;
     private final Font font = Minecraft.getInstance().font;
 
@@ -72,11 +73,30 @@ final class GuiOverlayCanvas implements OverlayCanvas {
         if (id == null) {
             return;
         }
-        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(id));
+        ItemStack stack = STACKS.get(id);
+        if (stack == null) {
+            // The title screen can draw before the item holders have their components bound (26.3 throws "Components not bound yet").
+            // Skip the icon for that frame and try again on the next one; cache the stack once it builds.
+            try {
+                stack = new ItemStack(BuiltInRegistries.ITEM.getValue(id));
+                stack.getItem();
+                if (stack.isEmpty()) {
+                    return;
+                }
+            } catch (RuntimeException | LinkageError e) {
+                return;
+            }
+            STACKS.put(id, stack);
+        }
         graphics.pose().pushMatrix();
         graphics.pose().translate((float) x, (float) y);
         graphics.pose().scale(scale, scale);
-        graphics.item(stack, 0, 0);
-        graphics.pose().popMatrix();
+        try {
+            graphics.item(stack, 0, 0);
+        } catch (RuntimeException e) {
+            STACKS.remove(id);
+        } finally {
+            graphics.pose().popMatrix();
+        }
     }
 }

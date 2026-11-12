@@ -286,7 +286,45 @@ interface WorldRecipesEvent extends EventBase {
 /** Minecraft objects are passed through as-is; see the Minecraft source for their methods. */
 type MinecraftObject = any;
 
+/** A block position, as findBlocks and connected return them. */
+interface BlockPosition {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** A block read from the world: its id, its state values as text, and where it is. */
+interface BlockInfo extends BlockPosition {
+  id: string;
+  properties: { [name: string]: string };
+}
+
+/**
+ * Read and search the blocks around a gameplay event (event.world), flood fill connected blocks, break blocks and grow plants.
+ * A matcher is a block id ('minecraft:oak_log'), a tag ('#minecraft:logs') or either with state values ('minecraft:wheat[age=7]').
+ */
+interface LevelAccess {
+  dimension: string;
+  getBlock(x: number, y: number, z: number): BlockInfo | null;
+  getBlockId(x: number, y: number, z: number): string | null;
+  matches(x: number, y: number, z: number, matcher: string): boolean;
+  isLoaded(x: number, y: number, z: number): boolean;
+  findBlocks(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, matcher: string): BlockPosition[];
+  findBlocksAround(x: number, y: number, z: number, radius: number, matcher: string): BlockPosition[];
+  connected(x: number, y: number, z: number, matcher: string, diagonal: boolean, limit: number): BlockPosition[];
+  connectedSame(x: number, y: number, z: number, diagonal: boolean, limit: number): BlockPosition[];
+  destroyBlock(x: number, y: number, z: number, drop: boolean): boolean;
+  setBlock(x: number, y: number, z: number, block: string): boolean;
+  bonemeal(x: number, y: number, z: number): boolean;
+}
+
 interface GameEvent extends EventBase {
+  /** The dimension of the event, such as 'minecraft:overworld'. */
+  dimension: string;
+  /** Read and search blocks around the event, break them, grow plants. Null on the client. */
+  world: LevelAccess | null;
+  /** Whether the event's player is crouching right now. */
+  sneaking: boolean;
   player: MinecraftObject;
   playerName: string;
   level: MinecraftObject;
@@ -368,13 +406,13 @@ declare const WorldgenEvents: {
 
 declare const BlockEvents: {
   broken(handler: Handler<GameEvent>): void;
-  broken(blockId: string, handler: Handler<GameEvent>): void;
+  broken(blockIdOrTag: string, handler: Handler<GameEvent>): void;
   placed(handler: Handler<GameEvent>): void;
-  placed(blockId: string, handler: Handler<GameEvent>): void;
+  placed(blockIdOrTag: string, handler: Handler<GameEvent>): void;
   rightClicked(handler: Handler<GameEvent>): void;
-  rightClicked(blockId: string, handler: Handler<GameEvent>): void;
+  rightClicked(blockIdOrTag: string, handler: Handler<GameEvent>): void;
   leftClicked(handler: Handler<GameEvent>): void;
-  leftClicked(blockId: string, handler: Handler<GameEvent>): void;
+  leftClicked(blockIdOrTag: string, handler: Handler<GameEvent>): void;
 };
 
 interface ItemChanges {
@@ -413,6 +451,10 @@ declare const PlayerEvents: {
   loggedOut(handler: Handler<GameEvent>): void;
   respawned(handler: Handler<GameEvent>): void;
   tick(handler: Handler<GameEvent>): void;
+  /** A player started crouching (once per press). */
+  sneakStarted(handler: Handler<GameEvent>): void;
+  /** A player stopped crouching. */
+  sneakStopped(handler: Handler<GameEvent>): void;
   chat(handler: Handler<GameEvent>): void;
   death(handler: Handler<GameEvent>): void;
   advancement(handler: Handler<GameEvent>): void;

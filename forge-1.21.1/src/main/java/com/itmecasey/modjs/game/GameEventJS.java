@@ -122,6 +122,23 @@ public final class GameEventJS extends EventJS {
         return level != null ? level : (player != null ? player.level() : entity != null ? entity.level() : null);
     }
 
+    /** The dimension of the event, such as {@code minecraft:overworld}, or null. */
+    public String getDimension() {
+        net.minecraft.world.level.Level l = getLevel();
+        return l == null ? null : l.dimension().location().toString();
+    }
+
+    /** Read and search blocks around the event, flood fill, break blocks with drops and grow plants (see LevelJS); null on the client. */
+    public com.itmecasey.modjs.worldcraft.LevelJS getWorld() {
+        return getLevel() instanceof net.minecraft.server.level.ServerLevel serverLevel
+            ? new com.itmecasey.modjs.worldcraft.LevelJS(new com.itmecasey.modjs.worldcraft.WorldCraftAdapters.Level(serverLevel)) : null;
+    }
+
+    /** Whether the event's player is crouching right now. */
+    public boolean isSneaking() {
+        return player != null && player.isShiftKeyDown();
+    }
+
     public MinecraftServer getServer() {
         if (server != null) {
             return server;

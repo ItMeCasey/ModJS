@@ -71,4 +71,68 @@ class TitleScreenTest {
         TitleScreenConfig.set(null);
         assertNull(TitleScreenConfig.current());
     }
+
+    private static org.mozilla.javascript.NativeObject options(Object... pairs) {
+        org.mozilla.javascript.NativeObject object = new org.mozilla.javascript.NativeObject();
+        for (int i = 0; i < pairs.length; i += 2) {
+            object.put((String) pairs[i], object, pairs[i + 1]);
+        }
+        return object;
+    }
+
+    @Test
+    void buttonsWithoutAnAnchorKeepTheOldPlacement() {
+        TitleScreenConfig config = new TitleScreenConfig();
+        config.button("A", "quit", options("x", 10, "y", 50));
+        config.button("B", "quit");
+        // centered column plus x offset, y from the top; a button without y asks to be stacked
+        assertEquals(960 / 2 - 100 + 10, config.buttons().get(0).place(960, 540)[0]);
+        assertEquals(50, config.buttons().get(0).place(960, 540)[1]);
+        assertEquals(TitleScreenConfig.Spot.STACK, config.buttons().get(1).place(960, 540)[1]);
+    }
+
+    @Test
+    void anchoredWidgetsFollowTheScreenSize() {
+        TitleScreenConfig config = new TitleScreenConfig();
+        config.button("Singleplayer", "singleplayer", options("anchor", "left", "x", 12, "y", -36, "width", 130));
+        config.button("Exit", "quit", options("anchor", "bottomright", "x", -8, "y", -8, "width", 50, "height", 20));
+        config.button("Middle", "quit", options("anchor", "center", "width", 100, "height", 20));
+        // left edge 12 from the screen's left edge, vertically centered, then shifted by y
+        assertEquals(12, config.buttons().get(0).place(960, 540)[0]);
+        assertEquals((540 - 20) / 2 - 36, config.buttons().get(0).place(960, 540)[1]);
+        // a bottom right button hugs the corner by its own size, so a resize keeps it there
+        assertEquals(960 - 50 - 8, config.buttons().get(1).place(960, 540)[0]);
+        assertEquals(540 - 20 - 8, config.buttons().get(1).place(960, 540)[1]);
+        assertEquals(1920 - 50 - 8, config.buttons().get(1).place(1920, 1080)[0]);
+        assertEquals((960 - 100) / 2, config.buttons().get(2).place(960, 540)[0]);
+        assertEquals((540 - 20) / 2, config.buttons().get(2).place(960, 540)[1]);
+    }
+
+    @Test
+    void percentOffsetsAndTextAndInputAnchors() {
+        TitleScreenConfig config = new TitleScreenConfig();
+        config.button("Quarter", "quit", options("anchor", "topleft", "x", "25%", "y", "10%", "width", 50));
+        config.text("Hello", options("anchor", "top", "y", 6));
+        config.text("Left", options("x", -20, "left", true));
+        config.text("Centered", options("x", 5));
+        config.input("name", options("anchor", "bottom", "y", -30, "width", 100));
+        assertEquals(200, config.buttons().get(0).place(800, 600)[0]);
+        assertEquals(60, config.buttons().get(0).place(800, 600)[1]);
+        // anchored text aligns by its own width; unanchored text keeps centered or left start behavior
+        assertEquals((800 - 30) / 2, config.texts().get(0).place(800, 600, 30, 9)[0]);
+        assertEquals(6, config.texts().get(0).place(800, 600, 30, 9)[1]);
+        assertEquals(800 / 2 - 20, config.texts().get(1).place(800, 600, 30, 9)[0]);
+        assertEquals(800 / 2 + 5 - 15, config.texts().get(2).place(800, 600, 30, 9)[0]);
+        assertEquals(20, config.texts().get(2).place(800, 600, 30, 9)[1]);
+        assertEquals((800 - 100) / 2, config.inputs().get(0).place(800, 600)[0]);
+        assertEquals(600 - 20 - 30, config.inputs().get(0).place(800, 600)[1]);
+    }
+
+    @Test
+    void anAnchorMustBeOneOfTheOverlayNames() {
+        TitleScreenConfig config = new TitleScreenConfig();
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> config.button("A", "quit", options("anchor", "middle")));
+        config.button("B", "quit", options("anchor", "Top-Left"));
+        assertEquals("topleft", config.buttons().get(0).spot().anchor());
+    }
 }

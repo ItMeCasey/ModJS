@@ -61,6 +61,19 @@ public final class GameEvents {
         return group.post(name, id, event);
     }
 
+    /** Block events reach handlers by block id and by block tag: {@code BlockEvents.broken('#minecraft:logs', ...)}. */
+    private static boolean fireBlock(String name, BlockState state, GameEventJS event) {
+        if (!EventGroups.BLOCK.hasHandlers(name)) {
+            return false;
+        }
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        ids.add(blockId(state));
+        if (EventGroups.BLOCK.hasTagHandlers(name)) {
+            state.getTags().forEach(tag -> ids.add("#" + tag.location()));
+        }
+        return EventGroups.BLOCK.post(name, ids, event);
+    }
+
     private static boolean wants(EventGroup group, String name) {
         return group.hasHandlers(name);
     }
@@ -83,7 +96,7 @@ public final class GameEvents {
         MinecraftForge.EVENT_BUS.addListener((BlockEvent.BreakEvent e) -> {
             GameEventJS js = new GameEventJS().player(e.getPlayer()).block(e.getPos(), e.getState());
             js.level((Level) e.getLevel());
-            if (fire(EventGroups.BLOCK, "broken", blockId(e.getState()), js)) {
+            if (fireBlock("broken", e.getState(), js)) {
                 e.setCanceled(true);
             }
         });
@@ -94,7 +107,7 @@ public final class GameEvents {
             if (placer instanceof Player player) {
                 js.player(player);
             }
-            if (fire(EventGroups.BLOCK, "placed", blockId(e.getPlacedBlock()), js)) {
+            if (fireBlock("placed", e.getPlacedBlock(), js)) {
                 e.setCanceled(true);
             }
         });
@@ -106,7 +119,7 @@ public final class GameEvents {
             BlockState state = e.getLevel().getBlockState(e.getPos());
             GameEventJS js = new GameEventJS().player(e.getEntity()).level(e.getLevel()).block(e.getPos(), state)
                 .item(e.getItemStack()).hand(e.getHand().name()).face(e.getFace() == null ? null : e.getFace().getName());
-            if (fire(EventGroups.BLOCK, "rightClicked", blockId(state), js)) {
+            if (fireBlock("rightClicked", state, js)) {
                 e.setCanceled(true);
             }
         });
@@ -118,7 +131,7 @@ public final class GameEvents {
             BlockState state = e.getLevel().getBlockState(e.getPos());
             GameEventJS js = new GameEventJS().player(e.getEntity()).level(e.getLevel()).block(e.getPos(), state)
                 .item(e.getItemStack()).hand(e.getHand().name()).face(e.getFace() == null ? null : e.getFace().getName());
-            if (fire(EventGroups.BLOCK, "leftClicked", blockId(state), js)) {
+            if (fireBlock("leftClicked", state, js)) {
                 e.setCanceled(true);
             }
         });
@@ -216,6 +229,12 @@ public final class GameEvents {
             }
             if (e.phase == TickEvent.Phase.END && e.side.isServer() && wants(EventGroups.PLAYER, "tick")) {
                 fire(EventGroups.PLAYER, "tick", null, new GameEventJS().player(e.player));
+            }
+            if (e.phase == TickEvent.Phase.END && e.side.isServer() && (wants(EventGroups.PLAYER, "sneakStarted") || wants(EventGroups.PLAYER, "sneakStopped"))) {
+                int sneakChange = com.itmecasey.modjs.event.SneakTracker.update(e.player.getUUID(), e.player.isShiftKeyDown());
+                if (sneakChange != 0) {
+                    fire(EventGroups.PLAYER, sneakChange > 0 ? "sneakStarted" : "sneakStopped", null, new GameEventJS().player(e.player));
+                }
             }
         });
 

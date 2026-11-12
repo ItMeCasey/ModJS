@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026.11.34
+
+All ten builds.
+
+- **Fix (26.1.2, 26.2, 26.3): a title screen button with an item icon no longer crashes the game.** On 26.3 the main menu can draw before the item holders have their components bound (`Components not bound yet`). The icon is now skipped for those frames, drawn once it builds, and the item stack is kept for the next frames. (GitHub issue 2)
+- **New: anchors on the title screen and your own screens.** `button`, `text` and `input` take `anchor` (`topleft`, `top`, `topright`, `left`, `center`, `right`, `bottomleft`, `bottom`, `bottomright`, the same names as `Overlay`). `x` and `y` are then offsets from the anchor point and the widget's matching edge or corner lines up with it, recomputed on every resize and fullscreen change. `x` and `y` also take a share of the screen as text (`'25%'`). Without an anchor nothing changes. (GitHub issue 4)
+- **New: read and change the blocks around an event.** Gameplay events have `event.dimension` and `event.world` with `getBlock(x, y, z)` (`{id, properties}`), `getBlockId`, `matches`, `isLoaded`, `findBlocks` (a box), `findBlocksAround` (a cube), `connected` and `connectedSame` (flood fill through connected blocks, optionally diagonal, with a limit), `destroyBlock(x, y, z, drop)`, `setBlock` and `bonemeal(x, y, z)`. Matchers are ids, `#tags` and state values (`minecraft:wheat[age=7]`). Searches are capped (262,144 blocks per box, 4,096 results). (GitHub issue 5)
+- **New: block tags in block events.** `BlockEvents.broken('#minecraft:logs', ...)` (and `placed`, `rightClicked`, `leftClicked`) run for every block in the tag; a block that matches an id handler and a tag handler runs both once. (GitHub issue 5)
+- **New: crouch events.** `PlayerEvents.sneakStarted` and `PlayerEvents.sneakStopped`, and `event.sneaking` on every event with a player. With `world.bonemeal(x, y, z)` a script can grow crops and saplings when a player crouches next to them. (GitHub issue 6)
+- Wiki page "Reading and changing blocks around an event", typings, and the title screen page with the anchor section.
+
 ## 2026.11.33
 
 All ten builds.

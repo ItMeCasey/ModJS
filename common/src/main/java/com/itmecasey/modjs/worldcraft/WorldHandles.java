@@ -77,6 +77,26 @@ public final class WorldHandles {
 
         double random();
 
+        /** The id of the block at a position ({@code minecraft:stone}), or null when that chunk is not loaded. */
+        default String blockId(int x, int y, int z) {
+            return null;
+        }
+
+        /** Breaks the block like the world does: with its drops when asked, without a tool. False when unloaded or already air. */
+        default boolean destroyBlock(int x, int y, int z, boolean drop) {
+            return false;
+        }
+
+        /** Applies bone meal growth to the block without using an item. True when something grew. */
+        default boolean bonemeal(int x, int y, int z) {
+            return false;
+        }
+
+        /** The dimension id ({@code minecraft:overworld}). */
+        default String dimension() {
+            return null;
+        }
+
         /** Block state values as text, for tests and logs. */
         default Map<String, String> describe(int x, int y, int z) {
             return Map.of();

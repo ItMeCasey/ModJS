@@ -52,3 +52,4 @@ ServerEvents.loaded(() => {
   Scoreboard.setTeamColor('st_team', 'red');
   console.log('SELFTEST script: scoreboard ' + Scoreboard.get('Alice', 'st_points') + ' ' + Scoreboard.teamOf('Alice'));
 });
+BlockEvents.broken('#minecraft:logs', e => { e.cancel(); });

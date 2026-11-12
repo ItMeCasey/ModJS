@@ -250,6 +250,57 @@ public final class WorldCraftAdapters {
         }
 
         @Override
+        public String blockId(int x, int y, int z) {
+            BlockPos pos = new BlockPos(x, y, z);
+            if (!level.hasChunkAt(pos)) {
+                return null;
+            }
+            return BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()).toString();
+        }
+
+        @Override
+        public boolean destroyBlock(int x, int y, int z, boolean drop) {
+            BlockPos pos = new BlockPos(x, y, z);
+            if (!level.hasChunkAt(pos) || level.getBlockState(pos).isAir()) {
+                return false;
+            }
+            return level.destroyBlock(pos, drop);
+        }
+
+        @Override
+        public boolean bonemeal(int x, int y, int z) {
+            BlockPos pos = new BlockPos(x, y, z);
+            if (!level.hasChunkAt(pos)) {
+                return false;
+            }
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof net.minecraft.world.level.block.BonemealableBlock growable && growable.isValidBonemealTarget(level, pos, state)
+                && growable.isBonemealSuccess(level, level.random, pos, state)) {
+                growable.performBonemeal(level, level.random, pos, state);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public String dimension() {
+            return level.dimension().location().toString();
+        }
+
+        @Override
+        public java.util.Map<String, String> describe(int x, int y, int z) {
+            BlockPos pos = new BlockPos(x, y, z);
+            java.util.Map<String, String> out = new java.util.LinkedHashMap<>();
+            if (level.hasChunkAt(pos)) {
+                BlockState state = level.getBlockState(pos);
+                for (Property<?> property : state.getProperties()) {
+                    out.put(property.getName(), valueName(state, property));
+                }
+            }
+            return out;
+        }
+
+        @Override
         public void spawnItem(double x, double y, double z, String itemId, int count) {
             Item item = item(itemId);
             if (item == null) {

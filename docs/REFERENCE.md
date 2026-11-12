@@ -177,6 +177,9 @@ Gameplay events (`BlockEvents`, `ItemEvents`, `PlayerEvents`, `EntityEvents`, `L
 `tell(text)`, `runCommand(command)` and `blockEntity` (the chest, furnace or sign at the event's block, or null). Chat can be rewritten with `event.message = '...'`; hurt damage with
 `event.setAmount(n)`.
 
+`dimension` is the event's dimension id, `sneaking` whether its player is crouching, and `world` (null on the client) reads and changes blocks around the event: `getBlock(x, y, z)` (`{id, properties, x, y, z}` or null when unloaded), `getBlockId`, `matches(x, y, z, matcher)`, `isLoaded`, `findBlocks(x1, y1, z1, x2, y2, z2, matcher)`, `findBlocksAround(x, y, z, radius, matcher)`, `connected(x, y, z, matcher, diagonal, limit)` and `connectedSame(x, y, z, diagonal, limit)` (flood fill; positions come back as `{x, y, z}`), `destroyBlock(x, y, z, drop)`, `setBlock(x, y, z, 'id[state=value]')` and `bonemeal(x, y, z)`. A matcher is an id, a `#tag`, or either with state values (`minecraft:wheat[age=7]`). Searches are capped at 262,144 blocks per box and 4,096 results.
+Block events take a tag as well as an id: `BlockEvents.broken('#minecraft:logs', e => ...)`. `PlayerEvents.sneakStarted` and `PlayerEvents.sneakStopped` run when a player starts and stops crouching.
+
 A block entity gives `id`, `blockId`, `x/y/z`, `hasInventory`, `size`, `getItemId(slot)`, `getCount(slot)`, `items` (list of `{slot, id, count}`),
 `setItem(slot, id, count)`, `clearSlot(slot)` and `nbt` (SNBT text). Example:
 `BlockEvents.rightClicked('minecraft:chest', e => { const be = e.blockEntity; if (be) e.tell(be.items.length + ' stacks'); })`.
@@ -333,7 +336,7 @@ ClientEvents.titleScreen(event => {
 });
 ```
 Button actions: `singleplayer`, `multiplayer`, `options`, `mods`, `languages`, `quit`, `connect:host`, `url:https://...`, or a function.
-Buttons without `x`/`y` stack down the middle. If no `titleScreen` handler exists the vanilla menu stays. F3+T applies changes.
+Buttons without `x`/`y`/`anchor` stack down the middle. `button`, `text` and `input` take `anchor` (`topleft`, `top`, `topright`, `left`, `center`, `right`, `bottomleft`, `bottom`, `bottomright`, as in `Overlay`): `x` and `y` are then offsets from the anchor point and the widget's matching edge or corner aligns to it (`{ anchor: 'left', x: 12, y: -36 }`), recomputed on every resize. `x` and `y` also take `'25%'` of the screen's width or height. If no `titleScreen` handler exists the vanilla menu stays. F3+T applies changes.
 The `panorama` background draws the vanilla one on 1.21.1; on 26.1.2 it uses the game's default menu background.
 
 ### Your own screens
