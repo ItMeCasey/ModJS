@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.11.37
+
+All ten builds compile (the dump is shared code; every build has its own mod list hook and command registration). Seen in a real client on Forge 1.20.1 and NeoForge 1.21.1.
+
+- **New: `/modjs dump`.** Writes everything scripts can reference into `modjs/probe/`: the ids of every registry (items, blocks, fluids, entity types, block entity types, enchantments, effects, biomes, dimensions, sounds, particles, creative tabs, villager professions, recipe types and every registry mods add), the tags of each registry, block state properties and values, recipes from the loaded data packs, loot table and advancement ids, the command tree, game rules and the id and version of every mod. Run in a client world it also writes the English language keys, the file ids of all textures, models, block states, particles, fonts and sounds in the loaded resource packs, and the key mappings. It runs in 8 millisecond slices so the game keeps ticking and prints its progress in chat. Operators can run it, and anyone in single player.
+- **New: generated typings.** `probe/ids.d.ts` (`ItemId`, `BlockId`, ... and `ItemIdLike` forms that also accept any string), `tags.d.ts`, `states.d.ts`, `recipes.d.ts` (recipe JSON shapes), `overloads.d.ts` (id-typed overloads for the recipe and tag events) and `api.d.ts` (methods of the real event and builder classes that `modjs.d.ts` does not list). `jsconfig.json` is updated by the dump only when it is missing or the file ModJS generated.
+- **New: VS Code extension** in `vscode-modjs/`: completion, hover and go to definition for ids, tags, recipe ids, mod ids, game rules and language keys, warnings for unknown ids and event names, snippets and a status bar item. Build with `npm install` and `npm run package`.
+
 ## 2026.11.35
 
 All ten builds (the new calls are in the shared code and every build has its own drawing and game hooks).

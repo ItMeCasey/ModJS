@@ -24,6 +24,7 @@ public final class ModJSCommands {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("modjs");
         Predicate<CommandSourceStack> admin = source -> source.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER);
         ItemListCommands.addTo(root);
+        com.itmecasey.modjs.probe.DumpCommands.addTo(root, admin);
 
         root.then(Commands.literal("reload").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();

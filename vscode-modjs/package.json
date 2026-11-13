@@ -1,0 +1,52 @@
+{
+  "name": "modjs",
+  "displayName": "ModJS",
+  "description": "IntelliSense for ModJS scripts: typings, ids, tags, recipes and language keys from a dump of the running game.",
+  "version": "2026.11.37",
+  "publisher": "itmecasey",
+  "license": "SEE LICENSE IN README.md",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages", "Snippets", "Other"],
+  "main": "./out/src/extension.js",
+  "activationEvents": [
+    "workspaceContains:**/modjs/probe/**",
+    "workspaceContains:**/modjs/jsconfig.json",
+    "workspaceContains:**/modjs/startup_scripts/**",
+    "workspaceContains:jsconfig.json"
+  ],
+  "contributes": {
+    "commands": [
+      { "command": "modjs.refreshDump", "title": "ModJS: Refresh dump" },
+      { "command": "modjs.setupProject", "title": "ModJS: Set up project" }
+    ],
+    "snippets": [
+      { "language": "javascript", "path": "./snippets/modjs.code-snippets" }
+    ],
+    "configuration": {
+      "title": "ModJS",
+      "properties": {
+        "modjs.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report unknown ids and unknown event names."
+        },
+        "modjs.completion.limit": {
+          "type": "number",
+          "default": 4000,
+          "description": "The most ids one completion list returns."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "test": "tsc -p . && node --test out/test/core.test.js",
+    "package": "tsc -p . && vsce package --no-dependencies --allow-missing-repository --skip-license"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "^3.2.0",
+    "typescript": "^5.4.0"
+  }
+}
