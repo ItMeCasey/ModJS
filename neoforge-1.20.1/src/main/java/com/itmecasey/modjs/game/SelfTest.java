@@ -442,6 +442,8 @@ public final class SelfTest {
         net.minecraft.world.phys.Vec3 sbOrigin = player.position();
         net.minecraft.world.item.ItemStack sbAxe = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_AXE);
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sbAxe);
+        net.minecraft.world.level.GameType sbMode = player.gameMode.getGameModeForPlayer();
+        sbSetMode(player, net.minecraft.world.level.GameType.SURVIVAL); // the test player starts in creative on some loaders; creative breaks use no tool
         player.setPos(52.5, 100.0, 40.5);
         net.minecraft.core.BlockPos sbBase = new net.minecraft.core.BlockPos(50, 100, 40);
         for (int i = 0; i < 4; i++) {
@@ -462,6 +464,7 @@ public final class SelfTest {
         check("breakBlocks breaks a whole list and wears the tool once per block", sbMany == 3 && level.getBlockState(sbBase.above(3)).isAir() && sbAxe.getDamageValue() == 4);
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
         player.setPos(sbOrigin.x, sbOrigin.y, sbOrigin.z);
+        sbSetMode(player, sbMode);
 
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
@@ -535,5 +538,17 @@ public final class SelfTest {
             && "Self Test Amplified".equals(worldTypeLang.get("generator.modjs.selftest_amp").getAsString()));
 
         LOGGER.info("SELFTEST DONE failures={}", failures);
+    }
+
+    /** Sets the game mode of the connectionless test player (the public methods broadcast to its missing connection). */
+    private static void sbSetMode(ServerPlayer player, net.minecraft.world.level.GameType mode) {
+        try {
+            java.lang.reflect.Method method = net.minecraft.server.level.ServerPlayerGameMode.class.getDeclaredMethod("setGameModeForPlayer",
+                net.minecraft.world.level.GameType.class, net.minecraft.world.level.GameType.class);
+            method.setAccessible(true);
+            method.invoke(player.gameMode, mode, null);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

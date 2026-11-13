@@ -102,7 +102,12 @@ public final class GameEvents {
         BlockEvent.BreakEvent.BUS.addListener((BlockEvent.BreakEvent e) -> {
             GameEventJS js = new GameEventJS().player(e.getPlayer()).block(e.getPos(), e.getState());
             js.level((net.minecraft.world.level.Level) e.getLevel());
-            return fireBlock("broken", e.getState(), js);
+            boolean cancelled = fireBlock("broken", e.getState(), js);
+            if (cancelled) {
+                // Forge 26.x decides a player's break from the event's result, not from the cancelled flag
+                e.setResult(net.minecraftforge.common.util.Result.DENY);
+            }
+            return cancelled;
         });
 
         BlockEvent.EntityPlaceEvent.BUS.addListener((BlockEvent.EntityPlaceEvent e) -> {
