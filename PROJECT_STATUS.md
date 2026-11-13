@@ -1,8 +1,8 @@
 # Project Status
 <!-- status-format: 1 -->
 
-Updated: 2026-11-12
-Summary: 2026.11.33 local candidate (not pushed): custom namespaces for everything `StartupEvents.registry` makes (`mypack:ruby`) and in-world crafting like Lychee (`ServerEvents.worldRecipes`: item on block, items in water, anvil, lightning, random tick, block break), shown on the recipe viewer pages; unit tests and the headless self test pass on NeoForge 1.21.1 and 26.3 with client frames there, the other builds compile and wait for CI.
+Updated: 2026-11-13
+Summary: ModJS 2026.11.35 is released on all ten builds (issues 2 to 6 closed; vein miner support, outlines, script key fix for 26.3); real-client frames exist only for NeoForge 26.3 and Forge 26.3.
 Spend: none
 
 ## Foundation
@@ -30,8 +30,8 @@ Spend: none
 
 ## Server scripts: world and entity events
 - [x] Block events: placed, broken, right click, left click and farmland trampled fire with correct data in a real client on all ten builds (examples/events/tour/events_check.js drives them through the server's packet handlers) (w:3)
-- [~] Open issues 2 to 6 (2026.11.34 local candidate): title screen icon crash on 26.x fixed (issue 2), anchors and percentages on title screen and own screens (issue 4), `event.world` block reading, search, flood fill, destroy and bone meal plus `event.dimension` and block tags in block events (issue 5), `sneakStarted`/`sneakStopped`/`event.sneaking` (issue 6); unit tests and the headless self test cover the world calls on the builds listed in docs/testing/2026.11.34.md; sneak events and anchors on screen are compile-checked on all ten builds and not seen in a real client unless that file says so (w:4)
-- [~] Issue 3 vein miner (2026.11.35 on branch vein-miner): `Overlay.outline` (color, fill, connected), `Client.lookingAt`/`world`/`getBlock`/`isKeyHeld`, `event.breakBlock`/`breakBlocks` with a recursion guard, example and wiki page, and a fix for script keys on 26.3; seen in a real client only on NeoForge 26.3 and Forge 26.3, the other eight builds compile and have unit tests (w:5)
+- [x] Issues 2, 4, 5, 6 (released as 2026.11.34, approved on CurseForge, issues closed 2026-11-13): title screen icon crash on 26.x fixed (issue 2), anchors and percentages on title screen and own screens (issue 4), `event.world` block reading, search, flood fill, destroy and bone meal plus `event.dimension` and block tags in block events (issue 5), `sneakStarted`/`sneakStopped`/`event.sneaking` (issue 6); unit tests and the headless self test cover the world calls on the builds listed in docs/testing/2026.11.34.md; sneak events and anchors on screen are compile-checked on all ten builds and not seen in a real client unless that file says so (w:4)
+- [x] Issue 3 vein miner (released as 2026.11.35, approved on CurseForge, issue closed 2026-11-13): `Overlay.outline` (color, fill, connected), `Client.lookingAt`/`world`/`getBlock`/`isKeyHeld`, `event.breakBlock`/`breakBlocks` with a recursion guard, example and wiki page, and a fix for script keys on 26.3; seen in a real client only on NeoForge 26.3 and Forge 26.3, the other eight builds compile and have unit tests (w:5)
 - [x] Item events: right click, entity interact, dropped, picked up, can-pick-up, crafted, smelted and food eaten fire in a real client on all ten builds (crafted, smelted and food eaten are fired through the loader's event factory, because a client cancels a meal and no crafting menu is driven); tooltip events are now checked by constructing real item tooltips in each client tour (w:3)
 - [x] Player, entity, and level events: login, respawn, death, advancement, inventory, chest, tick (player, server, level), loaded, hurt, death, spawned, check spawn, explosion, chat, logged out and level unloaded events fire in a real client on all ten builds (Forge 1.21.1 opened with Quick Play drops events posted during startup, a Forge behavior that affects every mod; opened from the menu they fire, see docs/PORTING.md) (w:4)
 - [x] Command registration event with a builder API: add with typed arguments and number ranges, permissions, alias, edit, remove and rename are self-tested on all ten builds by running the commands through the dispatcher; `/modjs` commands ran on a real client on nine builds (Forge 1.21.1: when the world is opened from the menu, proved in a real Forge install; see docs/PORTING.md) (w:2)
