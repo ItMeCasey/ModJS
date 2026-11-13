@@ -480,6 +480,24 @@ public final class SelfTest {
         }, "probe/", "config/selftest_config", "persistent/");
         check("user files: the startup routines leave every existing file in the modjs folder untouched" + (guardProblems.isEmpty() ? "" : " (" + guardProblems + ")"), guardProblems.isEmpty());
 
+        // two scripts (a startup script and a server script) share configs: reading, writing, saving, onChange, a missing name and a name registered twice
+        com.itmecasey.modjs.config.ConfigManager.pollNow(false);
+        Object crossOk = com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.SERVER).eval("typeof global.cfgCross !== 'undefined' && Object.keys(global.cfgCross).length === 4 && Object.keys(global.cfgCross).every(function (k) { return global.cfgCross[k] === true; })"
+            + " && global.cfgChanges.join(',').indexOf('value') >= 0 && JsonIO.read('config/selftest_shared.json5').value === global.cfgA.value", "selftest-config-cross");
+        String crossDetail = Boolean.TRUE.equals(crossOk) ? "" : " " + com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.SERVER).eval("(typeof global.cfgCross === 'undefined' ? 'no result' : JSON.stringify(global.cfgCross)) + ' changes=' + (typeof global.cfgChanges === 'undefined' ? 'none' : global.cfgChanges.join(',')) + ' file=' + (JsonIO.exists('config/selftest_shared.json5') ? JSON.stringify(JsonIO.read('config/selftest_shared.json5')) : 'missing') + ' a=' + (typeof global.cfgA === 'undefined' ? 'none' : global.cfgA.value)", "selftest-config-detail");
+        check("config: two scripts share a config (read, write, save, onChange, missing name, name registered twice)" + crossDetail, Boolean.TRUE.equals(crossOk));
+        try {
+            for (String leftover : new String[] {"selftest_shared", "selftest_collide"}) {
+                try (java.util.stream.Stream<java.nio.file.Path> found = java.nio.file.Files.list(com.itmecasey.modjs.script.ScriptManager.root().resolve("config"))) {
+                    for (java.nio.file.Path path : (Iterable<java.nio.file.Path>) found.filter(p -> p.getFileName().toString().startsWith(leftover))::iterator) {
+                        java.nio.file.Files.deleteIfExists(path);
+                    }
+                }
+            }
+        } catch (java.io.IOException ignored) {
+            // the files are left for the next run, which reads their values as its starting point
+        }
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

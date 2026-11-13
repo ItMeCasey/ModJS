@@ -718,8 +718,10 @@ declare const Config: {
    * Missing entries are added with their defaults; wrong or out-of-range values are replaced by the default with a log line.
    */
   register<S extends ConfigSchema>(name: string, schema: S, options?: { side?: 'common' | 'client' | 'server' }): ConfigObject<S>;
-  /** A registered config, or null. */
+  /** A registered config (the same object every script holds), or null when no script has registered that name (yet). */
   get(name: string): (ConfigValues<any> & ConfigMethods) | null;
+  /** Whether a config with this name is registered. */
+  has(name: string): boolean;
   /** Reads one config (or all of them) from disk again. */
   reload(name?: string): boolean;
   /** The path of a config's file, or null. */

@@ -65,6 +65,7 @@ public final class ScriptConfig {
     private final Path file;
     private Map<String, Object> values;
     private long stamp = Long.MIN_VALUE;
+    private boolean loaded;
     private byte[] lastWritten = new byte[0];
     private final List<Listener> listeners = new ArrayList<>();
 
@@ -80,6 +81,7 @@ public final class ScriptConfig {
 
     private void warn(String message) {
         LOGGER.warn("[config:{}] {}", name, message);
+        ConfigManager.record("config:" + name + " " + message);
     }
 
     public synchronized ConfigSpec.GroupSpec schema() {
@@ -96,11 +98,23 @@ public final class ScriptConfig {
     /** Replaces the schema (the script ran again) and reads the file. */
     synchronized void define(ConfigSpec.GroupSpec next) {
         this.schema = next;
-        load();
+        if (!loaded) {
+            load();
+            return;
+        }
+        // registered again (a script ran again, or another script declares the same name): the values in memory stay, including ones that
+        // were set and not saved; they are checked against the new entries, and a file changed on disk is read first
+        Map<String, Object> before = values;
+        ConfigFormat.Validated checked = ConfigFormat.validate(schema, values);
+        checked.problems().stream().filter(p -> !p.contains(": missing, added")).forEach(this::warn);
+        values = checked.values();
+        markChanged(diff(before, values));
+        poll();
     }
 
     /** Reads the file: creates it with the defaults when missing (the only time it is written here); missing and bad entries use their defaults. Returns the keys that changed. */
     public synchronized Set<String> load() {
+        loaded = true;
         Map<String, Object> before = values;
         if (file == null) {
             return Set.of();
@@ -334,7 +348,7 @@ public final class ScriptConfig {
             Set<String> changed = keys.get(i);
             try {
                 com.itmecasey.modjs.script.ModJSContextFactory.INSTANCE.call(cx -> {
-                    Object[] args = {new ConfigHandle(this, "", listener.scope), cx.newArray(listener.scope, changed.toArray())};
+                    Object[] args = {new ConfigHandle(this, "", listener.scope, listener.type), cx.newArray(listener.scope, changed.toArray())};
                     return listener.function.call(cx, listener.scope, listener.scope, args);
                 });
             } catch (org.mozilla.javascript.RhinoException e) {

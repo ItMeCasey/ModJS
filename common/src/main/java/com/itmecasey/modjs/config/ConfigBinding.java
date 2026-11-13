@@ -34,8 +34,9 @@ public final class ConfigBinding extends ScriptableObject {
         define("register", ConfigBinding::register);
         define("get", (cx, s, args) -> {
             ScriptConfig config = ConfigManager.get(text(args, 0, "Config.get"));
-            return config == null ? null : new ConfigHandle(config, "", s);
+            return config == null ? null : new ConfigHandle(config, "", s, typeOf(s));
         });
+        define("has", (cx, s, args) -> ConfigManager.get(text(args, 0, "Config.has")) != null);
         define("reload", (cx, s, args) -> {
             if (args.length == 0) {
                 for (String name : ConfigManager.names()) {
@@ -145,6 +146,15 @@ public final class ConfigBinding extends ScriptableObject {
     }
 
     // -- helpers ---------------------------------------------------------------------------------------------------------------
+
+    /** The script type of the caller: the type that owns its scope, else the type being loaded, else server. */
+    static ScriptType typeOf(Scriptable scope) {
+        ScriptType type = ScriptManager.typeOf(scope);
+        if (type == null) {
+            type = ScriptManager.currentType();
+        }
+        return type == null ? ScriptType.SERVER : type;
+    }
 
     private static Object spec(Scriptable scope, ConfigSpec spec) {
         return Context.javaToJS(spec, scope);
@@ -266,7 +276,7 @@ public final class ConfigBinding extends ScriptableObject {
         if (side == null) {
             throw Context.reportRuntimeError("Config.register: side is 'common', 'client' or 'server', not '" + Context.toString(sideOption) + "'");
         }
-        ScriptType type = ScriptManager.currentType();
+        ScriptType type = typeOf(scope);
         if (type == ScriptType.CLIENT && side == ScriptConfig.Side.SERVER) {
             throw Context.reportRuntimeError("Config.register: a server config cannot be registered from a client script");
         }
@@ -274,7 +284,7 @@ public final class ConfigBinding extends ScriptableObject {
             throw Context.reportRuntimeError("Config.register: a client config cannot be registered from a server script");
         }
         ConfigSpec.GroupSpec schema = group(args[1], "Config.register", true);
-        ScriptConfig config = ConfigManager.register(name, side, schema);
-        return new ConfigHandle(config, "", scope);
+        ScriptConfig config = ConfigManager.register(name, side, schema, type);
+        return new ConfigHandle(config, "", scope, type);
     }
 }

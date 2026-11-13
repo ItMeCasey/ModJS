@@ -37,6 +37,20 @@ public final class ScriptManager {
         return MANAGERS.get(type);
     }
 
+    /** The script type a scope belongs to (the scope a script was run in), or null when it is none of them. */
+    public static ScriptType typeOf(Scriptable scope) {
+        if (scope == null) {
+            return null;
+        }
+        Scriptable top = ScriptableObject.getTopLevelScope(scope);
+        for (ScriptType type : ScriptType.values()) {
+            if (MANAGERS.get(type).scope == top) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     /** The type whose scripts are currently being loaded on this thread, or null. */
     public static ScriptType currentType() {
         return LOADING.get();

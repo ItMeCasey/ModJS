@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public final class ConfigManager {
     private static final Map<String, ScriptConfig> CONFIGS = new LinkedHashMap<>();
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger("modjs");
+    private static final java.util.ArrayDeque<String> NOTICES = new java.util.ArrayDeque<>();
     private static final long POLL_MS = 1000;
     private static long lastClientPoll;
     private static long lastServerPoll;
@@ -28,10 +30,54 @@ public final class ConfigManager {
         return ScriptManager.root().resolve("config");
     }
 
-    /** Registers (or registers again) a config and reads its file. */
-    public static synchronized ScriptConfig register(String name, ScriptConfig.Side side, ConfigSpec.GroupSpec schema) {
+    public static ScriptConfig register(String name, ScriptConfig.Side side, ConfigSpec.GroupSpec schema) {
+        return register(name, side, schema, null);
+    }
+
+    /** Logs a plain line about configs and keeps the last few for tools and tests. */
+    static void notice(String line) {
+        LOGGER.warn("[config] {}", line);
+        synchronized (NOTICES) {
+            NOTICES.addLast(line);
+            while (NOTICES.size() > 50) {
+                NOTICES.removeFirst();
+            }
+        }
+    }
+
+    static void record(String line) {
+        synchronized (NOTICES) {
+            NOTICES.addLast(line);
+            while (NOTICES.size() > 50) {
+                NOTICES.removeFirst();
+            }
+        }
+    }
+
+    /** The most recent config log lines, oldest first. */
+    public static List<String> notices() {
+        synchronized (NOTICES) {
+            return new ArrayList<>(NOTICES);
+        }
+    }
+
+    /**
+     * Registers (or registers again) a config and reads its file. Registering a name again with the same side keeps the same config
+     * object (every script that holds it sees the change) and the latest schema wins; a line is logged when the entries differ from
+     * the earlier registration. Registering a name with another side is refused with a log line and returns the existing config.
+     */
+    public static synchronized ScriptConfig register(String name, ScriptConfig.Side side, ConfigSpec.GroupSpec schema, ScriptType by) {
         ScriptConfig existing = CONFIGS.get(name);
-        if (existing != null && existing.side == side) {
+        if (existing != null && existing.side != side) {
+            notice("config '" + name + "' is already registered as a " + existing.side.name().toLowerCase(java.util.Locale.ROOT) + " config; the "
+                + side.name().toLowerCase(java.util.Locale.ROOT) + " registration from " + (by == null ? "a script" : by.name().toLowerCase(java.util.Locale.ROOT) + " scripts") + " is ignored");
+            return existing;
+        }
+        if (existing != null) {
+            if (!existing.schema().signature().equals(schema.signature())) {
+                notice("config '" + name + "' was registered again with different entries"
+                    + (by == null ? "" : " by " + by.name().toLowerCase(java.util.Locale.ROOT) + " scripts") + "; the latest entries are used");
+            }
             existing.define(schema);
             return existing;
         }
@@ -43,6 +89,7 @@ public final class ConfigManager {
         return created;
     }
 
+    /** A registered config, or null when no script has registered that name (yet). */
     public static synchronized ScriptConfig get(String name) {
         return CONFIGS.get(name);
     }

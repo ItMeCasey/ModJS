@@ -36,6 +36,11 @@ public abstract class ConfigSpec {
     /** Converts a raw value (number, boolean, text, list, map) to this entry's type. */
     public abstract Result coerce(Object raw);
 
+    /** The type, limits and default of the entry as text; two entries with the same signature behave the same. */
+    public String signature() {
+        return getClass().getSimpleName() + "(" + constraint() + ";" + String.valueOf(defaultValue()) + ")";
+    }
+
     /** Facts about the entry for the file comment, such as {@code "0 to 10"}, or an empty text. */
     public String constraint() {
         return "";
@@ -309,6 +314,13 @@ public abstract class ConfigSpec {
         public Result coerce(Object raw) {
             // groups are checked key by key by ConfigFormat.validate
             return raw instanceof Map<?, ?> ? Result.of(raw) : Result.bad("expected an object, got " + show(raw));
+        }
+
+        @Override
+        public String signature() {
+            StringBuilder out = new StringBuilder("Group{");
+            children.forEach((key, child) -> out.append(key).append('=').append(child.signature()).append(','));
+            return out.append('}').toString();
         }
 
         /** The entry at a dotted path such as {@code "nested.speed"}, or null. */
