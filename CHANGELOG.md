@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.11.36
+
+All ten builds (the config code is shared; each build has a one-line client tick call and the `/modjs reload config` command).
+
+- **New: config files for scripts.** `Config.register(name, schema, { side })` declares typed settings (`Config.number`, `integer`, `bool`, `string`, `choice`, `list`, nested groups, or plain values) and returns an object: `cfg.speed`, `cfg.nested.limit`, `cfg.speed = 3`, `cfg.get/set/save/reload/onChange`. The file is `modjs/config/<name>.json5` (`<name>-client.json5` and `<name>-server.json5` for the other sides): JSON with `//` comments, created with the defaults and a comment above every entry. An existing file is never rewritten when ModJS starts or reloads: missing entries and wrong or out-of-range values use their defaults with a log line, an unreadable file is left alone, and scripts never fail because of the file; `cfg.save()` writes the whole file and keeps a `.bak` copy of a file you edited. Files are checked about once a second and `onChange` runs after edits; `/modjs reload config [name]` reads server and common configs again. Config values are not synced to clients. Wiki page "Config files", typings, `examples/config`.
+- **Safer file handling.** ModJS only creates files that do not exist (the example scripts for a script folder that did not exist, `jsconfig.json`, `config/unify.json`, a new config file) and never replaces a user file; the one folder it owns is `probe/`, whose `modjs.d.ts` is rewritten only when it differs. Every file ModJS writes (those, `JsonIO.write`, persistent data, the dimensions file of a world) goes through a temporary file and an atomic move, so a crash cannot leave a truncated file. Deleting a script-created dimension refuses any folder that is not inside a `dimensions` folder of the world.
+
 ## 2026.11.35
 
 All ten builds (the new calls are in the shared code and every build has its own drawing and game hooks).

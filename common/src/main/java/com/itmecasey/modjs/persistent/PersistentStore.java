@@ -111,8 +111,7 @@ public final class PersistentStore {
     private void save() {
         Path file = file();
         try {
-            Files.createDirectories(file.getParent());
-            Files.writeString(file, GSON.toJson(data()), StandardCharsets.UTF_8);
+            com.itmecasey.modjs.script.SafeFiles.writeAtomic(file, GSON.toJson(data()));
         } catch (IOException e) {
             LOGGER.error("Could not save {}", file, e);
         }

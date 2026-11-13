@@ -30,6 +30,7 @@ public final class ExtraBindings {
         ScriptableObject.putProperty(scope, "MINUTE", 60_000);
         ScriptableObject.putProperty(scope, "HOUR", 3_600_000);
         ScriptableObject.putProperty(scope, "JsonIO", Context.javaToJS(new JsonIOBinding(), scope));
+        ScriptableObject.putProperty(scope, "Config", new com.itmecasey.modjs.config.ConfigBinding(scope));
         ScriptableObject.putProperty(scope, "Persistent", Context.javaToJS(new PersistentBinding(), scope));
         ScriptableObject.putProperty(scope, "Unify", Context.javaToJS(new com.itmecasey.modjs.unify.UnifyConfig.Binding(), scope));
         ScriptableObject.putProperty(scope, "Client", Context.javaToJS(new com.itmecasey.modjs.client.ScriptedScreens.Binding(), scope));

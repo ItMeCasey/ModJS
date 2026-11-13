@@ -72,7 +72,7 @@ public final class ScriptFolders {
             copyTypes(root);
             Path config = root.resolve("jsconfig.json");
             if (!Files.exists(config)) {
-                Files.writeString(config, """
+                SafeFiles.createIfAbsent(config, """
                     {
                       "compilerOptions": {
                         "target": "ES2020",
@@ -82,7 +82,7 @@ public final class ScriptFolders {
                       },
                       "include": ["probe/modjs.d.ts", "startup_scripts/**/*.js", "server_scripts/**/*.js", "client_scripts/**/*.js"]
                     }
-                    """.stripIndent(), StandardCharsets.UTF_8);
+                    """.stripIndent());
             }
         } catch (IOException e) {
             LOGGER.error("Could not prepare {}", root, e);
@@ -94,7 +94,7 @@ public final class ScriptFolders {
         boolean isNew = !Files.exists(dir);
         Files.createDirectories(dir);
         if (isNew) {
-            Files.writeString(dir.resolve("example.js"), example.stripIndent(), StandardCharsets.UTF_8);
+            SafeFiles.createIfAbsent(dir.resolve("example.js"), example.stripIndent());
         }
     }
 
@@ -103,9 +103,9 @@ public final class ScriptFolders {
             if (in == null) {
                 return;
             }
+            // probe/ is the one folder ModJS owns: its typings file is replaced when it differs from the one in this version
             Path target = root.resolve("probe").resolve("modjs.d.ts");
-            Files.createDirectories(target.getParent());
-            Files.write(target, in.readAllBytes());
+            SafeFiles.writeIfChanged(target, in.readAllBytes());
         }
     }
 }

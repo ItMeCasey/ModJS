@@ -132,7 +132,10 @@ public final class ClientBridge {
         });
 
         MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent e) -> {
-            if (e.phase == TickEvent.Phase.END) ScriptedKeys.tick();
+            if (e.phase == TickEvent.Phase.END) {
+                ScriptedKeys.tick();
+                com.itmecasey.modjs.config.ConfigManager.tickClient();
+            }
             if (e.phase == TickEvent.Phase.END && EventGroups.CLIENT.hasHandlers("tick")) {
                 EventGroups.CLIENT.post("tick", new ClientEventJS(0, 0));
             }

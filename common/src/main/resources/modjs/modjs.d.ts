@@ -682,6 +682,62 @@ declare const Network: {
   sendToAll(channel: string, data: any): void;
 };
 
+/** One entry of a config schema, made by Config.number, Config.integer, Config.bool, Config.string, Config.choice, Config.list or Config.group. */
+interface ConfigEntry<T> {
+  readonly __configType?: T;
+}
+
+type ConfigSchema = { [key: string]: ConfigEntry<any> | number | boolean | string | any[] | ConfigSchema };
+
+/** The values of a config as properties. A nested object is a group. */
+type ConfigValues<S> = {
+  [K in keyof S]: S[K] extends ConfigEntry<infer T> ? T : S[K] extends number ? number : S[K] extends boolean ? boolean : S[K] extends string ? string
+    : S[K] extends any[] ? S[K] : ConfigValues<S[K]>;
+};
+
+interface ConfigMethods {
+  /** The value at a key; a dotted key reaches into a group ('nested.limit'). undefined for a key that is not in the schema. */
+  get(key: string): any;
+  /** Checks and stores a value; false (and a log line) when the key is unknown or the value is refused. Does not write the file. */
+  set(key: string, value: any): boolean;
+  /** Writes the current values to the file. */
+  save(): void;
+  /** Reads the file again; true when a value changed. */
+  reload(): boolean;
+  /** Runs after values change (set, an edited file, a reload) with the dotted keys that changed. */
+  onChange(callback: (config: any, keys: string[]) => void): void;
+  toJSON(): any;
+}
+
+type ConfigObject<S> = ConfigValues<S> & ConfigMethods;
+
+/** Typed config files in modjs/config. */
+declare const Config: {
+  /**
+   * Registers a config and reads (or creates) its file: modjs/config/<name>.json5, <name>-client.json5 or <name>-server.json5.
+   * Missing entries are added with their defaults; wrong or out-of-range values are replaced by the default with a log line.
+   */
+  register<S extends ConfigSchema>(name: string, schema: S, options?: { side?: 'common' | 'client' | 'server' }): ConfigObject<S>;
+  /** A registered config, or null. */
+  get(name: string): (ConfigValues<any> & ConfigMethods) | null;
+  /** Reads one config (or all of them) from disk again. */
+  reload(name?: string): boolean;
+  /** The path of a config's file, or null. */
+  file(name: string): string | null;
+  names(): string[];
+  number(defaultValue: number, options?: { min?: number; max?: number; comment?: string }): ConfigEntry<number>;
+  integer(defaultValue: number, options?: { min?: number; max?: number; comment?: string }): ConfigEntry<number>;
+  int(defaultValue: number, options?: { min?: number; max?: number; comment?: string }): ConfigEntry<number>;
+  bool(defaultValue: boolean, options?: { comment?: string }): ConfigEntry<boolean>;
+  string(defaultValue?: string, options?: { maxLength?: number; pattern?: string; comment?: string }): ConfigEntry<string>;
+  choice<T extends string>(defaultValue: T, options: T[], settings?: { comment?: string }): ConfigEntry<T>;
+  list(element: 'string', defaultValue?: string[], options?: { maxSize?: number; comment?: string }): ConfigEntry<string[]>;
+  list(element: 'number' | 'int', defaultValue?: number[], options?: { maxSize?: number; min?: number; max?: number; comment?: string }): ConfigEntry<number[]>;
+  list(element: 'bool', defaultValue?: boolean[], options?: { maxSize?: number; comment?: string }): ConfigEntry<boolean[]>;
+  /** A nested object with a comment of its own (a plain nested object works too). */
+  group<S extends ConfigSchema>(entries: S, options?: { comment?: string }): ConfigEntry<ConfigValues<S>>;
+};
+
 declare const JsonIO: {
   /** Reads a JSON file relative to the modjs folder; null when missing. */
   read(path: string): any;

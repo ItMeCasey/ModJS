@@ -56,8 +56,7 @@ public final class JsonIOBinding {
     public void write(String path, Object value) {
         Path file = resolve(path);
         try {
-            Files.createDirectories(file.getParent());
-            Files.writeString(file, GSON.toJson(JsonUtil.toJson(value)), StandardCharsets.UTF_8);
+            com.itmecasey.modjs.script.SafeFiles.writeAtomic(file, GSON.toJson(JsonUtil.toJson(value)));
         } catch (IOException e) {
             throw Context.reportRuntimeError("Could not write " + path + ": " + e.getMessage());
         }

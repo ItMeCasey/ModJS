@@ -32,6 +32,12 @@ public final class ModJSCommands {
             return 1;
         }));
 
+        root.then(Commands.literal("reload").requires(admin).then(Commands.literal("config")
+            .executes(context -> reloadConfigs(context.getSource(), null))
+            .then(Commands.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+                .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(com.itmecasey.modjs.config.ConfigManager.names(), builder))
+                .executes(context -> reloadConfigs(context.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(context, "name"))))));
+
         root.then(Commands.literal("errors").requires(admin).executes(context -> {
             CommandSourceStack source = context.getSource();
             int total = 0;
@@ -101,5 +107,33 @@ public final class ModJSCommands {
         }, ticks);
         source.sendSuccess(() -> Component.literal("Event trace on" + (ticks ? " (with ticks)" : "") + ". Use /modjs trace off to stop."), false);
         return 1;
+    }
+
+    /** {@code /modjs reload config [name]}: reads the config files of server and common configs again. */
+    private static int reloadConfigs(CommandSourceStack source, String name) {
+        java.util.List<com.itmecasey.modjs.config.ScriptConfig> targets = new java.util.ArrayList<>();
+        if (name == null) {
+            targets.addAll(com.itmecasey.modjs.config.ConfigManager.serverSide());
+        } else {
+            com.itmecasey.modjs.config.ScriptConfig config = com.itmecasey.modjs.config.ConfigManager.get(name);
+            if (config == null) {
+                source.sendFailure(Component.literal("No config named " + name));
+                return 0;
+            }
+            if (config.side == com.itmecasey.modjs.config.ScriptConfig.Side.CLIENT) {
+                source.sendFailure(Component.literal("Config " + name + " is a client config"));
+                return 0;
+            }
+            targets.add(config);
+        }
+        int changed = 0;
+        for (com.itmecasey.modjs.config.ScriptConfig config : targets) {
+            if (config.reload()) {
+                changed++;
+            }
+        }
+        String text = "Reloaded " + targets.size() + " config(s), " + changed + " changed";
+        source.sendSuccess(() -> Component.literal(text), false);
+        return targets.size();
     }
 }

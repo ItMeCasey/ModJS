@@ -97,6 +97,7 @@ public final class ScriptManager {
         errors.clear();
         loadedCount = 0;
         EventGroups.clear(type);
+        com.itmecasey.modjs.config.ConfigManager.scriptsReloading(type);
         if (type == ScriptType.CLIENT) {
             com.itmecasey.modjs.client.overlay.Overlay.clear();
         }

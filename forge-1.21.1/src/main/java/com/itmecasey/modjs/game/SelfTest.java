@@ -457,6 +457,30 @@ public final class SelfTest {
         player.setPos(sbOrigin.x, sbOrigin.y, sbOrigin.z);
         sbSetMode(player, sbMode);
 
+        // script config: registers a typed config, checks values, creates its file with comments, reloads it from disk
+        java.nio.file.Path cfgFile = com.itmecasey.modjs.script.ScriptManager.root().resolve("config/selftest_config.json5");
+        Object cfgResult = com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.SERVER).eval("(function () { var c = Config.register('selftest_config', { speed: Config.number(1.5, { min: 0, max: 10, comment: 'Speed' }), mode: Config.choice('fast', ['fast', 'slow']) }); c.speed = 4; c.speed = 99; return '' + c.speed + c.mode; })()", "selftest-config");
+        java.nio.file.Path cfgPath = cfgFile;
+        boolean cfgFileOk = false;
+        boolean cfgReload = false;
+        try {
+            cfgFileOk = java.nio.file.Files.readString(cfgPath).contains("// Speed");
+            java.nio.file.Files.writeString(cfgFile, "{ \"speed\": 7 }");
+            cfgReload = Boolean.TRUE.equals(com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.SERVER).eval("Config.get('selftest_config').reload() && Config.get('selftest_config').speed === 7 && Config.get('selftest_config').mode === 'fast'", "selftest-config-reload"));
+            java.nio.file.Files.deleteIfExists(cfgFile);
+        } catch (java.io.IOException cfgError) {
+            cfgFileOk = false;
+        }
+        check("config: registers a typed config, refuses an out-of-range value, writes a commented file and reloads it", "4fast".equals(String.valueOf(cfgResult)) && cfgFileOk && cfgReload);
+
+        // user files: the startup routines (folder scaffolding, typings, jsconfig) leave every existing file of the modjs folder byte for byte as it was
+        java.nio.file.Path guardRoot = com.itmecasey.modjs.script.ScriptManager.root();
+        String guardProblems = com.itmecasey.modjs.script.UserFilesGuard.run(guardRoot, () -> {
+            com.itmecasey.modjs.script.ScriptFolders.prepare(guardRoot);
+            com.itmecasey.modjs.script.ScriptFolders.prepare(guardRoot);
+        }, "probe/", "config/selftest_config", "persistent/");
+        check("user files: the startup routines leave every existing file in the modjs folder untouched" + (guardProblems.isEmpty() ? "" : " (" + guardProblems + ")"), guardProblems.isEmpty());
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

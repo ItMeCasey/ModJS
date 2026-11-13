@@ -225,13 +225,26 @@ public final class DimensionManager {
         JsonObject out = new JsonObject();
         CREATED.forEach(out::add);
         try {
-            Files.writeString(server.getWorldPath(LevelResource.ROOT).resolve(FILE), out.toString(), StandardCharsets.UTF_8);
+            com.itmecasey.modjs.script.SafeFiles.writeAtomic(server.getWorldPath(LevelResource.ROOT).resolve(FILE), out.toString());
         } catch (IOException e) {
             LOGGER.error("Could not save {}", FILE, e);
         }
     }
 
+    /** Deletes the save folder of a dimension a script created. Refuses anything that is not a folder inside a {@code dimensions} folder of the world. */
     private static void deleteFolder(Path folder) {
+        Path normalized = folder.toAbsolutePath().normalize();
+        boolean inside = false;
+        for (Path parent = normalized.getParent(); parent != null; parent = parent.getParent()) {
+            if (parent.getFileName() != null && parent.getFileName().toString().equals("dimensions")) {
+                inside = true;
+                break;
+            }
+        }
+        if (!inside || normalized.getFileName() == null || normalized.getFileName().toString().equals("dimensions")) {
+            LOGGER.warn("Not deleting {}: it is not a dimension folder", folder);
+            return;
+        }
         if (!Files.isDirectory(folder)) {
             return;
         }

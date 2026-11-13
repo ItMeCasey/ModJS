@@ -62,8 +62,7 @@ public final class UnifyFile {
         Path file = file(root);
         try {
             if (!Files.isRegularFile(file)) {
-                Files.createDirectories(file.getParent());
-                Files.writeString(file, GSON.toJson(defaults()) + "\n", StandardCharsets.UTF_8);
+                com.itmecasey.modjs.script.SafeFiles.createIfAbsent(file, GSON.toJson(defaults()) + "\n");
                 return defaults();
             }
             JsonElement parsed = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8));

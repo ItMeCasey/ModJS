@@ -121,6 +121,7 @@ public final class ClientBridge {
 
         TickEvent.ClientTickEvent.Post.BUS.addListener((TickEvent.ClientTickEvent.Post e) -> {
             ScriptedKeys.tick();
+            com.itmecasey.modjs.config.ConfigManager.tickClient();
             if (EventGroups.CLIENT.hasHandlers("tick")) {
                 EventGroups.CLIENT.post("tick", new ClientEventJS(0, 0));
             }

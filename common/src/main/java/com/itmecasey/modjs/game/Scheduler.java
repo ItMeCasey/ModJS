@@ -68,6 +68,7 @@ public final class Scheduler {
     }
 
     static void tick() {
+        com.itmecasey.modjs.config.ConfigManager.tickServer();
         List<Task> due = new ArrayList<>();
         synchronized (Scheduler.class) {
             TASKS.addAll(PENDING);
