@@ -13,6 +13,7 @@ jobs:
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
       any: ${{ steps.plan.outputs.any }}
+      extension: ${{ steps.plan.outputs.extension }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -53,3 +54,27 @@ jobs:
         with:
           name: ${{ matrix.module }}
           path: ${{ matrix.module }}/build/libs/*.jar
+
+  # The VS Code extension in vscode-modjs/ is built and tested only when files there change. No game module is built for it.
+  extension:
+    needs: plan
+    if: needs.plan.outputs.extension == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode-modjs
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vscode-modjs/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run package
+      - uses: actions/upload-artifact@v5
+        with:
+          name: vscode-modjs
+          path: vscode-modjs/*.vsix
+          if-no-files-found: error
