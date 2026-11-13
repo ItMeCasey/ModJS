@@ -240,4 +240,22 @@ class TradesTest {
         assertTrue(TradeFilter.parse(null, ScriptType.SERVER).matches(view));
         assertThrows(IllegalArgumentException.class, () -> TradeFilter.parse(ScriptManager.of(ScriptType.SERVER).eval("({ give: 5 })", "f.js"), ScriptType.SERVER));
     }
+
+    @Test
+    void tradeFilesFollowTheSpellingOfEachBuild() {
+        eval("Villagers.addTrade('minecraft:mason', 1, { give: 'minecraft:stone', want: 'minecraft:emerald', villagerType: 'minecraft:desert', biome: 'minecraft:desert' });");
+        TradeSpec spec = TradeOps.snapshot().get(0).trades().get(0);
+        JsonObject newest = spec.toJson(TradeSpec.Style.V26_3).getAsJsonObject("merchant_predicate");
+        assertEquals("minecraft:all_of", newest.get("type").getAsString());
+        assertEquals("minecraft:entity_properties", newest.getAsJsonArray("terms").get(0).getAsJsonObject().get("type").getAsString());
+        assertTrue(newest.getAsJsonArray("terms").get(0).getAsJsonObject().getAsJsonObject("predicate").has("minecraft:predicates"));
+        JsonObject v262 = spec.toJson(TradeSpec.Style.V26_2).getAsJsonObject("merchant_predicate");
+        assertEquals("minecraft:all_of", v262.get("condition").getAsString());
+        assertFalse(v262.has("type"));
+        assertTrue(v262.getAsJsonArray("terms").get(0).getAsJsonObject().getAsJsonObject("predicate").has("minecraft:predicates"));
+        JsonObject v261 = spec.toJson(TradeSpec.Style.V26_1).getAsJsonObject("merchant_predicate");
+        assertEquals("minecraft:entity_properties", v261.getAsJsonArray("terms").get(0).getAsJsonObject().get("condition").getAsString());
+        assertTrue(v261.getAsJsonArray("terms").get(0).getAsJsonObject().getAsJsonObject("predicate").has("predicates"));
+        assertFalse(v261.getAsJsonArray("terms").get(0).getAsJsonObject().getAsJsonObject("predicate").has("minecraft:predicates"));
+    }
 }

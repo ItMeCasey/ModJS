@@ -64,6 +64,9 @@ public final class TradeFilter {
         if (text == null) {
             throw new IllegalArgumentException("the filter field '" + key + "' must be an id such as minecraft:emerald (with * as a wildcard)");
         }
+        if (text.equals("*")) {
+            return null; // matches every id: no condition
+        }
         String full = text.indexOf(':') < 0 && !text.startsWith("*") ? "minecraft:" + text : text;
         StringBuilder regex = new StringBuilder();
         for (String part : full.split("\\*", -1)) {
@@ -73,6 +76,11 @@ public final class TradeFilter {
             regex.append(Pattern.quote(part));
         }
         return Pattern.compile(regex.toString());
+    }
+
+    /** True when the filter has no conditions (every trade matches), so trades that cannot be inspected are removed too. */
+    public boolean isUnconditional() {
+        return function == null && level == null && give == null && want == null && id == null;
     }
 
     /** Whether a trade, described as {@link TradeSpec#view}, matches. */

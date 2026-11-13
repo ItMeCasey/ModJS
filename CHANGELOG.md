@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.11.38
+
+All ten builds.
+
+- **New: villager and wandering trader trades.** `Villagers.addTrade(profession, level, trade)`, `addTrades`, `replaceTrades` (the pool of a level becomes exactly these trades), `removeTrades(profession, [level,] filter)` (a function or `{ level, give, want, id }` with `*` wildcards) and `clearTrades(profession)`, for vanilla and modded professions and `minecraft:wandering_trader`. A trade has one or two costs, a result (with `components` on 1.21.1 and 26.x, `nbt` on 1.20.1), `maxUses`, `xp`, `priceMultiplier`, `demand` (1.20.1 and 1.21.1), conditions `villagerType` and `biome`, and a `when` function (1.20.1 and 1.21.1). On 26.1.2, 26.2 and 26.3, where trades are data, ModJS writes the trade files and the level tags (starting from the original tags, including the tags they reference, so shared trades can be removed); on 1.20.1 and 1.21.1 the trade lists are changed when a world starts. Wiki page "Villager trades", typings, `examples/villagers`.
+
 ## 2026.11.36
 
 All ten builds (the config code is shared; each build has a one-line client tick call and the `/modjs reload config` command).

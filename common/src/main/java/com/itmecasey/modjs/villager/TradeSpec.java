@@ -165,8 +165,33 @@ public final class TradeSpec {
         return out;
     }
 
-    /** The trade file of a 26.x build: gives, wants, additional_wants, max_uses, xp, reputation_discount, merchant_predicate. */
+    /** How a build spells loot conditions in trade files: 26.1.2 {@code condition} and {@code predicates}, 26.2 {@code condition} and {@code minecraft:predicates}, 26.3 {@code type} and {@code minecraft:predicates}. */
+    public enum Style {
+        V26_1("condition", "predicates"), V26_2("condition", "minecraft:predicates"), V26_3("type", "minecraft:predicates");
+
+        final String conditionKey;
+        final String predicatesKey;
+
+        Style(String conditionKey, String predicatesKey) {
+            this.conditionKey = conditionKey;
+            this.predicatesKey = predicatesKey;
+        }
+
+        /** The style of the running build. */
+        public static Style current() {
+            if (com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 3)) {
+                return V26_3;
+            }
+            return com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 2) ? V26_2 : V26_1;
+        }
+    }
+
     public JsonObject toJson() {
+        return toJson(Style.V26_3);
+    }
+
+    /** The trade file of a 26.x build: gives, wants, additional_wants, max_uses, xp, reputation_discount, merchant_predicate. */
+    public JsonObject toJson(Style style) {
         JsonObject out = new JsonObject();
         out.add("gives", give.toJson(true));
         out.add("wants", want.toJson(false));
@@ -183,8 +208,8 @@ public final class TradeSpec {
             villagerTypes.forEach(list::add);
             variants.add("minecraft:villager/variant", list);
             JsonObject predicates = new JsonObject();
-            predicates.add("minecraft:predicates", variants);
-            conditions.add(entity(predicates));
+            predicates.add(style.predicatesKey, variants);
+            conditions.add(entity(predicates, style));
         }
         if (!biomes.isEmpty()) {
             JsonObject location = new JsonObject();
@@ -193,13 +218,13 @@ public final class TradeSpec {
             location.add("biomes", list);
             JsonObject predicate = new JsonObject();
             predicate.add("location", location);
-            conditions.add(entity(predicate));
+            conditions.add(entity(predicate, style));
         }
         if (conditions.size() == 1) {
             out.add("merchant_predicate", conditions.get(0));
         } else if (conditions.size() == 2) {
             JsonObject all = new JsonObject();
-            all.addProperty("type", "minecraft:all_of");
+            all.addProperty(style.conditionKey, "minecraft:all_of");
             JsonArray terms = new JsonArray();
             conditions.forEach(terms::add);
             all.add("terms", terms);
@@ -208,9 +233,9 @@ public final class TradeSpec {
         return out;
     }
 
-    private static JsonObject entity(JsonObject predicate) {
+    private static JsonObject entity(JsonObject predicate, Style style) {
         JsonObject out = new JsonObject();
-        out.addProperty("type", "minecraft:entity_properties");
+        out.addProperty(style.conditionKey, "minecraft:entity_properties");
         out.addProperty("entity", "this");
         out.add("predicate", predicate);
         return out;

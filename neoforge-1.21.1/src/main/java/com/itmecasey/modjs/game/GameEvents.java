@@ -48,6 +48,7 @@ public final class GameEvents {
 
     public static void register() {
         registerBlocks();
+        VillagerTradeHooks.register();
         registerItems();
         registerPlayers();
         registerEntities();

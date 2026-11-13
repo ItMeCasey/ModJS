@@ -508,6 +508,19 @@ public final class SelfTest {
             // the files are left for the next run, which reads their values as its starting point
         }
 
+        // villager trades: a replaced tier, remove-all-then-add, a cleared profession, and conditions on the villager type
+        java.util.List<String> sbCleric = sbOffers(level, net.minecraft.world.entity.npc.VillagerProfession.CLERIC, null);
+        check("villagers: replaceTrades gives a cleric exactly the new tier (" + sbCleric + ")", sbCleric.size() == 2
+            && sbCleric.contains("minecraft:diamond x2 <- minecraft:emerald x3 max 7 xp 9") && sbCleric.contains("minecraft:gold_ingot x1 <- minecraft:emerald x1 + minecraft:book x1 max 12 xp 1"));
+        java.util.List<String> sbTools = sbOffers(level, net.minecraft.world.entity.npc.VillagerProfession.TOOLSMITH, null);
+        check("villagers: removeTrades of everything and addTrade leave a toolsmith one trade (" + sbTools + ")", sbTools.equals(java.util.List.of("minecraft:iron_axe x1 <- minecraft:emerald x4 max 12 xp 1")));
+        java.util.List<String> sbPlains = sbOffers(level, net.minecraft.world.entity.npc.VillagerProfession.MASON, "plains");
+        java.util.List<String> sbDesert = sbOffers(level, net.minecraft.world.entity.npc.VillagerProfession.MASON, "desert");
+        check("villagers: villager type conditions offer only the trade that fits (plains " + sbPlains + ", desert " + sbDesert + ")",
+            sbPlains.size() == 1 && sbPlains.get(0).startsWith("minecraft:granite") && sbDesert.size() == 1 && sbDesert.get(0).startsWith("minecraft:stone"));
+        java.util.List<String> sbLibrarian = sbOffers(level, net.minecraft.world.entity.npc.VillagerProfession.LIBRARIAN, null);
+        check("villagers: clearTrades leaves a librarian without trades (" + sbLibrarian + ")", sbLibrarian.isEmpty());
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);
@@ -592,5 +605,27 @@ public final class SelfTest {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /** The level 1 trades a fresh villager of this profession (and type, when given) rolls, as text. */
+    private static java.util.List<String> sbOffers(net.minecraft.server.level.ServerLevel level, net.minecraft.world.entity.npc.VillagerProfession profession, String type) {
+        net.minecraft.world.entity.npc.Villager villager = new net.minecraft.world.entity.npc.Villager(net.minecraft.world.entity.EntityType.VILLAGER, level);
+        var data = villager.getVillagerData().setProfession(profession).setLevel(1);
+        if (type != null) {
+            data = data.setType(net.minecraft.core.registries.BuiltInRegistries.VILLAGER_TYPE.get(net.minecraft.resources.ResourceLocation.tryParse("minecraft:" + type)));
+        }
+        villager.setVillagerData(data);
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (net.minecraft.world.item.trading.MerchantOffer offer : villager.getOffers()) {
+            StringBuilder text = new StringBuilder();
+            text.append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.getResult().getItem())).append(" x").append(offer.getResult().getCount());
+            text.append(" <- ").append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.getBaseCostA().getItem())).append(" x").append(offer.getBaseCostA().getCount());
+            if (!offer.getCostB().isEmpty()) {
+                text.append(" + ").append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.getCostB().getItem())).append(" x").append(offer.getCostB().getCount());
+            }
+            text.append(" max ").append(offer.getMaxUses()).append(" xp ").append(offer.getXp());
+            out.add(text.toString());
+        }
+        return out;
     }
 }

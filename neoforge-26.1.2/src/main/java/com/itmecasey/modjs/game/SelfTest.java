@@ -507,6 +507,19 @@ public final class SelfTest {
             // the files are left for the next run, which reads their values as its starting point
         }
 
+        // villager trades: a replaced tier, remove-all-then-add, a cleared profession, and conditions on the villager type
+        java.util.List<String> sbCleric = sbOffers(level, net.minecraft.world.entity.npc.villager.VillagerProfession.CLERIC, null);
+        check("villagers: replaceTrades gives a cleric exactly the new tier (" + sbCleric + ")", sbCleric.size() == 2
+            && sbCleric.contains("minecraft:diamond x2 <- minecraft:emerald x3 max 7 xp 9") && sbCleric.contains("minecraft:gold_ingot x1 <- minecraft:emerald x1 + minecraft:book x1 max 12 xp 1"));
+        java.util.List<String> sbTools = sbOffers(level, net.minecraft.world.entity.npc.villager.VillagerProfession.TOOLSMITH, null);
+        check("villagers: removeTrades of everything and addTrade leave a toolsmith one trade (" + sbTools + ")", sbTools.equals(java.util.List.of("minecraft:iron_axe x1 <- minecraft:emerald x4 max 12 xp 1")));
+        java.util.List<String> sbPlains = sbOffers(level, net.minecraft.world.entity.npc.villager.VillagerProfession.MASON, "plains");
+        java.util.List<String> sbDesert = sbOffers(level, net.minecraft.world.entity.npc.villager.VillagerProfession.MASON, "desert");
+        check("villagers: villager type conditions offer only the trade that fits (plains " + sbPlains + ", desert " + sbDesert + ")",
+            sbPlains.size() == 1 && sbPlains.get(0).startsWith("minecraft:granite") && sbDesert.size() == 1 && sbDesert.get(0).startsWith("minecraft:stone"));
+        java.util.List<String> sbLibrarian = sbOffers(level, net.minecraft.world.entity.npc.villager.VillagerProfession.LIBRARIAN, null);
+        check("villagers: clearTrades leaves a librarian without trades (" + sbLibrarian + ")", sbLibrarian.isEmpty());
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);
@@ -592,5 +605,39 @@ public final class SelfTest {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.npc.villager.Villager> sbVillagerType() {
+        return (net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.npc.villager.Villager>) net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+            .getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("minecraft", "villager"));
+    }
+
+    /** The level 1 trades a fresh villager of this profession (and type, when given) rolls, as text. */
+    private static java.util.List<String> sbOffers(net.minecraft.server.level.ServerLevel level, net.minecraft.resources.ResourceKey<net.minecraft.world.entity.npc.villager.VillagerProfession> key, String type) {
+        var holder = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.VILLAGER_PROFESSION).getOrThrow(key);
+        net.minecraft.world.entity.npc.villager.Villager villager = new net.minecraft.world.entity.npc.villager.Villager(sbVillagerType(), level);
+        var data = villager.getVillagerData().withProfession(holder).withLevel(1);
+        if (type != null) {
+            data = data.withType(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.VILLAGER_TYPE)
+                .getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.VILLAGER_TYPE, net.minecraft.resources.Identifier.fromNamespaceAndPath("minecraft", type))));
+        }
+        villager.setVillagerData(data);
+        return sbText(villager.getOffers());
+    }
+
+    private static java.util.List<String> sbText(net.minecraft.world.item.trading.MerchantOffers offers) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (net.minecraft.world.item.trading.MerchantOffer offer : offers) {
+            StringBuilder text = new StringBuilder();
+            text.append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.getResult().getItem())).append(" x").append(offer.getResult().getCount());
+            text.append(" <- ").append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.getBaseCostA().getItem())).append(" x").append(offer.getBaseCostA().getCount());
+            if (!offer.getCostB().isEmpty()) {
+                text.append(" + ").append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.getCostB().getItem())).append(" x").append(offer.getCostB().getCount());
+            }
+            text.append(" max ").append(offer.getMaxUses()).append(" xp ").append(offer.getXp());
+            out.add(text.toString());
+        }
+        return out;
     }
 }

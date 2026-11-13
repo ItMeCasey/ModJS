@@ -95,20 +95,38 @@ public final class TradeData {
 
     /** Writes the trade files and tags for every request scripts made. Does nothing when there are none. */
     public static void writeTo(GeneratedData data) {
-        writeTo(data, TradeOps.snapshot(), TradeData::originalPool);
+        writeTo(data, TradeOps.snapshot(), TradeData::originalPool, TradeSpec.Style.current());
     }
 
-    /** The entries of the original tag of a level, from the jars. */
+    /**
+     * The entries of the original tag of a level, from the jars. Entries that name another tag (such as {@code #minecraft:common_smith/level_1}) are
+     * replaced by what that tag holds, so scripts can remove trades that the profession shares with others.
+     */
     private static List<String> originalPool(String profession, int level) {
         List<String> out = new ArrayList<>();
-        for (JsonElement entry : TagSources.mergedValues("villager_trade", namespace(profession), path(profession) + "/" + TradeOps.levelName(profession, level))) {
-            out.add(TagSources.entryId(entry));
-        }
+        expand(namespace(profession), path(profession) + "/" + TradeOps.levelName(profession, level), out, 0);
         return out;
+    }
+
+    private static void expand(String namespace, String path, List<String> out, int depth) {
+        for (JsonElement entry : TagSources.mergedValues("villager_trade", namespace, path)) {
+            String id = TagSources.entryId(entry);
+            if (id.startsWith("#") && depth < 8) {
+                String tag = id.substring(1);
+                int colon = tag.indexOf(':');
+                expand(colon < 0 ? "minecraft" : tag.substring(0, colon), colon < 0 ? tag : tag.substring(colon + 1), out, depth + 1);
+            } else if (!out.contains(id)) {
+                out.add(id);
+            }
+        }
     }
 
     /** The same with the original pools given, so tests do not need the game jars. */
     static void writeTo(GeneratedData data, List<TradeOps.Op> ops, java.util.function.BiFunction<String, Integer, List<String>> original) {
+        writeTo(data, ops, original, TradeSpec.Style.V26_3);
+    }
+
+    static void writeTo(GeneratedData data, List<TradeOps.Op> ops, java.util.function.BiFunction<String, Integer, List<String>> original, TradeSpec.Style style) {
         if (ops.isEmpty()) {
             return;
         }
@@ -132,9 +150,9 @@ public final class TradeData {
                     case CLEAR -> p.entries.clear();
                     case REPLACE -> {
                         p.entries.clear();
-                        addAll(p, op, level, generated, counters);
+                        addAll(p, op, level, generated, counters, style);
                     }
-                    case ADD -> addAll(p, op, level, generated, counters);
+                    case ADD -> addAll(p, op, level, generated, counters, style);
                     case REMOVE -> {
                         final int levelNow = level;
                         p.entries.removeIf(entry -> {
@@ -163,12 +181,12 @@ public final class TradeData {
         });
     }
 
-    private static void addAll(Pool pool, TradeOps.Op op, int level, Map<String, JsonObject> generated, Map<String, Integer> counters) {
+    private static void addAll(Pool pool, TradeOps.Op op, int level, Map<String, JsonObject> generated, Map<String, Integer> counters, TradeSpec.Style style) {
         for (TradeSpec spec : op.trades()) {
             String base = "modjs:villagers/" + namespace(op.profession()) + "/" + path(op.profession()) + "/" + TradeOps.levelName(op.profession(), level);
             int n = counters.merge(base, 1, Integer::sum);
             String id = base + "/" + n;
-            generated.put(id, spec.toJson());
+            generated.put(id, spec.toJson(style));
             pool.entries.add(id);
         }
     }

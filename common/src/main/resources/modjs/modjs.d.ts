@@ -682,6 +682,55 @@ declare const Network: {
   sendToAll(channel: string, data: any): void;
 };
 
+/** A trade for Villagers.addTrade and replaceTrades. */
+interface VillagerTrade {
+  /** The result: 'minecraft:diamond', '3x minecraft:diamond', Item.of(...) or { item, count, components, nbt }. */
+  give: string | { item: string; count?: number; components?: Record<string, any>; nbt?: string | Record<string, any> };
+  /** One cost, or a list of one or two costs ('8x minecraft:emerald'). */
+  want: string | { item: string; count?: number } | Array<string | { item: string; count?: number }>;
+  /** Trades before a restock (default 12). */
+  maxUses?: number;
+  /** Experience for the villager (default 1). */
+  xp?: number;
+  /** Price change from demand and reputation (default 0.05). */
+  priceMultiplier?: number;
+  /** Starting demand (1.20.1 and 1.21.1 only). */
+  demand?: number;
+  /** Only villagers of these types are offered the trade. */
+  villagerType?: string | string[];
+  /** Only villagers standing in these biomes. */
+  biome?: string | string[];
+  /** Runs when a villager rolls the trade (1.20.1 and 1.21.1 only). */
+  when?: (trade: any, villager: any) => boolean;
+}
+
+/** What a removeTrades function receives. */
+interface VillagerTradeView {
+  profession: string;
+  level: number;
+  /** The trade's own id (26.x), else an empty text. */
+  id: string;
+  give: { id: string; count: number };
+  want: Array<{ id: string; count: number }>;
+  maxUses: number;
+  xp: number;
+}
+
+/** Selects trades to remove: a function, or fields that must all match ('*' is a wildcard in ids). */
+type VillagerTradeFilter = ((trade: VillagerTradeView) => boolean) | { level?: number; give?: string; want?: string; id?: string };
+
+/** Changes the trades of professions and of the wandering trader (minecraft:wandering_trader: level 1 common, 2 rare, 3 buying on 26.x). */
+declare const Villagers: {
+  addTrade(profession: string, level: number, trade: VillagerTrade): void;
+  addTrades(profession: string, level: number, trades: VillagerTrade[]): void;
+  /** The pool of the level becomes exactly these trades. */
+  replaceTrades(profession: string, level: number, trades: VillagerTrade[]): void;
+  removeTrades(profession: string, filter: VillagerTradeFilter): void;
+  removeTrades(profession: string, level: number, filter: VillagerTradeFilter): void;
+  /** Removes every trade of the profession. */
+  clearTrades(profession: string): void;
+};
+
 /** One entry of a config schema, made by Config.number, Config.integer, Config.bool, Config.string, Config.choice, Config.list or Config.group. */
 interface ConfigEntry<T> {
   readonly __configType?: T;
