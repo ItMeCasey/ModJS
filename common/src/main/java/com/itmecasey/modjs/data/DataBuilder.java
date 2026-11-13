@@ -63,6 +63,10 @@ public final class DataBuilder {
             tags.writeTo(data);
         }
 
+        if (com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 1)) {
+            com.itmecasey.modjs.villager.TradeData.writeTo(data);
+        }
+
         EventGroups.SERVER.post("blockLootTables", new LootEventJS("blocks", "minecraft:block", data));
         EventGroups.SERVER.post("entityLootTables", new LootEventJS("entities", "minecraft:entity", data));
         EventGroups.SERVER.post("chestLootTables", new LootEventJS("chests", "minecraft:chest", data));

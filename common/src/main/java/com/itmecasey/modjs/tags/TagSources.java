@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 /** Reads the tag files that ship inside the game and mod jars, so removals can be computed. */
-final class TagSources {
+public final class TagSources {
     private static final Logger LOGGER = LoggerFactory.getLogger("modjs");
 
     private TagSources() {
     }
 
     /** The id an entry stands for: the string itself, or the {@code id} of an object entry. */
-    static String entryId(JsonElement entry) {
+    public static String entryId(JsonElement entry) {
         if (entry.isJsonPrimitive()) {
             return entry.getAsString();
         }
@@ -37,7 +37,7 @@ final class TagSources {
     }
 
     /** Every copy of the tag found on the class path, merged the way the game merges data packs. */
-    static List<JsonElement> mergedValues(String registry, String namespace, String path) {
+    public static List<JsonElement> mergedValues(String registry, String namespace, String path) {
         String resource = "data/" + namespace + "/" + com.itmecasey.modjs.format.DataFolders.tags(registry) + "/" + path + ".json";
         Map<String, JsonElement> merged = new LinkedHashMap<>();
         for (ClassLoader loader : new ClassLoader[] {Thread.currentThread().getContextClassLoader(), TagSources.class.getClassLoader()}) {

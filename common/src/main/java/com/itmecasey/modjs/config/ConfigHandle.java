@@ -177,7 +177,7 @@ public final class ConfigHandle extends ScriptableObject {
     }
 
     /** Plain Java values as script values: numbers, booleans, text, arrays and objects. */
-    static Object plain(Object value, Scriptable scope) {
+    public static Object plain(Object value, Scriptable scope) {
         if (value instanceof Long l) {
             return l.doubleValue();
         }

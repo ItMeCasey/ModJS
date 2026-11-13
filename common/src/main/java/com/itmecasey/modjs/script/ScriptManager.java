@@ -112,6 +112,7 @@ public final class ScriptManager {
         loadedCount = 0;
         EventGroups.clear(type);
         com.itmecasey.modjs.config.ConfigManager.scriptsReloading(type);
+        com.itmecasey.modjs.villager.TradeOps.scriptsReloading(type);
         if (type == ScriptType.CLIENT) {
             com.itmecasey.modjs.client.overlay.Overlay.clear();
         }
