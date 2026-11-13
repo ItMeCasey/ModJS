@@ -1,0 +1,92 @@
+{
+  "name": "modjs",
+  "displayName": "ModJS",
+  "description": "IntelliSense for ModJS Minecraft scripts: typings, ids, tags, recipes and language keys from a dump of the running game.",
+  "version": "2026.11.37",
+  "publisher": "itmecasey",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#3a3658",
+    "theme": "dark"
+  },
+  "keywords": [
+    "modjs",
+    "minecraft",
+    "mod",
+    "forge",
+    "neoforge",
+    "javascript",
+    "intellisense",
+    "scripting"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ItMeCasey/ModJS.git",
+    "directory": "vscode-modjs"
+  },
+  "bugs": {
+    "url": "https://github.com/ItMeCasey/ModJS/issues"
+  },
+  "homepage": "https://itmecasey.com/wiki/modjs/",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "main": "./out/src/extension.js",
+  "activationEvents": [
+    "workspaceContains:**/modjs/jsconfig.json",
+    "workspaceContains:**/modjs/probe/**",
+    "workspaceContains:probe/modjs.d.ts",
+    "workspaceContains:probe/data/meta.json"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "modjs.refreshDump",
+        "title": "ModJS: Refresh dump"
+      },
+      {
+        "command": "modjs.setupProject",
+        "title": "ModJS: Set up project"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "javascript",
+        "path": "./snippets/modjs.code-snippets"
+      }
+    ],
+    "configuration": {
+      "title": "ModJS",
+      "properties": {
+        "modjs.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report unknown ids and unknown event names."
+        },
+        "modjs.completion.limit": {
+          "type": "number",
+          "default": 4000,
+          "description": "The most ids one completion list returns."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "test": "tsc -p . && node --test out/test/core.test.js",
+    "package": "npm run compile && vsce package --no-dependencies",
+    "ci": "npm ci && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "1.75.0",
+    "@vscode/vsce": "^3.2.0",
+    "typescript": "^5.4.0"
+  }
+}

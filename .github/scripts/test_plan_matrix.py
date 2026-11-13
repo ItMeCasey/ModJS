@@ -94,6 +94,43 @@ class SyntheticChanges(unittest.TestCase):
             self.assertIn("any=false", text)
 
 
+class ExtensionChanges(unittest.TestCase):
+    def test_extension_files_build_no_game_module(self):
+        files = ["vscode-modjs/package.json", "vscode-modjs/src/core/dump.ts", "vscode-modjs/README.md", "vscode-modjs/icon.png"]
+        self.assertEqual(pm.plan_build(files), [])
+        self.assertTrue(pm.plan_extension(files))
+
+    def test_extension_files_next_to_a_module_change_select_only_that_module(self):
+        files = ["vscode-modjs/src/extension.ts", "forge-1.21.1/gradle.properties"]
+        self.assertEqual(names(pm.plan_build(files)), ["forge-1.21.1"])
+        self.assertTrue(pm.plan_extension(files))
+
+    def test_game_and_docs_changes_do_not_run_the_extension_check(self):
+        self.assertFalse(pm.plan_extension(["common/src/main/java/A.java", "docs/REFERENCE.md", ".github/workflows/release.yml"]))
+        self.assertFalse(pm.plan_extension([]))
+
+    def test_unknown_diff_runs_the_extension_check(self):
+        self.assertTrue(pm.plan_extension(None))
+
+    def test_output_has_the_extension_flag_in_build_mode_only(self):
+        script = os.path.join(ROOT, ".github", "scripts", "plan_matrix.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "out.txt")
+            env = dict(os.environ, GITHUB_OUTPUT=out)
+            run = subprocess.run([sys.executable, "-I", script, "build", "--files", "vscode-modjs/package.json"],
+                                 cwd=ROOT, env=env, capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            text = open(out, encoding="utf-8").read()
+            self.assertIn("any=false", text)
+            self.assertIn("extension=true", text)
+            out2 = os.path.join(tmp, "out2.txt")
+            env = dict(os.environ, GITHUB_OUTPUT=out2)
+            run = subprocess.run([sys.executable, "-I", script, "release", "--tag", "v" + pm.plan_release("")[0]],
+                                 cwd=ROOT, env=env, capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertNotIn("extension=", open(out2, encoding="utf-8").read())
+
+
 class RealCommits(unittest.TestCase):
     def test_status_only_commit(self):
         self.assertEqual(pm.plan_build(git_diff("b64fbce^", "b64fbce")), [])

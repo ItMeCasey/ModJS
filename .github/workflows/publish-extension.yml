@@ -1,0 +1,50 @@
+name: publish-extension
+
+# Manual only. Publishes the VS Code extension in vscode-modjs/ to the Visual Studio Marketplace (needs the repository secret
+# VSCE_PAT) and to Open VSX (needs OVSX_PAT). A store whose secret does not exist is skipped. The secrets are created by the
+# repository owner; see docs/VSCODE_EXTENSION.md.
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to the stores whose secret exists (off only builds the package)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode-modjs
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vscode-modjs/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run package
+      - name: Visual Studio Marketplace
+        if: inputs.publish
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then echo "VSCE_PAT is not set; skipping the Visual Studio Marketplace."; exit 0; fi
+          npx vsce publish --packagePath ./*.vsix
+      - name: Open VSX
+        if: inputs.publish
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then echo "OVSX_PAT is not set; skipping Open VSX."; exit 0; fi
+          npx --yes ovsx publish ./*.vsix
+      - uses: actions/upload-artifact@v5
+        with:
+          name: vscode-modjs
+          path: vscode-modjs/*.vsix

@@ -4,7 +4,8 @@
   plan_matrix.py build   [--before SHA] [--sha SHA] [--files F ...]   builds affected by the changed files
   plan_matrix.py release --tag vYYYY.M.N                              builds whose own mod_version equals the tag
 
-Writes `matrix=<json>` and `any=true|false` to $GITHUB_OUTPUT (and prints them).
+Writes `matrix=<json>` and `any=true|false` to $GITHUB_OUTPUT (and prints them). In build mode it also writes
+`extension=true|false`: true when a changed file is under vscode-modjs/ (the VS Code extension, which no game build uses).
 
 How ModJS shares code (checked against every module's build.gradle):
   <loader>-<mc>/     one module, its own folder
@@ -41,7 +42,7 @@ ZERO = "0" * 40
 
 # Folders that no jar is built from.
 NO_BUILD_PREFIXES = (
-    "docs/", "branding/", "curseforge/", "scripts/", "release/", "logs/", "dist/",
+    "docs/", "branding/", "curseforge/", "scripts/", "release/", "logs/", "dist/", "vscode-modjs/",
     ".github/ISSUE_TEMPLATE/", ".github/workflows/", ".github/scripts/",
 )
 NO_BUILD_ROOT_FILES = {".gitignore", "LICENSE", "README.md", "CHANGELOG.md", "PROJECT_STATUS.md"}
@@ -95,6 +96,13 @@ def plan_build(files):
     return [m for m in ALL if m[0] in picked]
 
 
+def plan_extension(files):
+    """True when the VS Code extension needs its own check (None means the list is unknown)."""
+    if files is None:
+        return True
+    return any(f.replace("\\", "/").lstrip("./").startswith("vscode-modjs/") for f in files)
+
+
 def module_version(module, root="."):
     try:
         with open(os.path.join(root, module, "gradle.properties"), encoding="utf-8") as fh:
@@ -123,9 +131,11 @@ def plan_release(tag, root="."):
     return version, picked
 
 
-def emit(picked):
+def emit(picked, extension=None):
     matrix = {"include": [{"module": m, "java": j} for m, j in picked]}
     lines = [f"matrix={json.dumps(matrix)}", f"any={'true' if picked else 'false'}"]
+    if extension is not None:
+        lines.append(f"extension={'true' if extension else 'false'}")
     print("\n".join(lines))
     print("builds:", ", ".join(m for m, _ in picked) or "none")
     out = os.environ.get("GITHUB_OUTPUT")
@@ -151,6 +161,8 @@ def main(argv=None):
     else:
         files = args.files if args.files is not None else changed_files(args.before, args.sha)
         picked = plan_build(files)
+        emit(picked, plan_extension(files))
+        return
     emit(picked)
 
 
