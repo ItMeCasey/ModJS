@@ -510,6 +510,15 @@ public final class SelfTest {
         java.util.List<String> sbLibrarian = sbOffers(level, net.minecraft.world.entity.npc.villager.VillagerProfession.LIBRARIAN, null);
         check("villagers: clearTrades leaves a librarian without trades (" + sbLibrarian + ")", sbLibrarian.isEmpty());
 
+        // a custom villager profession: registered, its job site block belongs to its point of interest, and a villager of it rolls the trades of level 1
+        boolean sbProfession = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.VILLAGER_PROFESSION).get(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.VILLAGER_PROFESSION, net.minecraft.resources.Identifier.fromNamespaceAndPath("modjs_test", "smith"))).isPresent();
+        var sbPoi = net.minecraft.world.entity.ai.village.poi.PoiTypes.forState(net.minecraft.world.level.block.Blocks.CRAFTING_TABLE.defaultBlockState());
+        boolean sbPoiOk = sbPoi.isPresent() && sbPoi.get().is(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.POINT_OF_INTEREST_TYPE, net.minecraft.resources.Identifier.fromNamespaceAndPath("modjs_test", "smith")));
+        java.util.List<String> sbSmith = sbProfession ? sbOffers(level, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.VILLAGER_PROFESSION, net.minecraft.resources.Identifier.fromNamespaceAndPath("modjs_test", "smith")), null) : java.util.List.of();
+        check("villagers: a registered profession has its job site (profession " + sbProfession + ", job site " + sbPoiOk + ") and its level 1 trades (" + sbSmith + ")",
+            sbProfession && sbPoiOk && sbSmith.size() == 2 && sbSmith.contains("minecraft:iron_pickaxe x1 <- minecraft:emerald x4 max 5 xp 3")
+            && sbSmith.contains("minecraft:iron_axe x1 <- minecraft:emerald x2 + minecraft:stick x1 max 12 xp 1"));
+
         Integer copperColor = com.itmecasey.modjs.unify.ColorSampler.sample("copper");
         LOGGER.info("SELFTEST sampled copper color {}", copperColor == null ? "none" : Integer.toHexString(copperColor));
         check("Unify samples a material color from the game's textures", copperColor != null);

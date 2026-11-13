@@ -719,6 +719,35 @@ interface VillagerTradeView {
 /** Selects trades to remove: a function, or fields that must all match ('*' is a wildcard in ids). */
 type VillagerTradeFilter = ((trade: VillagerTradeView) => boolean) | { level?: number; give?: string; want?: string; id?: string };
 
+/** Options of Villagers.profession (startup scripts). */
+interface VillagerProfessionOptions {
+  /** The block or blocks a villager works at (required). */
+  jobSite: string | string[];
+  secondarySite?: string | string[];
+  /** Items the villager picks up from the ground. */
+  requests?: string | string[];
+  /** A sound event id played at the job site. */
+  workSound?: string;
+  /** The displayed name (default: the id, capitalized). */
+  name?: string;
+  /** The vanilla profession skin to copy (default 'minecraft:nitwit'). */
+  texture?: string;
+  /** The trades of each level, 1 to 5. */
+  trades?: { [level: number]: VillagerTrade[] };
+}
+
+/** What StartupEvents.registry('villager_profession', ...) creates. */
+interface VillagerProfessionBuilder {
+  jobSite(...blocks: string[]): VillagerProfessionBuilder;
+  secondarySite(...blocks: string[]): VillagerProfessionBuilder;
+  requests(...items: string[]): VillagerProfessionBuilder;
+  workSound(sound: string): VillagerProfessionBuilder;
+  name(name: string): VillagerProfessionBuilder;
+  texture(base: string): VillagerProfessionBuilder;
+  trade(level: number, trade: VillagerTrade): VillagerProfessionBuilder;
+  trades(level: number, trades: VillagerTrade[]): VillagerProfessionBuilder;
+}
+
 /** Changes the trades of professions and of the wandering trader (minecraft:wandering_trader: level 1 common, 2 rare, 3 buying on 26.x). */
 declare const Villagers: {
   addTrade(profession: string, level: number, trade: VillagerTrade): void;
@@ -729,6 +758,8 @@ declare const Villagers: {
   removeTrades(profession: string, level: number, filter: VillagerTradeFilter): void;
   /** Removes every trade of the profession. */
   clearTrades(profession: string): void;
+  /** Registers a villager profession (startup scripts). */
+  profession(id: string, options: VillagerProfessionOptions): void;
 };
 
 /** One entry of a config schema, made by Config.number, Config.integer, Config.bool, Config.string, Config.choice, Config.list or Config.group. */

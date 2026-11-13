@@ -190,4 +190,25 @@ public final class TradeData {
             pool.entries.add(id);
         }
     }
+
+    /** The trade sets of custom professions (26.x): one per level, reading the tag {@code <profession>/level_N}, which is made empty when nothing fills it. */
+    public static void writeProfessions(GeneratedData data, java.util.Collection<com.itmecasey.modjs.registry.ProfessionBuilderJS> professions) {
+        String folder = DataFolders.tags("villager_trade");
+        for (com.itmecasey.modjs.registry.ProfessionBuilderJS profession : professions) {
+            for (int level = 1; level <= 5; level++) {
+                String name = profession.id() + "/level_" + level;
+                JsonObject set = new JsonObject();
+                set.addProperty("amount", 2);
+                set.addProperty("random_sequence", profession.namespace() + ":trade_set/" + name);
+                set.addProperty("trades", "#" + profession.namespace() + ":" + name);
+                data.putJson(profession.namespace(), "trade_set/" + name, set);
+                if (!data.has(profession.namespace(), folder + "/" + name + ".json")) {
+                    JsonObject tag = new JsonObject();
+                    tag.addProperty("replace", false);
+                    tag.add("values", new JsonArray());
+                    data.putJson(profession.namespace(), folder + "/" + name, tag);
+                }
+            }
+        }
+    }
 }

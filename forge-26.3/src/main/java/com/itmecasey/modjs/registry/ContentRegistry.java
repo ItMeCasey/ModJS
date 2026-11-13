@@ -194,6 +194,7 @@ public final class ContentRegistry {
         if (!CONTAINER_BLOCKS.isEmpty() || !SCRIPT_BLOCKS.isEmpty()) {
             BLOCK_ENTITIES.register(modBusGroup);
         }
+        ProfessionRegistry.register(modBusGroup);
         MENUS.registerAll(r -> r.register(modBusGroup));
         TABS.registerAll(r -> r.register(modBusGroup));
         BLOCKS.registerAll(r -> r.register(modBusGroup));

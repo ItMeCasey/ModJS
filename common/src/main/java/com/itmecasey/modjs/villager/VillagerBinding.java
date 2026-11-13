@@ -123,4 +123,69 @@ public final class VillagerBinding {
     public int getPending() {
         return TradeOps.snapshot().size();
     }
+
+    /**
+     * Registers a villager profession (startup scripts):
+     * {@code Villagers.profession('mypack:smith', { jobSite: 'minecraft:smithing_table', workSound: 'minecraft:entity.villager.work_toolsmith', trades: { 1: [...] } })}.
+     * The same builder is available as {@code StartupEvents.registry('villager_profession', event => event.create('mypack:smith'))}.
+     */
+    public void profession(String id, Object options) {
+        String where = "Villagers.profession";
+        if (type(where) != ScriptType.STARTUP) {
+            throw Context.reportRuntimeError(where + ": professions are registered from startup scripts");
+        }
+        com.itmecasey.modjs.registry.ProfessionBuilderJS builder;
+        try {
+            builder = com.itmecasey.modjs.registry.ProfessionBuilderJS.of(id);
+        } catch (IllegalArgumentException e) {
+            throw Context.reportRuntimeError(where + ": " + e.getMessage());
+        }
+        Object plain = JsonUtil.unwrap(options);
+        builder.jobSite(strings(plain, "jobSite", where));
+        builder.secondarySite(strings(plain, "secondarySite", where));
+        builder.requests(strings(plain, "requests", where));
+        String sound = JsonUtil.asString(JsonUtil.property(plain, "workSound"));
+        if (sound != null) {
+            builder.workSound(sound);
+        }
+        String name = JsonUtil.asString(JsonUtil.property(plain, "name"));
+        if (name != null) {
+            builder.name(name);
+        }
+        String texture = JsonUtil.asString(JsonUtil.property(plain, "texture"));
+        if (texture != null) {
+            builder.texture(texture);
+        }
+        Object trades = JsonUtil.property(plain, "trades");
+        if (trades != null) {
+            for (int level = 1; level <= 5; level++) {
+                // keys such as 1 are array-style indexes in script objects, so they are read by number first
+                Object list = trades instanceof org.mozilla.javascript.Scriptable object ? object.get(level, object) : null;
+                if (list == null || list == org.mozilla.javascript.Scriptable.NOT_FOUND) {
+                    list = JsonUtil.property(trades, String.valueOf(level));
+                }
+                if (list != null) {
+                    builder.trades(level, list);
+                }
+            }
+        }
+        com.itmecasey.modjs.registry.RegistryManager.addProfession(builder);
+    }
+
+    private static String[] strings(Object options, String key, String where) {
+        Object raw = JsonUtil.property(options, key);
+        if (raw == null) {
+            return new String[0];
+        }
+        Object plain = JsonUtil.unwrap(raw);
+        List<?> items = plain instanceof List<?> list ? list : List.of(plain);
+        String[] out = new String[items.size()];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = JsonUtil.asString(items.get(i));
+            if (out[i] == null) {
+                throw Context.reportRuntimeError(where + ": '" + key + "' takes ids as text");
+            }
+        }
+        return out;
+    }
 }

@@ -24,6 +24,8 @@ public final class RegistryManager {
     private static final Map<String, ArmorMaterialBuilderJS> ARMOR_MATERIALS = new LinkedHashMap<>();
     private static final Map<String, FluidBuilderJS> FLUIDS = new LinkedHashMap<>();
     private static final Map<String, CreativeTabBuilderJS> TABS = new LinkedHashMap<>();
+    private static final Map<String, ProfessionBuilderJS> PROFESSIONS = new LinkedHashMap<>();
+    private static final Map<String, ProfessionBuilderJS> DIRECT_PROFESSIONS = new LinkedHashMap<>();
     private static final Map<String, com.itmecasey.modjs.unify.UnifyMaterials.Entry> UNIFY_ENTRIES = new LinkedHashMap<>();
     private static boolean contributorsInstalled;
     private static boolean UNIFY_FILE_READ;
@@ -39,6 +41,7 @@ public final class RegistryManager {
         FLUIDS.clear();
         TIERS.clear();
         ARMOR_MATERIALS.clear();
+        PROFESSIONS.clear();
         UNIFY_ENTRIES.clear();
         com.itmecasey.modjs.item.ItemModifications.clear();
         com.itmecasey.modjs.block.BlockModifications.clear();
@@ -50,6 +53,8 @@ public final class RegistryManager {
         EventGroups.STARTUP.postExact("registry", "fluid", new RegistryEventJS<>("fluid", FLUIDS, FluidBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "block", new RegistryEventJS<>("block", BLOCKS, BlockBuilderJS::new));
         EventGroups.STARTUP.postExact("registry", "item", new RegistryEventJS<>("item", ITEMS, ItemBuilderJS::new));
+        EventGroups.STARTUP.postExact("registry", "villager_profession", new RegistryEventJS<>("villager profession", PROFESSIONS, ProfessionBuilderJS::new));
+        collectProfessions();
         for (BlockBuilderJS block : BLOCKS.values()) {
             if (!block.isNoItem() && ITEMS.remove(block.fullId()) != null) {
                 com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.STARTUP)
@@ -81,6 +86,48 @@ public final class RegistryManager {
             DataBuilder.addClientContributor(RegistryManager::writeAssets);
             DataBuilder.addServerContributor(RegistryManager::writeData);
         }
+    }
+
+    /** {@code Villagers.profession(...)} in a startup script: collected next to the ones made in the registry event. */
+    public static synchronized void addProfession(ProfessionBuilderJS profession) {
+        if (DIRECT_PROFESSIONS.containsKey(profession.fullId())) {
+            throw org.mozilla.javascript.Context.reportRuntimeError("Duplicate villager profession id '" + profession.fullId() + "'");
+        }
+        DIRECT_PROFESSIONS.put(profession.fullId(), profession);
+    }
+
+    private static void collectProfessions() {
+        for (ProfessionBuilderJS direct : DIRECT_PROFESSIONS.values()) {
+            if (PROFESSIONS.containsKey(direct.fullId())) {
+                com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.STARTUP).addError("Duplicate villager profession id '" + direct.fullId() + "'");
+            } else {
+                PROFESSIONS.put(direct.fullId(), direct);
+            }
+        }
+        PROFESSIONS.values().removeIf(profession -> {
+            String problem = profession.problem();
+            if (problem != null) {
+                com.itmecasey.modjs.script.ScriptManager.of(com.itmecasey.modjs.script.ScriptType.STARTUP).addError(problem);
+                return true;
+            }
+            return false;
+        });
+        java.util.List<com.itmecasey.modjs.villager.TradeOps.Op> trades = new java.util.ArrayList<>();
+        for (ProfessionBuilderJS profession : PROFESSIONS.values()) {
+            profession.tradesByLevel().forEach((level, specs) -> trades.add(new com.itmecasey.modjs.villager.TradeOps.Op(
+                com.itmecasey.modjs.villager.TradeOps.Kind.ADD, profession.fullId(), level, specs, null, null)));
+        }
+        com.itmecasey.modjs.villager.TradeOps.setProfessionOps(trades);
+    }
+
+    /** Forgets every profession (tests). */
+    public static synchronized void forgetProfessions() {
+        PROFESSIONS.clear();
+        DIRECT_PROFESSIONS.clear();
+    }
+
+    public static Collection<ProfessionBuilderJS> professions() {
+        return PROFESSIONS.values();
     }
 
     /** Registers the canonical items {@code Unify.materials} asked for, unless a script already made the same id. */
@@ -209,6 +256,13 @@ public final class RegistryManager {
                 data.putBytes(NAMESPACE, path, com.itmecasey.modjs.unify.UnifyMaterials.texture(entry.kind(), entry.color()));
             }
         }
+        for (ProfessionBuilderJS profession : PROFESSIONS.values()) {
+            JsonObject names = lang(langs, profession.namespace());
+            names.addProperty("entity." + profession.namespace() + ".villager." + profession.id(), profession.displayName());
+            names.addProperty("entity.minecraft.villager." + profession.id(), profession.displayName());
+            names.addProperty("entity.minecraft.villager." + profession.namespace() + "." + profession.id(), profession.displayName());
+            ProfessionAssets.copyTexture(data, profession);
+        }
         for (Map.Entry<String, JsonObject> entry : langs.entrySet()) {
             if (entry.getValue().size() > 0) {
                 data.putJson(entry.getKey(), "lang/en_us", entry.getValue());
@@ -226,6 +280,9 @@ public final class RegistryManager {
     }
 
     static void writeData(GeneratedData data) {
+        if (!PROFESSIONS.isEmpty() && com.itmecasey.modjs.script.PlatformBinding.atLeast(26, 1)) {
+            com.itmecasey.modjs.villager.TradeData.writeProfessions(data, PROFESSIONS.values());
+        }
         Map<String, java.util.List<String>> itemTags = new LinkedHashMap<>();
         Map<String, java.util.List<String>> blockTags = new LinkedHashMap<>();
         for (ItemBuilderJS item : ITEMS.values()) {

@@ -169,6 +169,7 @@ public final class ContentRegistry {
             });
             BLOCK_ENTITIES_SCRIPT.register(modBus);
         }
+        ProfessionRegistry.register(modBus);
         MENUS.registerAll(r -> r.register(modBus));
         TABS.registerAll(r -> r.register(modBus));
         BLOCKS.registerAll(r -> r.register(modBus));

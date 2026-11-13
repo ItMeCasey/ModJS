@@ -28,6 +28,8 @@ public final class TradeOps {
     public static final String WANDERING_TRADER = "minecraft:wandering_trader";
 
     private static final List<Op> OPS = new ArrayList<>();
+    /** The trades of registered professions: kept when scripts run again, and applied before the requests of scripts. */
+    private static List<Op> PROFESSION_OPS = List.of();
 
     private TradeOps() {
     }
@@ -37,11 +39,18 @@ public final class TradeOps {
     }
 
     public static synchronized List<Op> snapshot() {
-        return new ArrayList<>(OPS);
+        List<Op> all = new ArrayList<>(PROFESSION_OPS);
+        all.addAll(OPS);
+        return all;
     }
 
     public static synchronized boolean any() {
-        return !OPS.isEmpty();
+        return !OPS.isEmpty() || !PROFESSION_OPS.isEmpty();
+    }
+
+    /** Sets the trades of the registered professions (replacing the ones of an earlier call). */
+    public static synchronized void setProfessionOps(List<Op> ops) {
+        PROFESSION_OPS = List.copyOf(ops);
     }
 
     /** A script type runs again: its requests are made again by its scripts. */
@@ -51,6 +60,7 @@ public final class TradeOps {
 
     public static synchronized void clear() {
         OPS.clear();
+        PROFESSION_OPS = List.of();
     }
 
     public static boolean isWandering(String profession) {
