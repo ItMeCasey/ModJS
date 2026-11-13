@@ -142,6 +142,10 @@ def main():
             parser.error("--collect needs --artifacts and --version")
         args.collect.mkdir(parents=True, exist_ok=True)
         for module in selected(args.version):
+            source = "forge-1.20.1" if module == "neoforge-1.20.1" else module  # NeoForge 1.20.1 ships the Forge 1.20.1 jar
+            if not (args.artifacts / f"jar-{source}").is_dir():
+                print(f"skip {module}: not built for this release")
+                continue
             jar = pick_jar(args.artifacts / f"jar-{module}", module, args.version)
             target = args.collect / clean_name(module, args.version)
             target.write_bytes(jar.read_bytes())
@@ -160,7 +164,8 @@ def main():
             continue
         folder = args.artifacts / f"jar-{module}"
         if not folder.is_dir():
-            sys.exit(f"Missing build folder {folder}")
+            print(f"skip {module}: not built for this release")
+            continue
         jar = pick_jar(folder, module, args.version)
         # CurseForge also wants an environment (Client and Server): ModJS runs on both.
         ids = [resolve(versions, minecraft), resolve(versions, loader), resolve(versions, "Client"), resolve(versions, "Server")]
@@ -174,6 +179,8 @@ def main():
             title = f"ModJS {args.version} (Forge and NeoForge {minecraft})"
         plan.append((module, jar, ids, title, clean_name(module, args.version)))
 
+    if not plan:
+        sys.exit("No build to upload: none of the selected modules has a built jar")
     for module, jar, ids, title, name in plan:
         print(f"{title}: {name} ({jar.stat().st_size // 1024} KiB) game version ids {ids}, {args.release_type}")
     if args.dry_run:

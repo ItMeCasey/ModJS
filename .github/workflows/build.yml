@@ -6,31 +6,27 @@ on:
   pull_request:
 
 jobs:
+  # Only the builds that the pushed files affect are built (see .github/scripts/plan_matrix.py); docs, status and workflow
+  # only pushes build nothing.
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      any: ${{ steps.plan.outputs.any }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - id: plan
+        env:
+          BEFORE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: python3 .github/scripts/plan_matrix.py build --before "$BEFORE" --sha "${{ github.sha }}"
   build:
+    needs: plan
+    if: needs.plan.outputs.any == 'true'
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - module: forge-26.3
-            java: 25
-          - module: neoforge-26.3
-            java: 25
-          - module: forge-26.2
-            java: 25
-          - module: neoforge-26.2
-            java: 25
-          - module: forge-26.1.2
-            java: 25
-          - module: forge-1.21.1
-            java: 21
-          - module: forge-1.20.1
-            java: 17
-          - module: neoforge-1.20.1
-            java: 17
-          - module: neoforge-1.21.1
-            java: 21
-          - module: neoforge-26.1.2
-            java: 25
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     runs-on: ubuntu-latest
     defaults:
       run:

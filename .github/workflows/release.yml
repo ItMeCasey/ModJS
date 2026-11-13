@@ -31,27 +31,9 @@ jobs:
       - uses: actions/checkout@v5
       - name: Pick the builds for this tag
         id: pick
-        run: |
-          versions=$(grep -h '^mod_version=' */gradle.properties | sed 's/^mod_version=//' | sort -uV)
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then version="${GITHUB_REF_NAME#v}"; else version=$(echo "$versions" | tail -n 1); fi
-          include=""
-          for file in */gradle.properties; do
-            module="${file%/gradle.properties}"
-            if [ "$(sed -n 's/^mod_version=//p' "$file")" = "$version" ]; then
-              case "$module" in
-                *-26.*) java=25 ;;
-                *-1.21.1) java=21 ;;
-                *-1.20.1) java=17 ;;
-                *) echo "unknown module $module"; exit 1 ;;
-              esac
-              include="$include{\"module\":\"$module\",\"java\":$java},"
-              echo "building $module (mod_version $version)"
-            else
-              echo "skipping $module: mod_version is not $version"
-            fi
-          done
-          if [ -z "$include" ]; then echo "No build has mod_version $version"; exit 1; fi
-          echo "matrix={\"include\":[${include%,}]}" >> "$GITHUB_OUTPUT"
+        # Builds the modules whose own mod_version equals the tag (the newest version on a manual run), plus the Forge 1.20.1
+        # jar whenever NeoForge 1.20.1 is released (that one file is uploaded for both). Fails when no build has the version.
+        run: python3 .github/scripts/plan_matrix.py release --tag "${GITHUB_REF_NAME}"
 
   build:
     needs: pick
