@@ -434,3 +434,8 @@ headless server with `-Dmodjs.selftest=true`, which posts real Forge events for 
 ### Loop-local variables in Rhino
 
 ModJS currently embeds Rhino 1.7.15 in interpreted ES6 mode. In that engine, a `const` declared inside a repeated loop block retains its first value on later iterations. Use `let` for values initialized inside `for` and `while` bodies. Top-level constants and constants in separately invoked functions do not have this loop behavior.
+
+## Dump and editor support
+
+`/modjs dump` writes the game's registries, tags, block states, recipes, command tree, game rules, mods and (from a client) language keys and resource pack file ids to `modjs/probe/data/*.json`, and typings built from them to `modjs/probe/*.d.ts` (`ids.d.ts`, `tags.d.ts`, `states.d.ts`, `recipes.d.ts`, `overloads.d.ts`, `api.d.ts`). Operators can run it, and anyone in single player. `vscode-modjs/` holds a VS Code extension that reads these files for completion, hover, go to definition and warnings for unknown ids and event names. The wiki page [[folder-layout]] has the file list.
+

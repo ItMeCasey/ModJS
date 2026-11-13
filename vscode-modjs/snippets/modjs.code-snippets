@@ -1,0 +1,86 @@
+{
+  "ModJS recipes event": {
+    "prefix": "modjs-recipes",
+    "body": ["ServerEvents.recipes(event => {", "\t$0", "});"],
+    "description": "ServerEvents.recipes"
+  },
+  "ModJS shaped recipe": {
+    "prefix": "modjs-shaped",
+    "body": [
+      "event.shaped('${1:minecraft:diamond}', [",
+      "\t'${2:AAA}',",
+      "\t'${3:A A}',",
+      "\t'${4:AAA}'",
+      "], { A: '${5:minecraft:coal}' });"
+    ],
+    "description": "event.shaped"
+  },
+  "ModJS shapeless recipe": {
+    "prefix": "modjs-shapeless",
+    "body": ["event.shapeless('${1:minecraft:diamond}', ['${2:minecraft:coal}', '${3:minecraft:coal}']);"],
+    "description": "event.shapeless"
+  },
+  "ModJS smelting recipe": {
+    "prefix": "modjs-smelting",
+    "body": ["event.smelting('${1:minecraft:glass}', '${2:minecraft:sand}').xp(${3:0.1});"],
+    "description": "event.smelting"
+  },
+  "ModJS remove recipe": {
+    "prefix": "modjs-remove",
+    "body": ["event.remove({ output: '${1:minecraft:torch}' });"],
+    "description": "event.remove"
+  },
+  "ModJS tags event": {
+    "prefix": "modjs-tags",
+    "body": ["ServerEvents.tags('${1:item}', event => {", "\tevent.add('${2:c:gems/ruby}', '${3:modjs:ruby}');", "});"],
+    "description": "ServerEvents.tags"
+  },
+  "ModJS startup item": {
+    "prefix": "modjs-item",
+    "body": [
+      "StartupEvents.registry('item', event => {",
+      "\tevent.create('${1:ruby}').displayName('${2:Ruby}');",
+      "});"
+    ],
+    "description": "StartupEvents.registry('item')"
+  },
+  "ModJS startup block": {
+    "prefix": "modjs-block",
+    "body": [
+      "StartupEvents.registry('block', event => {",
+      "\tevent.create('${1:ruby_block}').hardness(${2:5}).resistance(${3:6}).requiresTool(true);",
+      "});"
+    ],
+    "description": "StartupEvents.registry('block')"
+  },
+  "ModJS block broken": {
+    "prefix": "modjs-broken",
+    "body": ["BlockEvents.broken('${1:minecraft:stone}', event => {", "\t$0", "});"],
+    "description": "BlockEvents.broken"
+  },
+  "ModJS block right clicked": {
+    "prefix": "modjs-rightclicked",
+    "body": ["BlockEvents.rightClicked('${1:minecraft:stone}', event => {", "\t$0", "});"],
+    "description": "BlockEvents.rightClicked"
+  },
+  "ModJS player chat": {
+    "prefix": "modjs-chat",
+    "body": ["PlayerEvents.chat(event => {", "\t$0", "});"],
+    "description": "PlayerEvents.chat"
+  },
+  "ModJS item tooltip": {
+    "prefix": "modjs-tooltip",
+    "body": ["ItemEvents.tooltip(event => {", "\t$0", "});"],
+    "description": "ItemEvents.tooltip"
+  },
+  "ModJS language event": {
+    "prefix": "modjs-lang",
+    "body": ["ClientEvents.lang('${1:en_us}', event => {", "\tevent.add('${2:item.modjs.ruby}', '${3:Ruby}');", "});"],
+    "description": "ClientEvents.lang"
+  },
+  "ModJS command registry": {
+    "prefix": "modjs-commands",
+    "body": ["ServerEvents.commandRegistry(event => {", "\t$0", "});"],
+    "description": "ServerEvents.commandRegistry"
+  }
+}

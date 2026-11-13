@@ -109,6 +109,7 @@ tasks.withType(Test).configureEach {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
 }
 
 // neoforge.mods.toml is a template: this fills in its ${} values from gradle.properties.
