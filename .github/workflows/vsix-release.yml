@@ -1,0 +1,50 @@
+name: vsix-release
+
+# Builds the VS Code extension (vscode-modjs/) from a tag and attaches the .vsix to that tag's GitHub release.
+# The extension has its own version, so it does not have to equal the game version: the file is named modjs-<extension version>.vsix.
+# release.yml calls this once per tag release; it can also be run by hand for an existing tag. It builds no game module and uploads
+# nothing to CurseForge. A .vsix with the same name that is already on the release is replaced.
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag whose release gets the .vsix
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag (for example v2026.11.38) whose release gets the .vsix
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  vsix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vscode-modjs/package-lock.json
+      - name: Build and test the extension
+        working-directory: vscode-modjs
+        run: |
+          npm ci
+          npm test
+          npm run package
+      - name: Attach the .vsix to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          files=(vscode-modjs/modjs-*.vsix)
+          [ -e "${files[0]}" ] || { echo "::error::No .vsix was produced"; exit 1; }
+          echo "Attaching ${files[*]} to ${{ inputs.tag }}"
+          gh release upload "${{ inputs.tag }}" "${files[@]}" --clobber

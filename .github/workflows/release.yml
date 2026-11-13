@@ -138,39 +138,12 @@ jobs:
           name: release-jars
           path: dist/*.jar
 
-  # The VS Code extension (vscode-modjs/) is built once per release, not once per module, and attached to the GitHub release
-  # that the publish job created. It runs only when the extension's own version equals the tag version; no game module is built here.
+  # The VS Code extension (vscode-modjs/) is built once per tag release and its .vsix is attached to the GitHub release that the
+  # publish job created. The extension has its own version (the file is named after it), so it need not equal the tag version.
+  # Only a failed build fails this job. No game module is built here; vsix-release.yml also runs by hand for an existing tag.
   vsix:
     needs: publish
     if: github.ref_type == 'tag'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Compare the extension version with the tag
-        id: version
-        run: |
-          extension=$(node -p "require('./vscode-modjs/package.json').version")
-          if [ "$extension" = "${GITHUB_REF_NAME#v}" ]; then
-            echo "match=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "match=false" >> "$GITHUB_OUTPUT"
-            echo "Extension version $extension is not ${GITHUB_REF_NAME#v}; no .vsix is attached."
-          fi
-      - uses: actions/setup-node@v5
-        if: steps.version.outputs.match == 'true'
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: vscode-modjs/package-lock.json
-      - name: Build and test the extension
-        if: steps.version.outputs.match == 'true'
-        working-directory: vscode-modjs
-        run: |
-          npm ci
-          npm test
-          npm run package
-      - name: Attach the .vsix to the GitHub release
-        if: steps.version.outputs.match == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${GITHUB_REF_NAME}" vscode-modjs/*.vsix --clobber
+    uses: ./.github/workflows/vsix-release.yml
+    with:
+      tag: ${{ github.ref_name }}
