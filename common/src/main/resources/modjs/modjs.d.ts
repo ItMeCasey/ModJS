@@ -65,6 +65,9 @@ interface DataEvent extends EventBase {
 interface LangEvent extends EventBase {
   language: string;
   add(key: string, value: string): void;
+  renameItem(itemId: string, newName: string): void;
+  renameBlock(blockId: string, newName: string): void;
+  renameEntity(entityId: string, newName: string): void;
 }
 
 interface LootPool {
